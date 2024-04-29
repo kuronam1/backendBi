@@ -1,0 +1,11 @@
+env: "local"
+serverHTTP:
+  addr: "localhost:8080"
+  timeout: 4s
+  idleTimeout: 10s
+PG:
+  host: ""
+  port: ""
+  username: ""
+  password: ""
+  databaseName: ""
