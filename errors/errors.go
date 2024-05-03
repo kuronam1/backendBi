@@ -1,6 +1,7 @@
 package errors
 
 import (
+	"errors"
 	"log"
 	"log/slog"
 )
@@ -23,3 +24,5 @@ func Error(err error) slog.Attr {
 		Value: slog.StringValue(err.Error()),
 	}
 }
+
+var ErrNoRows = errors.New("sql: no rows in result set")

@@ -10,7 +10,8 @@ import (
 )
 
 var (
-	notValidRole = errors.New("role is not valid")
+	notValidLoginPass = errors.New("not valid data")
+	notValidRole      = errors.New("role is not valid")
 )
 
 func LoginCheck() gin.HandlerFunc {
@@ -79,3 +80,18 @@ func LoggingReq(l *slog.Logger) gin.HandlerFunc {
 		l.Info(fmt.Sprintf("recieved a req: Method - %s, Addr - %s", c.Request.Method, c.Request.URL.Path))
 	}
 }
+
+func CheckAdminAuth() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		token, err := c.Cookie("Authorization")
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+				"error": "Unauthorized",
+			})
+			return
+		}
+	}
+}
+
+//Действие - загрузка расписания (метод) (что надо с фронта)
+// + сделать функции под бд (отдельно от )

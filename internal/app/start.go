@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"sbitnev_back/errors"
 	"sbitnev_back/internal/config"
+	"sbitnev_back/internal/database/Store"
 	rt "sbitnev_back/internal/router/router"
 	"sbitnev_back/pkg/logging"
 	"sbitnev_back/pkg/server"
@@ -13,9 +14,20 @@ import (
 )
 
 func Run(cfg *config.Config) {
-	logger := logging.InitLogger(cfg.Env)
+	logger := logging.InitLogger(cfg.Env) // сделать свою обертку
 
-	router := rt.InitRouter(logger)
+	database, err := Store.InitStorage(cfg)
+	if err != nil {
+		logger.Error(fmt.Sprintf("[DB]: Error while initializing - %s", err))
+		os.Exit(1)
+	}
+
+	if err := database.PrepareTables(); err != nil {
+		logger.Error(fmt.Sprintf("[DB]: Error while initializing - %s", err))
+		os.Exit(1)
+	}
+
+	router := rt.InitRouter(logger, database) // расписать хендлеры + исправить ошибки из should be done
 
 	logger.Info(fmt.Sprintf("[Server] Starting server on port %s", cfg.Addr))
 	httpServer := server.New(router, cfg)
@@ -33,7 +45,7 @@ func Run(cfg *config.Config) {
 	}
 
 	logger.Error(fmt.Sprintf("[Server]: Shutting down http.Server in %.1f", cfg.ShutDownTimout.Seconds()))
-	err := httpServer.Shutdown()
+	err = httpServer.Shutdown()
 	if err != nil {
 		logger.Error(fmt.Sprintf("[Server] Stopped - http.Server.Shutdown: %s", errors.Error(err)))
 	}

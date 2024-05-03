@@ -1,12 +1,16 @@
 package user
 
-import "log/slog"
+import (
+	"log/slog"
+	"sbitnev_back/internal/database/Store"
+)
 
-type User struct {
-	Login    string `json:"login"`
-	Password string `json:"password"`
+type Userdata struct {
+	Login    string
+	Password string
 }
 
 type handler struct {
 	logger *slog.Logger
+	db     *Store.Storage
 }
