@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log/slog"
@@ -27,10 +28,10 @@ const (
 	parent          = "parent"
 )
 
-func NewHandler(logger *slog.Logger, db *Store.Storage) handlers.Handler {
+func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
 	return &handler{
-		logger: logger,
-		db:     db,
+		logger:  logger,
+		storage: store,
 	}
 }
 
@@ -41,7 +42,7 @@ func (h *handler) Register(router *gin.Engine) {
 	//router.POST(homePageUrl, h.FeedBack)
 
 	AdminMenuPath := router.Group("/admin")
-	AdminMenuPath.Use(middleware.LoginCheck(), middleware.RoleCheck())
+	AdminMenuPath.Use(middleware.CheckAdminAuth(h.storage))
 	AdminMenuPath.GET("/management")
 	AdminMenuPath.GET("/journal")
 	AdminMenuPath.GET("/schedule")
@@ -108,12 +109,12 @@ func (h *handler) UserIdent(c *gin.Context) {
 	login := c.PostForm("login")
 	pass := c.PostForm("password")
 
-	userRep := h.db.User()
+	userRep := h.storage.User()
 	userData, err := userRep.GetUserByLogin(login)
 	if err != nil {
 		h.logger.Error(fmt.Sprintf("[UserIdent] error while identifing user: %s", err))
-		switch err {
-		case sql.ErrNoRows:
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
 			c.String(http.StatusUnauthorized, "Error: No such user", err)
 			return
 		default:

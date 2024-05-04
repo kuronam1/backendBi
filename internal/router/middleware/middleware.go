@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net/http"
+	"sbitnev_back/internal/database/Store"
+	"sbitnev_back/internal/router/handlers/encryption"
 	"slices"
 )
 
@@ -81,15 +83,37 @@ func LoggingReq(l *slog.Logger) gin.HandlerFunc {
 	}
 }
 
-func CheckAdminAuth() gin.HandlerFunc {
+func CheckAdminAuth(storage *Store.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("Authorization")
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-				"error": "Unauthorized",
+			c.Redirect(http.StatusMovedPermanently, "/login")
+			c.Abort()
+			return
+		}
+
+		id, err := encryption.ParsingToken(token)
+		userRep := storage.User()
+		user, err := userRep.GetUserByID(id)
+		switch {
+		case errors.Is(err, encryption.NotValid):
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": "not valid token",
+			})
+		case errors.Is(err, encryption.ParsingErr):
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": "internal server error",
 			})
 			return
 		}
+
+		if user.Role != "admin" {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
+				"error": "invalid role",
+			})
+		}
+
+		c.Next()
 	}
 }
 

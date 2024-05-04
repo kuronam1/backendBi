@@ -11,6 +11,6 @@ type Userdata struct {
 }
 
 type handler struct {
-	logger *slog.Logger
-	db     *Store.Storage
+	logger  *slog.Logger
+	storage *Store.Storage
 }
