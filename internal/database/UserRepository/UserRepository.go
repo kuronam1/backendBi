@@ -3,11 +3,13 @@ package UserRepository
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"sbitnev_back/internal/database/models"
 )
 
 var (
-	invalidUser = errors.New("user not registered")
+	internalServerErr = errors.New("internal server error")
+	invalidUser       = errors.New("user not registered")
 )
 
 type UserRepository struct {
@@ -15,23 +17,28 @@ type UserRepository struct {
 }
 
 func (u *UserRepository) GetUserByLogin(login string) (*models.User, error) {
-	query := `SELECT * FROM users WHERE login = $1`
+	const op = "userRep.GetUserByLogin"
 
-	DBrow := u.DB.QueryRow(query, login)
-	if err := DBrow.Err(); err != nil {
-		return nil, invalidUser
+	stmt, err := u.DB.Prepare("SELECT * FROM users WHERE login = $1")
+	if err != nil {
+		return nil, internalServerErr
 	}
+	defer stmt.Close()
 
 	user := &models.User{}
-	if err := DBrow.Scan(
+	err = stmt.QueryRow(login).Scan(
 		&user.UserId,
 		&user.Login,
 		&user.Password,
 		&user.FullName,
 		&user.Role,
 		&user.GroupID,
-	); err != nil {
-		return nil, err
+	)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return nil, invalidUser
+	case err != nil:
+		return nil, fmt.Errorf("[%s]: %w", op, err)
 	}
 
 	return user, nil

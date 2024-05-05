@@ -90,6 +90,10 @@ func CheckAdminAuth(storage *Store.Storage) gin.HandlerFunc {
 			c.Redirect(http.StatusMovedPermanently, "/login")
 			c.Abort()
 			return
+		} else if token == "" {
+			c.Redirect(http.StatusMovedPermanently, "/login")
+			c.Abort()
+			return
 		}
 
 		id, err := encryption.ParsingToken(token)
@@ -118,4 +122,4 @@ func CheckAdminAuth(storage *Store.Storage) gin.HandlerFunc {
 }
 
 //Действие - загрузка расписания (метод) (что надо с фронта)
-// + сделать функции под бд (отдельно от )
+// + сделать функции под бд
