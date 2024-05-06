@@ -44,20 +44,27 @@ CREATE TABLE IF NOT EXISTS grades (
 INSERT INTO groups(group_name) VALUES ('БИ4-1');
 INSERT INTO groups(group_name) VALUES ('БИ4-2');
 
-INSERT INTO users (login, password, full_name, role) VALUES ('asdfwa', '1234567', 'kolya', 'user(0)');
-INSERT INTO users (login, password, full_name, role) VALUES ('homemem', 'mypass', 'makson', 'user(1)');
-INSERT INTO users (login, password, full_name, role) VALUES ('PRICOL', 'qwerty', 'ura', 'user(0)');
+INSERT INTO users (login, password, full_name, role)
+    VALUES ('asdfwa', '1234567', 'kolya', 'user(0)');
+INSERT INTO users (login, password, full_name, role)
+    VALUES ('homemem', 'mypass', 'makson', 'user(1)');
+INSERT INTO users (login, password, full_name, role)
+    VALUES ('PRICOL', 'qwerty', 'ura', 'user(0)');
 
 INSERT INTO group_users(group_id, user_id) VALUES ('1', '1');
 INSERT INTO group_users(group_id, user_id) VALUES ('1', '3');
 
 INSERT INTO disciplines(teacher_id, discipline_name) VALUES ('2', 'Программирование');
 
-INSERT INTO lessons(group_id, time, discipline_id, audience) VALUES ('1', CURRENT_TIMESTAMP, '1', '5-309');
-INSERT INTO lessons(group_id, time, discipline_id, audience) VALUES ('2', CURRENT_TIMESTAMP, '1', '5-310');
+INSERT INTO lessons(group_id, time, discipline_id, audience)
+    VALUES ('1', CURRENT_TIMESTAMP, '1', '5-309');
+INSERT INTO lessons(group_id, time, discipline_id, audience)
+    VALUES ('2', CURRENT_TIMESTAMP, '1', '5-310');
 
-INSERT INTO grades(student_id, discipline_id, grade, date, comment) VALUES ('1', '1', '4', CURRENT_DATE, 'Контрольрная работа');
-INSERT INTO grades(student_id, discipline_id, grade, date, comment) VALUES ('3', '1', 'н', CURRENT_DATE, 'Контрольрная работа');
+INSERT INTO grades(student_id, discipline_id, grade, date, comment)
+    VALUES ('1', '1', '4', CURRENT_DATE, 'Контрольрная работа');
+INSERT INTO grades(student_id, discipline_id, grade, date, comment)
+    VALUES ('3', '1', 'н', CURRENT_DATE, 'Контрольрная работа');
 
 --Вывод оценок кокнретного ученика по user_id
 SELECT g.grade_id, g.student_id, g.discipline_id, g.grade, g.date, g.comment

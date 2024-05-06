@@ -2,7 +2,6 @@ package Store
 
 import (
 	"database/sql"
-	"fmt"
 	_ "github.com/lib/pq"
 	"io"
 	"os"
@@ -13,10 +12,8 @@ import (
 )
 
 const (
-	initFileName = "init.sql"
+	initFileName = "./internal/database/Store/init.sql"
 )
-
-//const  = "postgres://user:Rtyuehe1223@localhost:5432/MyDB"
 
 type Storage struct {
 	DB              *sql.DB
@@ -26,9 +23,7 @@ type Storage struct {
 }
 
 func InitStorage(c *config.Config) (*Storage, error) {
-	connStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s",
-		c.PG.Username, c.PG.Password, c.PG.Host, c.PG.Port, c.PG.DataBasename)
-	db, err := sql.Open("postgres", connStr)
+	db, err := sql.Open("postgres", c.PgUrl)
 	if err != nil {
 		return nil, err
 	}

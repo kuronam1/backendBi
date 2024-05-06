@@ -11,7 +11,7 @@ var e = errors.New("error while reading cfg")
 type Config struct {
 	Env        string `yaml:"env" envDefault:"local"`
 	ServerHTTP `yaml:"serverHTTP"`
-	PG         `yaml:"postgres" env-required:"true"`
+	PgUrl      string `yaml:"pgUrl" env-required:"true"`
 	//RedisDB    Redis  `yaml:"redis"`
 }
 
@@ -21,13 +21,14 @@ type ServerHTTP struct {
 	ShutDownTimout time.Duration `yaml:"idleTimeout" env-default:"10s"`
 }
 
-type PG struct {
+/*type PG struct {
 	Host         string `yaml:"host"`
 	Port         string `yaml:"port"`
 	Username     string `yaml:"username"`
 	Password     string `yaml:"password"`
-	DataBasename string `yaml:"dataBasename"`
-}
+	DataBaseName string `yaml:"databaseName"`
+	SslMode      string `yaml:"sslMode"`
+}*/
 
 func NewConfig(path string) (*Config, error) {
 	cfg := &Config{}
