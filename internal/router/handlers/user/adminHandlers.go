@@ -103,8 +103,32 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 	}
 }
 
-func (h *AdminHandler) GroupRegister(c *gin.Context) {
+func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
+	type request struct {
+		speciality string
+		number     int
+		course     int
+	}
+	return func(c *gin.Context) {
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": err,
+			})
+			return
+		}
 
+		group := &models.Group{
+			Number:     req.number,
+			Speciality: req.speciality,
+			Course:     req.course,
+		}
+		if err := h.Storage.Groups().GroupRegistration(group); err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+		}
+	}
 }
 
 func (h *AdminHandler) BackUp(c *gin.Context) {
@@ -125,7 +149,18 @@ func (h *AdminHandler) Journal(c *gin.Context) {
 		return
 	}
 
-	c.HTML(200, "", groups)
+	disciplines, err := h.Storage.Disciplines().GetAllDisciplines()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(200, "", gin.H{
+		"groups":      groups,
+		"disciplines": disciplines,
+	})
 }
 
 func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {

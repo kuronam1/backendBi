@@ -1,8 +1,9 @@
 CREATE TABLE IF NOT EXISTS groups (
-                                      group_id SERIAL PRIMARY KEY,
-                                      group_name VARCHAR NOT NULL,
-                                      speciality VARCHAR NOT NULL,
-                                      course INTEGER NOT NULL
+                                    group_id SERIAL PRIMARY KEY,
+                                    group_name VARCHAR NOT NULL,
+                                    number INTEGER NOT NULL,
+                                    speciality VARCHAR NOT NULL,
+                                    course INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users  (

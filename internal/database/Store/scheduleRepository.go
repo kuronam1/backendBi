@@ -111,7 +111,7 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) (*mode
 	schedule := make(map[time.Weekday][]models.Lesson)
 
 	stmt, err := s.store.DB.Prepare(`
-SELECT l.lesson_id, g.group_name, l.time, d.discipline_name, l.audience, l.description
+SELECT g.group_name, l.time, d.discipline_name, l.audience, l.description
 FROM lessons l
 		JOIN disciplines d ON l.description = d.discipline_id
     	JOIN groups g ON l.group_id = g.group_id
@@ -131,7 +131,6 @@ WHERE u.full_name = $1`)
 	for rows.Next() {
 		var lesson models.Lesson
 		err = rows.Scan(
-			&lesson.LessonId,
 			&lesson.GroupName,
 			&lesson.Time,
 			&lesson.DisciplineName,

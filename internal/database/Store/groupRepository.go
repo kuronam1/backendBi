@@ -3,6 +3,7 @@ package Store
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"sbitnev_back/internal/database/models"
 )
 
@@ -61,5 +62,31 @@ func (g *GroupRepository) GetGroupByName(name string) (*models.Group, error) {
 		return nil, err
 	default:
 		return &gr, nil
+	}
+}
+
+func (g *GroupRepository) GroupRegistration(group *models.Group) error {
+	const op = "fc.groupRep.GroupRegistration"
+	stmt, err := g.store.DB.Prepare("INSERT INTO groups (group_name, number, speciality, course) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING")
+	if err != nil {
+		return err
+	}
+
+	groupName := configurationGroupName(group.Speciality, group.Number, group.Course)
+
+	_, err = stmt.Exec(groupName, group.Number, group.Speciality, group.Course)
+	return err
+}
+
+func configurationGroupName(speciality string, number, course int) string {
+	switch speciality {
+	case "ЭВМ":
+		return fmt.Sprintf("ЭВМ %d - %d", number, course)
+	case "БИ":
+		return fmt.Sprintf("БИ %d - %d", number, course)
+	case "ПМ":
+		return fmt.Sprintf("ПМ %d - %d", number, course)
+	default:
+		return fmt.Sprintf("БП %d - %d", number, course)
 	}
 }

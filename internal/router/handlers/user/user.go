@@ -61,6 +61,7 @@ func (h *handler) Register(router *gin.Engine) {
 	AdminMenuPath.POST("/management/userReg", h.AdminHandler.UserRegister())
 	//AdminMenuPath.POST("/management/userDel")
 	//AdminMenuPath.PATCH("/management/userRef")
+	AdminMenuPath.POST("/management/groupReg", h.AdminHandler.GroupRegister())
 	AdminMenuPath.PATCH("/management/gradesRef", h.AdminHandler.GradesRefactor())
 	AdminMenuPath.POST("/management/bdBackUp", h.AdminHandler.BackUp)
 	AdminMenuPath.GET("/journal")
@@ -85,9 +86,6 @@ func (h *handler) Register(router *gin.Engine) {
 	ParentMenuPath.GET("/journal")
 	ParentMenuPath.GET("/schedule")
 }
-
-//Дописать в функцию Auth() обращение к БД + установку роли для пользователя
-// + Redirect на страницу защищенной группы
 
 func (h *handler) HomePage(c *gin.Context) {
 	if c.FullPath() != homePageUrl {
