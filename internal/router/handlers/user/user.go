@@ -32,26 +32,39 @@ func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
 	return &handler{
 		logger:  logger,
 		storage: store,
+		AdminHandler: &AdminHandler{
+			Logger:  logger,
+			Storage: store,
+		},
+		StudentHandler: &StudentHandler{
+			Logger:  logger,
+			Storage: store,
+		},
+		TeacherHandler: &TeacherHandler{
+			Logger:  logger,
+			Storage: store,
+		},
 	}
 }
 
 func (h *handler) Register(router *gin.Engine) {
 	router.GET(homePageUrl, h.HomePage)
 	router.GET(LoginPageUrl, h.LoginPage)
-	router.POST(LoginPageUrl, h.UserIdent)
+	router.POST(LoginPageUrl, h.UserIdent())
 	//router.POST(homePageUrl, h.FeedBack)
 
 	AdminMenuPath := router.Group("/adminPanel")
 	AdminMenuPath.Use(middleware.CheckAdminAuth(h.storage))
-	AdminMenuPath.GET("/menu")
-	AdminMenuPath.GET("/management")
-	AdminMenuPath.POST("/management/scheduleReg")
-	AdminMenuPath.POST("/management/userReg")
-	AdminMenuPath.PATCH("/management/gradesRef")
-	AdminMenuPath.POST("/management/userDel")
-	AdminMenuPath.POST("/management/bdBackUp")
+	AdminMenuPath.GET("/menu", h.AdminHandler.Menu)
+	AdminMenuPath.GET("/management", h.AdminHandler.Management)
+	AdminMenuPath.POST("/management/scheduleReg", h.AdminHandler.ScheduleRegister)
+	AdminMenuPath.POST("/management/userReg", h.AdminHandler.UserRegister())
+	//AdminMenuPath.POST("/management/userDel")
+	//AdminMenuPath.PATCH("/management/userRef")
+	AdminMenuPath.PATCH("/management/gradesRef", h.AdminHandler.GradesRefactor())
+	AdminMenuPath.POST("/management/bdBackUp", h.AdminHandler.BackUp)
 	AdminMenuPath.GET("/journal")
-	AdminMenuPath.GET("/schedule")
+	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule)
 
 	TeacherMenuPath := router.Group("/teacherPanel")
 	TeacherMenuPath.Use(middleware.LoginCheck(), middleware.RoleCheck())
@@ -115,47 +128,62 @@ func (h *handler) FeedBack(c *gin.Context) {
 
 //Не забыть про хедеры ...
 
-func (h *handler) UserIdent(c *gin.Context) {
-	login := c.PostForm("login")
-	pass := c.PostForm("password")
-
-	userRep := h.storage.User()
-	userData, err := userRep.GetUserByLogin(login)
-	if err != nil {
-		h.logger.Error(fmt.Sprintf("[UserIdent] error while identifing user: %s", err))
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			c.String(http.StatusUnauthorized, "Error: No such user", err)
-			return
-		default:
-			c.String(http.StatusInternalServerError, "Internal Server Error")
+func (h *handler) UserIdent() gin.HandlerFunc {
+	type request struct {
+		Login    string `json:"login"`
+		Password string `json:"password"`
+	}
+	return func(c *gin.Context) {
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{
+				"err in bind": err,
+			})
 			return
 		}
-	}
 
-	if pass != userData.Password {
-		c.String(http.StatusForbidden, "error: wrong login or password")
-		return
-	}
+		userRep := h.storage.User()
+		userData, err := userRep.GetUserByLogin(req.Login)
+		if err != nil {
+			h.logger.Error(fmt.Sprintf("[UserIdent] error while identifing user: %s", err))
+			switch {
+			case errors.Is(err, sql.ErrNoRows):
+				c.String(http.StatusUnauthorized, "Error: No such user", err)
+				return
+			default:
+				c.JSON(http.StatusInternalServerError, gin.H{
+					"err in getUser": err,
+				})
+				return
+			}
+		}
 
-	token, err := encryption.MakeToken(userData.UserId)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Internal Server Error")
-		return
-	}
+		if req.Password != userData.Password {
+			c.String(http.StatusForbidden, "error: wrong login or password")
+			return
+		}
 
-	c.SetCookie("Authorization", token,
-		86400, "/",
-		"localhost", false, true)
+		token, err := encryption.MakeToken(userData.UserID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"err in makeToken": err,
+			})
+			return
+		}
 
-	switch userData.Role {
-	case admin:
-		c.Redirect(http.StatusMovedPermanently, AdminMenuURL)
-	case teacher:
-		c.Redirect(http.StatusMovedPermanently, TeacherMenuURL)
-	case student:
-		c.Redirect(http.StatusMovedPermanently, StudentMenuURL)
-	case parent:
-		c.Redirect(http.StatusMovedPermanently, ParentMenuURL)
+		c.SetCookie("Authorization", token,
+			86400, "/",
+			"localhost", false, true)
+
+		switch userData.Role {
+		case admin:
+			c.Redirect(http.StatusMovedPermanently, AdminMenuURL)
+		case teacher:
+			c.Redirect(http.StatusMovedPermanently, TeacherMenuURL)
+		case student:
+			c.Redirect(http.StatusMovedPermanently, StudentMenuURL)
+		case parent:
+			c.Redirect(http.StatusMovedPermanently, ParentMenuURL)
+		}
 	}
 }

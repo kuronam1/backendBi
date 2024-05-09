@@ -3,12 +3,11 @@ package models
 import "time"
 
 type User struct {
-	UserId   int
+	UserID   int
 	Login    string
 	Password string
 	FullName string
 	Role     string
-	GroupID  int
 }
 
 type Grade struct {
@@ -25,13 +24,30 @@ type Journal struct {
 }
 
 type Schedule struct {
-	Lessons []Lesson
+	Lessons map[time.Weekday][]Lesson
 }
 
 type Lesson struct {
-	LessonId     int
-	GroupId      int
-	time         time.Time
-	disciplineId int
-	audience     string
+	LessonId       int
+	GroupName      string
+	Time           time.Time
+	DisciplineName string
+	Audience       string
+	Description    string
+	TeacherName    string
+}
+
+type Group struct {
+	Id         int
+	Name       string
+	Speciality string
+	Course     int
+}
+
+type Discipline struct {
+	DisciplineID   int
+	TeacherID      int
+	DisciplineName string
+	Speciality     string
+	Course         int
 }

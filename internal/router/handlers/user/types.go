@@ -11,6 +11,9 @@ type Userdata struct {
 }
 
 type handler struct {
-	logger  *slog.Logger
-	storage *Store.Storage
+	logger         *slog.Logger
+	storage        *Store.Storage
+	AdminHandler   *AdminHandler
+	StudentHandler *StudentHandler
+	TeacherHandler *TeacherHandler
 }

@@ -3,10 +3,9 @@ package encryption
 import (
 	"errors"
 	"github.com/golang-jwt/jwt"
-	"time"
 )
 
-const key = "MyKey"
+var key = []byte("myKey")
 
 var (
 	ParsingErr  = errors.New("error while parsing")
@@ -16,8 +15,7 @@ var (
 
 func MakeToken(id int) (string, error) {
 	payload := jwt.MapClaims{
-		"id":  id,
-		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"id": id,
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, payload)
@@ -26,7 +24,7 @@ func MakeToken(id int) (string, error) {
 		return "", CreatingErr
 	}
 
-	return tokenString, err
+	return tokenString, nil
 }
 
 func ParsingToken(token string) (int, error) {
@@ -38,8 +36,13 @@ func ParsingToken(token string) (int, error) {
 		return 0, ParsingErr
 	}
 
-	if jwtToken.Valid && claims["exp"].(time.Time).Unix() > time.Now().Unix() {
-		return claims["id"].(int), nil
+	id, ok := claims["id"].(float64)
+	if !ok {
+		return 0, ParsingErr
+	}
+
+	if jwtToken.Valid {
+		return int(id), nil
 	} else {
 		return 0, NotValid
 	}
