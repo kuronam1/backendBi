@@ -59,7 +59,7 @@ func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, s
 	return id, nil
 }
 
-func (d *DisciplineRepository) GetAllDisciplines() ([]*models.Discipline, error) {
+func (d *DisciplineRepository) GetAllDisciplines() ([]models.Discipline, error) {
 	const op = "fc.discRep.GetAllDisciplines"
 	stmt, err := d.store.DB.Prepare("SELECT teacher_id, discipline_name, speciality, course FROM disciplines")
 	if err != nil {
@@ -73,9 +73,9 @@ func (d *DisciplineRepository) GetAllDisciplines() ([]*models.Discipline, error)
 	}
 	defer rows.Close()
 
-	var res []*models.Discipline
+	var res []models.Discipline
 	for rows.Next() {
-		var discipline *models.Discipline
+		var discipline models.Discipline
 		err = rows.Scan(
 			&discipline.TeacherID,
 			&discipline.DisciplineName,

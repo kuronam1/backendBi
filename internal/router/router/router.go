@@ -13,8 +13,8 @@ func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
 	log.Info("[router]: registration front files and routes")
 	router := gin.New()
 	router.Use(gin.Recovery(), middleware.LoggingReq(log))
-	router.LoadHTMLGlob("html/*")
-	router.Static("/static/assets", "./static/assets")
+	/*router.LoadHTMLGlob("html/*")
+	router.Static("/static/assets", "./static/assets")*/
 
 	handler := user.NewHandler(log, db)
 	handler.Register(router)

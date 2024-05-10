@@ -3,6 +3,7 @@ package user
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net/http"
@@ -24,8 +25,10 @@ type AdminHandler struct {
 //"homePage"
 
 func (h *AdminHandler) Management(c *gin.Context) {
+	const op = "AdminHandlers.Management"
 	groups, err := h.Storage.Groups().GetAllGroups()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -34,13 +37,19 @@ func (h *AdminHandler) Management(c *gin.Context) {
 
 	specialities, err := h.Storage.Groups().GetAllSpecialities()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(http.StatusOK, "", gin.H{
+	/*c.HTML(http.StatusOK, "", gin.H{
+		"Groups":       groups,
+		"Specialities": specialities,
+	})*/
+
+	c.JSON(http.StatusOK, gin.H{
 		"Groups":       groups,
 		"Specialities": specialities,
 	})
@@ -49,8 +58,10 @@ func (h *AdminHandler) Management(c *gin.Context) {
 // Registers
 
 func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
+	const op = "AdminHandlers.ScheduleRegister"
 	file, err := c.FormFile("file")
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -60,6 +71,7 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	filePath := filepath.Join("/schedule", file.Filename)
 	err = c.SaveUploadedFile(file, filePath)
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 			"error": err,
 		})
@@ -67,6 +79,7 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	}
 
 	if err := h.Storage.Schedule().ScheduleRegister(filePath); err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -87,11 +100,12 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 		GroupName string `json:"groupName"`
 	}
 	return func(c *gin.Context) {
-		const op = "handlers.UserRegister"
+		const op = "AdminHandlers.UserRegister"
 		rep := h.Storage.User()
 
 		var request Request
 		if err := c.BindJSON(&request); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(500, gin.H{
 				"error": err,
 			})
@@ -106,6 +120,7 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 		}
 		id, err := rep.CreateUser(user)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(500, gin.H{
 				"error": err,
 			})
@@ -113,6 +128,7 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 		}
 
 		if err := rep.CreateUserLink(id, request.GroupName); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -126,13 +142,15 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 
 func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 	type request struct {
-		speciality string
-		number     int
-		course     int
+		Speciality string `json:"speciality"`
+		Number     int    `json:"number"`
+		Course     int    `json:"course"`
 	}
 	return func(c *gin.Context) {
+		const op = "AdminHandlers.GroupRegister"
 		var req request
 		if err := c.BindJSON(&req); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
@@ -140,11 +158,12 @@ func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 		}
 
 		group := &models.Group{
-			Number:     req.number,
-			Speciality: req.speciality,
-			Course:     req.course,
+			Number:     req.Number,
+			Speciality: req.Speciality,
+			Course:     req.Course,
 		}
 		if err := h.Storage.Groups().GroupRegistration(group); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -165,34 +184,43 @@ func (h *AdminHandler) BackUp(c *gin.Context) {
 // Grades and Journal
 
 func (h *AdminHandler) GetJournal(c *gin.Context) {
+	const op = "AdminHandlers.GetJournal"
 	groupName, exist := c.GetQuery("group")
 	if !exist {
 		h.GetPreJournal(c)
+		c.Abort()
 		return
 	}
 
 	disciplineName, exist := c.GetQuery("discipline")
 	if !exist {
 		h.GetPreJournal(c)
+		c.Abort()
 		return
 	}
 
 	journal, err := h.Storage.Journal().GetGroupJournalByDiscipline(groupName, disciplineName)
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(http.StatusOK, "", gin.H{
-		"journal": journal,
+	/*c.HTML(http.StatusOK, "", gin.H{
+		"Journal": journal,
+	})*/
+	c.JSON(http.StatusOK, gin.H{
+		"Journal": journal,
 	})
 }
 
 func (h *AdminHandler) GetPreJournal(c *gin.Context) {
+	const op = "AdminHandlers.GetPreJournal"
 	groups, err := h.Storage.Groups().GetAllGroups()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(500, gin.H{
 			"error": err,
 		})
@@ -201,33 +229,41 @@ func (h *AdminHandler) GetPreJournal(c *gin.Context) {
 
 	disciplines, err := h.Storage.Disciplines().GetAllDisciplines()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(200, "", gin.H{
-		"groups":      groups,
-		"disciplines": disciplines,
+	/*c.HTML(200, "", gin.H{
+		"Groups":      groups,
+		"Disciplines": disciplines,
+	})*/
+	c.JSON(http.StatusOK, gin.H{
+		"Groups":      groups,
+		"Disciplines": disciplines,
 	})
 }
 
 func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 	type Request struct {
-		UserName       string    `json:"userName"`
-		DisciplineName string    `json:"disciplineName"`
-		OldLevel       int       `json:"oldLevel"`
-		OldDate        time.Time `json:"oldDate"`
-		OldComment     string    `json:"oldComment,omitempty"`
-		NewLevel       int       `json:"newLevel"`
-		NewDate        time.Time `json:"newDate"`
-		NewComment     string    `json:"newComment,omitempty"`
+		GradeID        int    `json:"gradeID"`
+		UserName       string `json:"userName"`
+		DisciplineName string `json:"disciplineName"`
+		OldLevel       int    `json:"oldLevel"`
+		OldDate        string `json:"oldDate"`
+		OldComment     string `json:"oldComment,omitempty"`
+		NewLevel       int    `json:"newLevel"`
+		NewDate        string `json:"newDate"`
+		NewComment     string `json:"newComment,omitempty"`
 	}
 	return func(c *gin.Context) {
+		const op = "AdminHandlers.GradesRefactor"
 		var req Request
 		if err := c.BindJSON(&req); err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
 			return
@@ -235,6 +271,7 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 
 		user, err := h.Storage.User().GetUserByName(req.UserName)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in getUser", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -243,16 +280,37 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 
 		discipline, err := h.Storage.Disciplines().GetDisciplineByName(req.DisciplineName)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s getDis", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
 			return
 		}
+
+		oldGradeDate, err := time.Parse(time.DateOnly, req.OldDate)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+			return
+		}
+
+		newGradeDate, err := time.Parse(time.DateOnly, req.NewDate)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+			return
+		}
+
 		oldGrade := &models.Grade{
+			GradeID:      req.GradeID,
 			StudentID:    user.UserID,
 			DisciplineID: discipline.DisciplineID,
 			Level:        req.OldLevel,
-			Date:         req.OldDate,
+			Date:         oldGradeDate,
 			Comment:      req.OldComment,
 		}
 
@@ -260,11 +318,12 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			StudentID:    user.UserID,
 			DisciplineID: discipline.DisciplineID,
 			Level:        req.NewLevel,
-			Date:         req.NewDate,
+			Date:         newGradeDate,
 			Comment:      req.NewComment,
 		}
 
 		if err := h.Storage.Journal().UpdateGrade(oldGrade, NewGrade); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in ref", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -279,76 +338,92 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 // Schedules
 
 func (h *AdminHandler) GetSchedule(c *gin.Context) {
-	groupName, exist := c.GetQuery("group")
-	if exist {
+	const op = "AdminHandlers.GetSchedule"
+	groupName, exists := c.GetQuery("group")
+	if exists {
 		h.ScheduleWithQueryGroup(groupName)
 		c.Abort()
 		return
 	}
 
-	teacherName, exist := c.GetQuery("teacher")
-	if exist {
+	teacherName, exists := c.GetQuery("teacher")
+	if exists {
 		h.ScheduleWithQueryTeacher(teacherName)
 		c.Abort()
 		return
 	}
 
-	h.GetPreSchedule()
+	h.GetPreSchedule(c)
 }
 
 func (h *AdminHandler) ScheduleWithQueryGroup(groupName string) gin.HandlerFunc {
+	const op = "AdminHandlers.ScheduleWithQueryGroup"
 	return func(c *gin.Context) {
 		schedule, err := h.Storage.ScheduleMethods.GetScheduleByGroupName(groupName)
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
 			return
 		case err != nil:
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
 		}
 
-		c.HTML(http.StatusOK, "", gin.H{
+		/*c.HTML(http.StatusOK, "", gin.H{
 			"schedule": schedule,
+		})*/
+		c.JSON(http.StatusOK, gin.H{
+			"Schedule": schedule,
 		})
 	}
 }
 
 func (h *AdminHandler) ScheduleWithQueryTeacher(teacherName string) gin.HandlerFunc {
+	const op = "AdminHandlers.ScheduleWithQueryTeacher"
 	return func(c *gin.Context) {
 		schedule, err := h.Storage.ScheduleMethods.GetScheduleByTeacherName(teacherName)
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
 			return
 		case err != nil:
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
 			return
 		}
 
-		c.HTML(http.StatusOK, "", gin.H{
-			"schedule": schedule,
+		/*c.HTML(http.StatusOK, "", gin.H{
+			"Schedule": schedule,
+		})*/
+		c.JSON(http.StatusOK, gin.H{
+			"Schedule": schedule,
 		})
 	}
 }
 
-func (h *AdminHandler) GetPreSchedule() gin.HandlerFunc {
+func (h *AdminHandler) GetPreSchedule(c *gin.Context) gin.HandlerFunc {
+	const op = "AdminHandlers.GetPreSchedule"
 	return func(c *gin.Context) {
 		groups, err := h.Storage.Groups().GetAllGroups()
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
 			return
 		case err != nil:
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -358,20 +433,26 @@ func (h *AdminHandler) GetPreSchedule() gin.HandlerFunc {
 		teachers, err := h.Storage.User().GetAllTeachers()
 		switch {
 		case errors.Is(err, sql.ErrNoRows):
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
 			return
 		case err != nil:
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
 			return
 		}
 
-		c.HTML(200, "", gin.H{
-			"teachers": teachers,
-			"groups":   groups,
+		/*c.HTML(200, "", gin.H{
+			"Teachers": teachers,
+			"Groups":   groups,
+		})*/
+		c.JSON(http.StatusOK, gin.H{
+			"Teachers": teachers,
+			"Groups":   groups,
 		})
 	}
 }

@@ -17,10 +17,11 @@ type JournalRepository struct {
 func (j *JournalRepository) GetJournalByStudentID(id int) (*models.Journal, error) {
 	const op = "fc.journalRep.UpdateGrade"
 	stmt, err := j.store.DB.Prepare(`
-SELECT d.discipline_name, g.grade, g.time, g.comment FROM grades g
+SELECT d.discipline_name, g.grade, g.date, g.comment FROM grades g
         JOIN disciplines d ON g.discipline_id = d.discipline_id
         JOIN users u ON g.student_id = u.user_id
-WHERE u.user_id = $1`)
+WHERE u.user_id = $1
+ORDER BY g.date`)
 	if err != nil {
 		return nil, err
 	}
@@ -42,9 +43,9 @@ WHERE u.user_id = $1`)
 		)
 		err := rows.Scan(
 			&disName,
-			grade.Level,
-			grade.Date,
-			grade.Comment)
+			&grade.Level,
+			&grade.Date,
+			&grade.Comment)
 		if err != nil {
 			return nil, err
 		}
@@ -64,6 +65,7 @@ func (j *JournalRepository) UpdateGrade(oldGrade, newGrade *models.Grade) error 
 	if err != nil {
 		return err
 	}
+	defer stmt.Close()
 
 	_, err = stmt.Exec(newGrade.Level, newGrade.Date, newGrade.Comment, oldGrade.GradeID)
 	if err != nil {
@@ -76,7 +78,7 @@ func (j *JournalRepository) UpdateGrade(oldGrade, newGrade *models.Grade) error 
 func (j *JournalRepository) GetGroupJournalByDiscipline(groupName, disciplineName string) (*models.Journal, error) {
 	const op = "fc.journalRep.GetAdminJournal"
 	stmt, err := j.store.DB.Prepare(`
-SELECT g.grade, g.date, g.comment, u.full_name
+SELECT g.grade_id, g.grade, g.date, g.comment, u.full_name
 FROM grades g
 			JOIN users u ON g.student_id = u.user_id
 			JOIN disciplines d ON d.discipline_id = g.discipline_id
@@ -102,6 +104,7 @@ WHERE gr.group_name = $1 AND d.discipline_name = $2`)
 			fullName string
 		)
 		err = rows.Scan(
+			&grade.GradeID,
 			&grade.Level,
 			&grade.Date,
 			&grade.Comment,
@@ -117,7 +120,7 @@ WHERE gr.group_name = $1 AND d.discipline_name = $2`)
 
 func (j *JournalRepository) CreateGrade(grade *models.Grade) error {
 	const op = "fc.journalRep.GetAdminJournal"
-	stmt, err := j.store.DB.Prepare("INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ($1, $2, $3, $4)")
+	stmt, err := j.store.DB.Prepare("INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ($1, $2, $3, $4, $5)")
 	if err != nil {
 		return err
 	}

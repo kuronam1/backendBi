@@ -17,19 +17,28 @@ type GroupRepository struct {
 
 func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	const op = "fc.Storage.GetAllGroups"
-	var res []models.Group
 	//GetLogger()
 
-	stmt, err := g.store.DB.Prepare("SELECT * FROM groups")
+	stmt, err := g.store.DB.Prepare("SELECT group_name, number, speciality, course FROM groups")
 	if err != nil {
 		return nil, err
 	}
 	defer stmt.Close()
 
 	rows, err := stmt.Query()
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var res []models.Group
 	for rows.Next() {
-		var group models.Group
-		err = rows.Scan(&group.Id, &group.Name)
+		group := models.Group{}
+		err = rows.Scan(
+			&group.Name,
+			&group.Number,
+			&group.Speciality,
+			&group.Course)
 		if err != nil {
 			return nil, err
 		}
@@ -81,13 +90,13 @@ func (g *GroupRepository) GroupRegistration(group *models.Group) error {
 func configurationGroupName(speciality string, number, course int) string {
 	switch speciality {
 	case "ЭВМ":
-		return fmt.Sprintf("ЭВМ %d - %d", number, course)
+		return fmt.Sprintf("ЭВМ %d - %d", course, number)
 	case "БИ":
-		return fmt.Sprintf("БИ %d - %d", number, course)
+		return fmt.Sprintf("БИ %d - %d", course, number)
 	case "ПМ":
-		return fmt.Sprintf("ПМ %d - %d", number, course)
+		return fmt.Sprintf("ПМ %d - %d", course, number)
 	default:
-		return fmt.Sprintf("БП %d - %d", number, course)
+		return fmt.Sprintf("БП %d - %d", course, number)
 	}
 }
 

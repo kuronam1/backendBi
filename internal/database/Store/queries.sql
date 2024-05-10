@@ -58,3 +58,36 @@ SELECT d.discipline_name, g.grade, g.time, g.comment FROM grades g
         JOIN disciplines d ON g.discipline_id = d.discipline_id
         JOIN users u ON g.student_id = u.user_id
 WHERE u.user_id = 1
+
+INSERT INTO users (login, password, full_name, role) VALUES ('mylogin', 'mypassword', 'Андрей Горбунов', 'admin');
+INSERT INTO users (login, password, full_name, role) VALUES ('sbitneva', 'qweqweqwe', 'Сбитнева Анастасия', 'student');
+INSERT INTO users (login, password, full_name, role) VALUES ('xzKTO', '473824893', 'Тютюник Николай', 'student');
+INSERT INTO users (login, password, full_name, role) VALUES ('belov', 'qwerty', 'Белов Ф.Р.', 'teacher');
+
+INSERT INTO groups (group_name, number, speciality, course) VALUES ('БИ','1', 'ЭВМ', '2');
+INSERT INTO groups (group_name, number, speciality, course) VALUES ('БИ','2', 'ЭВМ', '2');
+
+INSERT INTO group_students(group_id, student_id) VALUES ('1', '2');
+INSERT INTO group_students(group_id, student_id) VALUES ('2', '3');
+
+INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES ('4', 'Основы философии', 'ЭВМ', '2');
+
+INSERT INTO lessons (group_id, time, discipline_id, audience, description, lesson_order) VALUES ('1', '2024-05-10 8:30:00','1' ,'A-2', 'Лекция', '1');
+INSERT INTO lessons (group_id, time, discipline_id, audience, description, lesson_order) VALUES ('2', '2024-05-10 8:30:00','1' ,'A-2', 'Лекция', '1');
+INSERT INTO lessons (group_id, time, discipline_id, audience, description, lesson_order) VALUES ('1', '2024-05-11 8:30:00','1' ,'A-2', 'Семенар', '1');
+INSERT INTO lessons (group_id, time, discipline_id, audience, description, lesson_order) VALUES ('2', '2024-05-11 10:00:00','1' ,'A-2', 'Семенар', '2');
+
+UPDATE groups SET group_name = 'ЭВМ 2 - 1' WHERE group_id = 1;
+UPDATE groups SET group_name = 'ЭВМ 2 - 2' WHERE group_id = 2;
+
+SELECT g.group_name, l.time, d.discipline_name, l.audience, l.description, l.lesson_order
+FROM lessons l
+         JOIN disciplines d ON l.description = d.discipline_id
+         JOIN groups g ON l.group_id = g.group_id
+         JOIN users u ON u.user_id = d.teacher_id
+WHERE u.full_name = 'Белов Ф.Р.';
+
+SELECT discipline_id, discipline_name FROM disciplines WHERE teacher_id = 4;
+SELECT group_id, time, audience, description, lesson_order FROM lessons WHERE discipline_id = 1;
+SELECT group_name FROM groups WHERE group_id = 1;
+

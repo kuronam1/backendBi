@@ -51,7 +51,7 @@ func (u *UserRepository) GetUserByID(id int) (*models.User, error) {
 	}
 	defer stmt.Close()
 
-	var user *models.User
+	user := &models.User{}
 	err = stmt.QueryRow(id).Scan(
 		&user.Login,
 		&user.Password,
@@ -82,7 +82,6 @@ func (u *UserRepository) GetUserByName(name string) (*models.User, error) {
 		&user.UserID,
 		&user.Login,
 		&user.Password,
-		&user.FullName,
 		&user.Role,
 	)
 	switch {
@@ -95,21 +94,25 @@ func (u *UserRepository) GetUserByName(name string) (*models.User, error) {
 	}
 }
 
-func (u *UserRepository) CreateUser(user *models.User) (int64, error) {
+func (u *UserRepository) CreateUser(user *models.User) (int, error) {
 	const op = "fc.userRep.CreateUser"
-	stmt, err := u.store.DB.Prepare("INSERT INTO users VALUES ($1, $2, $3, $4)")
+	stmt, err := u.store.DB.Prepare("INSERT INTO users (login, password, full_name, role) VALUES ($1, $2, $3, $4)")
+	if err != nil {
+		return 0, err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(user.Login, user.Password, user.FullName, user.Role)
 	if err != nil {
 		return 0, err
 	}
 
-	res, err := stmt.Exec(user.Role, user.Login, user.Password, user.Role)
-
-	id, err := res.LastInsertId()
+	userData, err := u.GetUserByLogin(user.Login)
 	if err != nil {
 		return 0, err
 	}
 
-	return id, nil
+	return userData.UserID, nil
 }
 
 /*func (u *UserRepository) DeleteUser(user *models.User) error {
@@ -120,7 +123,7 @@ func (u *UserRepository) UpdateUser(user *models.User) error {
 	return nil
 }*/
 
-func (u *UserRepository) CreateUserLink(userID int64, groupName string) error {
+func (u *UserRepository) CreateUserLink(userID int, groupName string) error {
 	const op = "fc.userRep.CreateUserLink"
 
 	selectStmt, err := u.store.DB.Prepare("SELECT group_id FROM groups WHERE group_name = $1")
@@ -151,7 +154,7 @@ func (u *UserRepository) CreateUserLink(userID int64, groupName string) error {
 func (u *UserRepository) GetAllTeachers() ([]models.User, error) {
 	const op = "fc.userRep.GetAllTeachers"
 
-	stmt, err := u.store.DB.Prepare("SELECT * FROM users WHERE role = 'teacher'")
+	stmt, err := u.store.DB.Prepare("SELECT user_id, login, password, full_name, role FROM users WHERE role = 'teacher'")
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +168,7 @@ func (u *UserRepository) GetAllTeachers() ([]models.User, error) {
 
 	var res []models.User
 	for rows.Next() {
-		var teacher models.User
+		teacher := models.User{}
 		err := rows.Scan(
 			&teacher.UserID,
 			&teacher.Login,

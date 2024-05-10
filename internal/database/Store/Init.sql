@@ -47,5 +47,3 @@ CREATE TABLE IF NOT EXISTS grades (
                                       date DATE NOT NULL,
                                       comment TEXT
 );
-
-INSERT INTO users (login, password, full_name, role) VALUES ('mylogin', 'mypassword', 'Андрей Горбунов', 'admin')

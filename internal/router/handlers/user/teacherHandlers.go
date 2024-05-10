@@ -1,6 +1,7 @@
 package user
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net/http"
@@ -15,10 +16,14 @@ type TeacherHandler struct {
 }
 
 func (h *TeacherHandler) Menu(c *gin.Context) {
-	c.HTML(http.StatusOK, "", nil)
+	//c.HTML(http.StatusOK, "", nil)
+	c.JSON(http.StatusOK, gin.H{
+		"OK": "u r in menu",
+	})
 }
 
 func (h *TeacherHandler) GetJournal(c *gin.Context) {
+	const op = "TeacherHandlers.GetJournal"
 	groupName, exist := c.GetQuery("group")
 	if !exist {
 		h.GetPreJournal(c)
@@ -33,20 +38,27 @@ func (h *TeacherHandler) GetJournal(c *gin.Context) {
 
 	journal, err := h.Storage.Journal().GetGroupJournalByDiscipline(groupName, disciplineName)
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(http.StatusOK, "", gin.H{
+	/*c.HTML(http.StatusOK, "", gin.H{
 		"journal": journal,
+	})*/
+	c.JSON(http.StatusOK, gin.H{
+		"Journal": journal,
 	})
+
 }
 
 func (h *TeacherHandler) GetPreJournal(c *gin.Context) {
+	const op = "TeacherHandlers.GetPreJournal"
 	groups, err := h.Storage.Groups().GetAllGroups()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(500, gin.H{
 			"error": err,
 		})
@@ -55,13 +67,18 @@ func (h *TeacherHandler) GetPreJournal(c *gin.Context) {
 
 	disciplines, err := h.Storage.Disciplines().GetAllDisciplines()
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(200, "", gin.H{
+	/*c.HTML(200, "", gin.H{
+		"Groups":      groups,
+		"Disciplines": disciplines,
+	})*/
+	c.JSON(http.StatusOK, gin.H{
 		"groups":      groups,
 		"disciplines": disciplines,
 	})
@@ -77,9 +94,11 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 		Date           string `json:"date"`
 		Comment        string `json:"comment,omitempty"`
 	}
+	const op = "TeacherHandlers.AddGrade"
 	return func(c *gin.Context) {
 		var req request
 		if err := c.BindJSON(&req); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
@@ -88,6 +107,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 
 		user, err := h.Storage.User().GetUserByName(req.StudentName)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
 				"error": err,
 			})
@@ -96,6 +116,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 
 		discipline, err := h.Storage.Disciplines().GetDisciplineByName(req.DisciplineName)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -104,6 +125,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 
 		date, err := time.Parse(time.DateOnly, req.Date)
 		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -119,6 +141,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 		}
 
 		if err := h.Storage.Journal().CreateGrade(grade); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -132,6 +155,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 }
 
 func (h *TeacherHandler) GetSchedule(c *gin.Context) {
+	const op = "TeacherHandlers.GetSchedule"
 	teacherID, exists := c.Get("id")
 	if !exists {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -142,6 +166,7 @@ func (h *TeacherHandler) GetSchedule(c *gin.Context) {
 
 	user, err := h.Storage.User().GetUserByID(teacherID.(int))
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
@@ -150,13 +175,17 @@ func (h *TeacherHandler) GetSchedule(c *gin.Context) {
 
 	schedule, err := h.Storage.Schedule().GetScheduleByTeacherName(user.FullName)
 	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
 		return
 	}
 
-	c.HTML(http.StatusOK, "", gin.H{
+	/*c.HTML(http.StatusOK, "", gin.H{
+		"Schedule": schedule,
+	})*/
+	c.JSON(http.StatusOK, gin.H{
 		"Schedule": schedule,
 	})
 }
