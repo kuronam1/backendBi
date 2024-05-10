@@ -35,7 +35,8 @@ CREATE TABLE IF NOT EXISTS lessons ( --вариант для храниея ра
                                        time TIMESTAMP NOT NULL,
                                        discipline_id INTEGER NOT NULL REFERENCES disciplines(discipline_id),
                                        audience VARCHAR(10) NOT NULL,
-                                       description VARCHAR NOT NULL
+                                       description VARCHAR NOT NULL,
+                                       lesson_order INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS grades (

@@ -12,7 +12,7 @@ type DisciplineRepository struct {
 
 func (d *DisciplineRepository) GetDisciplineByName(name string) (*models.Discipline, error) {
 	const op = "fc.journalRep.GetDisciplineByName"
-	stmt, err := d.store.DB.Prepare("SELECT teacher_id, discipline_name, speciality, course FROM disciplines WHERE discipline_name = $1")
+	stmt, err := d.store.DB.Prepare("SELECT discipline_id, teacher_id, speciality, course FROM disciplines WHERE discipline_name = $1")
 	if err != nil {
 		return nil, err
 	}
@@ -24,7 +24,8 @@ func (d *DisciplineRepository) GetDisciplineByName(name string) (*models.Discipl
 	err = stmt.QueryRow(name).Scan(
 		&dis.DisciplineID,
 		&dis.TeacherID,
-		&dis.DisciplineName,
+		&dis.Speciality,
+		&dis.Course,
 	)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):

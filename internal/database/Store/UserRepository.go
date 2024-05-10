@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"path"
 	"sbitnev_back/internal/database/models"
 )
 
@@ -45,7 +44,27 @@ func (u *UserRepository) GetUserByLogin(login string) (*models.User, error) {
 }
 
 func (u *UserRepository) GetUserByID(id int) (*models.User, error) {
-	return nil, nil
+	const op = "fc.userRep.GetUserByID"
+	stmt, err := u.store.DB.Prepare("SELECT login, password, full_name, role FROM users WHERE user_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	var user *models.User
+	err = stmt.QueryRow(id).Scan(
+		&user.Login,
+		&user.Password,
+		&user.FullName,
+		&user.Role)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		return nil, invalidUser
+	case err != nil:
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (u *UserRepository) GetUserByName(name string) (*models.User, error) {
@@ -110,7 +129,7 @@ func (u *UserRepository) CreateUserLink(userID int64, groupName string) error {
 	}
 	defer selectStmt.Close()
 
-	insertStmt, err := u.store.DB.Prepare("INSERT INTO group_users VALUES ($1, $2)")
+	insertStmt, err := u.store.DB.Prepare("INSERT INTO group_students VALUES ($1, $2)")
 	if err != nil {
 		return err
 	}
@@ -162,8 +181,6 @@ func (u *UserRepository) GetAllTeachers() ([]models.User, error) {
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
-
-	path.Join()
 
 	return res, nil
 }

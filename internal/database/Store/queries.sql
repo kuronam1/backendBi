@@ -15,8 +15,9 @@ SELECT u.full_name, g.grade, g.date, g.comment
 FROM grades g
          JOIN users u ON g.student_id = u.user_id
          JOIN disciplines d ON g.discipline_id = d.discipline_id
-         JOIN group_users gu ON u.user_id = gu.user_id
-         JOIN groups gr ON gu.group_id = gr.group_id WHERE gr.group_name = 'БИ4-1' AND d.discipline_name = 'Программирование';
+         JOIN group_students gu ON u.user_id = gu.student_id
+         JOIN groups gr ON gu.group_id = gr.group_id
+WHERE gr.group_name = 'БИ4-1' AND d.discipline_name = 'Программирование';
 
 -- Принадлежность студента к группе
 SELECT u.full_name AS student_name, g.group_name
@@ -34,7 +35,7 @@ WHERE d.teacher_id = 28
 ORDER BY l.time;
 
 -- Вывод расписания для студента
-SELECT d.discipline_name, l.time, l.audience, l.description, u.full_name AS teacher_name
+SELECT g.group_name, l.time, d.discipline_name, l.audience, l.description, u.full_name AS teacher_name
 FROM users u
          JOIN disciplines d ON d.teacher_id = u.user_id
          JOIN lessons l ON l.discipline_id = d.discipline_id
@@ -52,3 +53,8 @@ WHERE l.group_id = 1;
 INSERT INTO users (login, password, full_name, role) VALUES ('myLogin', 'myPass', 'Андрей Горбунов', 'учитель')
 INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES (1, 'Программирование', 'ЭВМ', 1)
                                                                           ON CONFLICT DO NOTHING;
+
+SELECT d.discipline_name, g.grade, g.time, g.comment FROM grades g
+        JOIN disciplines d ON g.discipline_id = d.discipline_id
+        JOIN users u ON g.student_id = u.user_id
+WHERE u.user_id = 1

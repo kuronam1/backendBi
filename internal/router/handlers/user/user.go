@@ -14,18 +14,17 @@ import (
 )
 
 const (
-	homePageUrl     = "/"
-	LoginPageUrl    = "/login"
-	journalPageUrl  = "/journal"
-	schedulePageUrl = "/schedule"
-	AdminMenuURL    = "/AdminMenu"
-	StudentMenuURL  = "/StudentMenu"
-	TeacherMenuURL  = "/TeacherMenu"
-	ParentMenuURL   = "/ParentMenu"
-	admin           = "admin"
-	teacher         = "teacher"
-	student         = "student"
-	parent          = "parent"
+	homePageUrl    = "/"
+	LoginPageUrl   = "/login"
+	LogoutPageURl  = "/logout"
+	AdminMenuURL   = "/AdminMenu"
+	StudentMenuURL = "/StudentMenu"
+	TeacherMenuURL = "/TeacherMenu"
+	ParentMenuURL  = "/ParentMenu"
+	admin          = "admin"
+	teacher        = "teacher"
+	student        = "student"
+	parent         = "parent"
 )
 
 func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
@@ -47,15 +46,17 @@ func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
 	}
 }
 
+//Дописать проверки middleware !!!!
+
 func (h *handler) Register(router *gin.Engine) {
 	router.GET(homePageUrl, h.HomePage)
-	router.GET(LoginPageUrl, h.LoginPage)
 	router.POST(LoginPageUrl, h.UserIdent())
+	router.POST(LogoutPageURl, h.Logout)
 	//router.POST(homePageUrl, h.FeedBack)
 
 	AdminMenuPath := router.Group("/adminPanel")
 	AdminMenuPath.Use(middleware.CheckAdminAuth(h.storage))
-	AdminMenuPath.GET("/menu", h.AdminHandler.Menu)
+	//AdminMenuPath.GET("/menu", h.AdminHandler.Menu)
 	AdminMenuPath.GET("/management", h.AdminHandler.Management)
 	AdminMenuPath.POST("/management/scheduleReg", h.AdminHandler.ScheduleRegister)
 	AdminMenuPath.POST("/management/userReg", h.AdminHandler.UserRegister())
@@ -64,53 +65,34 @@ func (h *handler) Register(router *gin.Engine) {
 	AdminMenuPath.POST("/management/groupReg", h.AdminHandler.GroupRegister())
 	AdminMenuPath.PATCH("/management/gradesRef", h.AdminHandler.GradesRefactor())
 	AdminMenuPath.POST("/management/bdBackUp", h.AdminHandler.BackUp)
-	AdminMenuPath.GET("/journal")
+	AdminMenuPath.GET("/journal", h.AdminHandler.GetJournal)
 	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule)
 
 	TeacherMenuPath := router.Group("/teacherPanel")
-	TeacherMenuPath.Use(middleware.LoginCheck(), middleware.RoleCheck())
-	TeacherMenuPath.GET("/menu")
-	TeacherMenuPath.GET("/journal")
-	TeacherMenuPath.POST("/journal")
-	TeacherMenuPath.GET("/schedule")
+	TeacherMenuPath.Use(middleware.CheckTeacherAuth(h.storage))
+	TeacherMenuPath.GET("/menu", h.TeacherHandler.Menu)
+	TeacherMenuPath.GET("/journal", h.TeacherHandler.GetJournal)
+	TeacherMenuPath.POST("/journal", h.TeacherHandler.AddGrade())
+	TeacherMenuPath.GET("/schedule", h.TeacherHandler.GetSchedule)
 
 	StudentMenuPath := router.Group("/studentPanel")
-	StudentMenuPath.Use(middleware.LoginCheck(), middleware.RoleCheck())
-	StudentMenuPath.GET("/menu")
-	StudentMenuPath.GET("/journal")
-	StudentMenuPath.GET("/schedule")
+	StudentMenuPath.Use(middleware.CheckStudentAuth(h.storage))
+	StudentMenuPath.GET("/menu", h.StudentHandler.Menu)
+	StudentMenuPath.GET("/journal", h.StudentHandler.GetJournal)
+	StudentMenuPath.GET("/schedule", h.StudentHandler.GetSchedule)
 
 	ParentMenuPath := router.Group("/parentPanel")
-	ParentMenuPath.Use(middleware.LoginCheck(), middleware.RoleCheck())
-	ParentMenuPath.GET("/menu")
-	ParentMenuPath.GET("/journal")
-	ParentMenuPath.GET("/schedule")
+	ParentMenuPath.Use(middleware.CheckParentAuth(h.storage))
+	ParentMenuPath.GET("/menu", h.StudentHandler.Menu)
+	ParentMenuPath.GET("/journal", h.StudentHandler.GetJournal)
+	ParentMenuPath.GET("/schedule", h.StudentHandler.GetSchedule)
 }
 
 func (h *handler) HomePage(c *gin.Context) {
 	if c.FullPath() != homePageUrl {
 		c.HTML(404, "", nil)
 	}
-	c.HTML(200, "homePage.html", nil)
-}
-
-func (h *handler) LoginPage(c *gin.Context) {
-	c.JSON(http.StatusOK, map[string]string{
-		"status": "OK! u'r on auth page",
-	})
-}
-
-func (h *handler) SchedulePage(c *gin.Context) {
-	c.JSON(http.StatusAccepted, map[string]string{
-		"status":       "Accepted! u'r on schedule page",
-		"your role is": c.GetHeader("role"),
-	})
-}
-
-func (h *handler) JournalPage(c *gin.Context) {
-	c.JSON(http.StatusAccepted, map[string]string{
-		"status": "Accepted! u'r on journal page",
-	})
+	c.HTML(200, "index.tmpl", nil)
 }
 
 //??? Обговорить/обдумать идею автоотправления формы на какой-то рабочий email
@@ -184,4 +166,27 @@ func (h *handler) UserIdent() gin.HandlerFunc {
 			c.Redirect(http.StatusMovedPermanently, ParentMenuURL)
 		}
 	}
+}
+
+func (h *handler) Logout(c *gin.Context) {
+	token, err := c.Cookie("Authorization")
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	_, err = encryption.ParsingToken(token)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": encryption.NotValid,
+		})
+	}
+
+	c.SetCookie("Authorization", token,
+		-1, "/",
+		"localhost", false, true)
+
+	c.Redirect(http.StatusMovedPermanently, homePageUrl)
 }

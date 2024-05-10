@@ -20,7 +20,7 @@ type Grade struct {
 }
 
 type Journal struct {
-	Grades map[string][]*Grade
+	Grades map[string][]Grade
 }
 
 type Schedule struct {
@@ -35,6 +35,7 @@ type Lesson struct {
 	Audience       string
 	Description    string
 	TeacherName    string
+	LessonOrder    int
 }
 
 type Group struct {

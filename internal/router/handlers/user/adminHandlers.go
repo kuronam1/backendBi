@@ -17,12 +17,33 @@ type AdminHandler struct {
 	Storage *Store.Storage
 }
 
-func (h *AdminHandler) Menu(c *gin.Context) {
+/*func (h *AdminHandler) Menu(c *gin.Context) {
 	c.HTML(200, "", nil)
-}
+}*/
+
+//"homePage"
 
 func (h *AdminHandler) Management(c *gin.Context) {
-	c.HTML(200, "", nil)
+	groups, err := h.Storage.Groups().GetAllGroups()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	specialities, err := h.Storage.Groups().GetAllSpecialities()
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "", gin.H{
+		"Groups":       groups,
+		"Specialities": specialities,
+	})
 }
 
 // Registers
@@ -128,6 +149,10 @@ func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 				"error": err,
 			})
 		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "group created",
+		})
 	}
 }
 
@@ -138,9 +163,34 @@ func (h *AdminHandler) BackUp(c *gin.Context) {
 }
 
 // Grades and Journal
-//проверка на query параметры!
 
-func (h *AdminHandler) Journal(c *gin.Context) {
+func (h *AdminHandler) GetJournal(c *gin.Context) {
+	groupName, exist := c.GetQuery("group")
+	if !exist {
+		h.GetPreJournal(c)
+		return
+	}
+
+	disciplineName, exist := c.GetQuery("discipline")
+	if !exist {
+		h.GetPreJournal(c)
+		return
+	}
+
+	journal, err := h.Storage.Journal().GetGroupJournalByDiscipline(groupName, disciplineName)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "", gin.H{
+		"journal": journal,
+	})
+}
+
+func (h *AdminHandler) GetPreJournal(c *gin.Context) {
 	groups, err := h.Storage.Groups().GetAllGroups()
 	if err != nil {
 		c.AbortWithStatusJSON(500, gin.H{
@@ -229,16 +279,15 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 // Schedules
 
 func (h *AdminHandler) GetSchedule(c *gin.Context) {
-	values := c.Request.URL.Query()
-	groupName := values.Get("group")
-	if groupName != "" {
+	groupName, exist := c.GetQuery("group")
+	if exist {
 		h.ScheduleWithQueryGroup(groupName)
 		c.Abort()
 		return
 	}
 
-	teacherName := values.Get("teacher")
-	if teacherName != "" {
+	teacherName, exist := c.GetQuery("teacher")
+	if exist {
 		h.ScheduleWithQueryTeacher(teacherName)
 		c.Abort()
 		return

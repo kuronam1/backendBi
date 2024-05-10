@@ -90,3 +90,29 @@ func configurationGroupName(speciality string, number, course int) string {
 		return fmt.Sprintf("БП %d - %d", number, course)
 	}
 }
+
+func (g *GroupRepository) GetAllSpecialities() ([]string, error) {
+	const op = "fc.groupRep.GetAllSpecialities"
+	query := `SELECT speciality FROM disciplines`
+
+	rows, err := g.store.DB.Query(query)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var res []string
+	for rows.Next() {
+		var speciality string
+		err = rows.Scan(&speciality)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, speciality)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return res, err
+}
