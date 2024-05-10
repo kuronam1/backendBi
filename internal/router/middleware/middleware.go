@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"log/slog"
 	"net/http"
 	"sbitnev_back/internal/database/Store"
 	"sbitnev_back/internal/router/handlers/encryption"
@@ -204,6 +206,13 @@ func CheckParentAuth(storage *Store.Storage) gin.HandlerFunc {
 		}
 		c.Set("id", id)
 
+		c.Next()
+	}
+}
+
+func LoggingReq(logger *slog.Logger) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		logger.Info(fmt.Sprintf("[request] Method: %v, addr: %v", c.Request.Method, c.Request.URL))
 		c.Next()
 	}
 }
