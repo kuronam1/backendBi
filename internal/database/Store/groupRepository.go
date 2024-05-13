@@ -19,7 +19,7 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	const op = "fc.Storage.GetAllGroups"
 	//GetLogger()
 
-	stmt, err := g.store.DB.Prepare("SELECT group_name, number, speciality, course FROM groups")
+	stmt, err := g.store.DB.Prepare("SELECT group_id, group_name, number, speciality, course FROM groups")
 	if err != nil {
 		return nil, err
 	}
@@ -35,6 +35,7 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	for rows.Next() {
 		group := models.Group{}
 		err = rows.Scan(
+			&group.Id,
 			&group.Name,
 			&group.Number,
 			&group.Speciality,
@@ -52,25 +53,23 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	return res, nil
 }
 
-func (g *GroupRepository) GetGroupByName(name string) (*models.Group, error) {
+func (g *GroupRepository) GetGroupByName(name interface{}) (models.Group, error) {
 	const op = "fc.groupRep.GetGroupByName"
-	stmt, err := g.store.DB.Prepare("SELECT group_id, speciality, course FROM groups WHERE group_name = $1")
+	stmt, err := g.store.DB.Prepare("SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_name = $1")
 	if err != nil {
-		return nil, err
+		return models.Group{}, err
 	}
 	defer stmt.Close()
 
-	var gr = models.Group{
-		Name: name,
-	}
-	err = stmt.QueryRow(name).Scan(&gr.Id, &gr.Speciality, &gr.Course)
+	gr := models.Group{}
+	err = stmt.QueryRow(name).Scan(&gr.Id, &gr.Speciality, &gr.Name, &gr.Number, &gr.Course)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return nil, GroupNotRegistered
+		return models.Group{}, GroupNotRegistered
 	case err != nil:
-		return nil, err
+		return models.Group{}, err
 	default:
-		return &gr, nil
+		return gr, nil
 	}
 }
 
@@ -90,13 +89,13 @@ func (g *GroupRepository) GroupRegistration(group *models.Group) error {
 func configurationGroupName(speciality string, number, course int) string {
 	switch speciality {
 	case "ЭВМ":
-		return fmt.Sprintf("ЭВМ %d - %d", course, number)
+		return fmt.Sprintf("ЭВМ %d-%d", course, number)
 	case "БИ":
-		return fmt.Sprintf("БИ %d - %d", course, number)
+		return fmt.Sprintf("БИ %d-%d", course, number)
 	case "ПМ":
-		return fmt.Sprintf("ПМ %d - %d", course, number)
+		return fmt.Sprintf("ПМ %d-%d", course, number)
 	default:
-		return fmt.Sprintf("БП %d - %d", course, number)
+		return fmt.Sprintf("БП %d-%d", course, number)
 	}
 }
 
@@ -124,4 +123,46 @@ func (g *GroupRepository) GetAllSpecialities() ([]string, error) {
 	}
 
 	return res, err
+}
+
+func (g *GroupRepository) GetGroupByID(id int) (*models.Group, error) {
+	const op = "fc.groupRep.GetGroupByID"
+	stmt, err := g.store.DB.Prepare("SELECT group_name, speciality, number, course FROM groups WHERE group_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	group := &models.Group{}
+	err = stmt.QueryRow(id).Scan(
+		&group.Name,
+		&group.Speciality,
+		&group.Number,
+		&group.Course)
+	if err != nil {
+		return nil, err
+	}
+
+	return group, nil
+}
+
+func (g *GroupRepository) GroupMembership(studentID int) (*models.Group, error) {
+	stmt, err := g.store.DB.Prepare("SELECT g.group_id, group_name, number, speciality, course FROM groups g JOIN group_students gr ON g.group_id = gr.group_id WHERE student_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	group := &models.Group{}
+	err = stmt.QueryRow(studentID).Scan(
+		&group.Id,
+		&group.Name,
+		&group.Number,
+		&group.Speciality,
+		&group.Course)
+	if err != nil {
+		return nil, err
+	}
+
+	return group, nil
 }

@@ -55,6 +55,16 @@ ORDER BY g.date`)
 		return nil, err
 	}
 
+	group, err := j.store.Groups().GroupMembership(id)
+	if err != nil {
+		return nil, err
+	}
+
+	journal.Headers, err = j.store.Disciplines().GetGroupDisciplineNames(group.Name)
+	if err != nil {
+		return nil, err
+	}
+
 	return journal, nil
 
 }
@@ -75,7 +85,7 @@ func (j *JournalRepository) UpdateGrade(oldGrade, newGrade *models.Grade) error 
 	return nil
 }
 
-func (j *JournalRepository) GetGroupJournalByDiscipline(groupName, disciplineName string) (*models.Journal, error) {
+func (j *JournalRepository) GetGroupJournalByDiscipline(groupName, disciplineName string) ([]map[string][]models.Grade, error) {
 	const op = "fc.journalRep.GetAdminJournal"
 	stmt, err := j.store.DB.Prepare(`
 SELECT g.grade_id, g.grade, g.date, g.comment, u.full_name
@@ -83,7 +93,8 @@ FROM grades g
 			JOIN users u ON g.student_id = u.user_id
 			JOIN disciplines d ON d.discipline_id = g.discipline_id
 			JOIN groups gr ON d.speciality = gr.speciality AND d.course = gr.course
-WHERE gr.group_name = $1 AND d.discipline_name = $2`)
+WHERE gr.group_name = $1 AND d.discipline_name = $2
+ORDER BY u.full_name`)
 	if err != nil {
 		return nil, err
 	}
@@ -98,6 +109,7 @@ WHERE gr.group_name = $1 AND d.discipline_name = $2`)
 	journal := &models.Journal{
 		Grades: make(map[string][]models.Grade),
 	}
+
 	for rows.Next() {
 		var (
 			grade    models.Grade
@@ -114,8 +126,39 @@ WHERE gr.group_name = $1 AND d.discipline_name = $2`)
 		}
 		journal.Grades[fullName] = append(journal.Grades[fullName], grade)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
 
-	return journal, nil
+	journal.Headers, err = j.store.User().GetUserNamesByGroup(groupName)
+	if err != nil {
+		return nil, err
+	}
+
+	lessons, err := j.store.Schedule().GetAllGroupsLessonsOneDis(groupName, disciplineName)
+	if err != nil {
+		return nil, err
+	}
+
+	result := make([]map[string][]models.Grade, len(journal.Headers))
+	for i := 0; i < len(journal.Headers); i++ {
+		mp := make(map[string][]models.Grade)
+		studentGrades := make([]models.Grade, len(lessons))
+		for j := 0; j < len(lessons); j++ {
+			grades, inMap := journal.Grades[journal.Headers[i]]
+			if inMap {
+				for _, value := range grades {
+					if value.Date == lessons[j] {
+						studentGrades[j] = value
+					}
+				}
+			}
+		}
+		mp[journal.Headers[i]] = studentGrades
+		result[i] = mp
+	}
+
+	return result, nil
 }
 
 func (j *JournalRepository) CreateGrade(grade *models.Grade) error {

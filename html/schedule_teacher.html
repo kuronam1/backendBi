@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/fontello.css">
+    <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
+    <title>Филиал МАИ РКТ | Расписание *Имя преподавателя*</title> 
+</head>
+<body onload="logOutPopup(), restyleLinksTeacher(), checkSchedule()">
+
+    <!-- Header -->
+
+    <header>
+        <nav class="container navbar navbar-expand-lg">
+            <div class="col-md-3 justify-content-start">
+                <a id="teacher-brend" class="navbar-brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a id="teacher-schedule">Расписание</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a id="teacher-journal">Журнал</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-end">
+                <div id="circle">
+                    <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
+                </div>  
+            </div>            
+        </nav>
+    </header>
+
+    <!-- Блок с расписанием, весь приходит с бэка -->
+
+    <section class="pb-3 pt-3">
+        <div class="nameLesson text-center">
+            <h1>Расписание *ФИО преподавателя*</h1>
+        </div>
+        <div class="container mt-4 mb-4">
+            <table id="table" class="table table-bordered table-striped">
+                <thead>
+                <tr>
+                    <th scope="col">Дата</th>
+                    <th scope="col">День недели</th>
+                    <th scope="col">8:30 - 10:00</th>
+                    <th scope="col">10:10 - 11:40</th>
+                    <th scope="col">12:40 - 14:10</th>
+                    <th scope="col">14:20 - 15:50</th>
+                    <th scope="col">16:00 - 17:30</th>
+                    <th scope="col">17:40 - 19:10</th>
+                </tr>
+                </thead>
+                <!--.Schedule - map, где ключ - dayOfWeek, значение - структуры Lesson за этот день -->
+                <tbody>
+                <tr>
+                    <td scope="row">{{index .Schedule "key1"}}</td>
+                    <td scope="row">Пн</td>
+                    <td scope="row">{{index .Schedule "key1"}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Вт</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Ср</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Чт</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Пт</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Сб</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                <tr>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">Вс</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+            
+    </section>
+
+    <!-- Всплывающее окно для выхода -->
+
+    <div class="popup">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <h2>Вы уверены, что хотите выйти?</h2>
+            <form>
+                <div class="form-element">
+                    <button id="cancel-button" type="button">Выйти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="popupSchedule">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div id="windowSchedule">
+        </div>
+    </div>
+    <div class="overlay" id="overlay" style="display: none"></div>
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/script.js"></script>
+    <script src="../static/js/savefile.js"></script>
+</body> 
+</html>

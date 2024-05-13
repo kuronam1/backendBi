@@ -15,6 +15,13 @@ var (
 	notValidRole      = errors.New("role is not valid")
 )
 
+const (
+	Admin   = "admin"
+	Teacher = "teacher"
+	Student = "student"
+	Parent  = "parent"
+)
+
 func CheckAdminAuth(storage *Store.Storage) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		token, err := c.Cookie("Authorization")
@@ -52,7 +59,7 @@ func CheckAdminAuth(storage *Store.Storage) gin.HandlerFunc {
 			return
 		}
 
-		if user.Role != "admin" {
+		if user.Role != Admin {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": "invalid role",
 			})
@@ -100,7 +107,7 @@ func CheckStudentAuth(storage *Store.Storage) gin.HandlerFunc {
 			return
 		}
 
-		if user.Role != "student" {
+		if user.Role != Student {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": "invalid role",
 			})
@@ -149,7 +156,7 @@ func CheckTeacherAuth(storage *Store.Storage) gin.HandlerFunc {
 			return
 		}
 
-		if user.Role != "teacher" {
+		if user.Role != Teacher {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": "invalid role",
 			})
@@ -198,7 +205,7 @@ func CheckParentAuth(storage *Store.Storage) gin.HandlerFunc {
 			return
 		}
 
-		if user.Role != "parent" {
+		if user.Role != Parent {
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
 				"error": "invalid role",
 			})

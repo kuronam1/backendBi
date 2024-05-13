@@ -44,12 +44,7 @@ func (h *AdminHandler) Management(c *gin.Context) {
 		return
 	}
 
-	/*c.HTML(http.StatusOK, "", gin.H{
-		"Groups":       groups,
-		"Specialities": specialities,
-	})*/
-
-	c.JSON(http.StatusOK, gin.H{
+	c.HTML(http.StatusOK, "admin_management.html", gin.H{
 		"Groups":       groups,
 		"Specialities": specialities,
 	})
@@ -97,7 +92,7 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 		Password  string `json:"password"`
 		UserName  string `json:"userName"`
 		Role      string `json:"role"`
-		GroupName string `json:"groupName"`
+		GroupName string `json:"groupName,omitempty"`
 	}
 	return func(c *gin.Context) {
 		const op = "AdminHandlers.UserRegister"
@@ -208,12 +203,43 @@ func (h *AdminHandler) GetJournal(c *gin.Context) {
 		return
 	}
 
-	/*c.HTML(http.StatusOK, "", gin.H{
-		"Journal": journal,
-	})*/
-	c.JSON(http.StatusOK, gin.H{
-		"Journal": journal,
+	lessons, err := h.Storage.Schedule().GetAllGroupsLessonsOneDis(groupName, disciplineName)
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	groups, err := h.Storage.Groups().GetAllGroups()
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(500, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	disciplines, err := h.Storage.Disciplines().GetAllDisciplines()
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "admin_journal.html", gin.H{
+		"Journal":     journal,
+		"Lessons":     lessons,
+		"Groups":      groups,
+		"Disciplines": disciplines,
 	})
+	/*c.JSON(200, gin.H{
+		"Journal": journal,
+		"Lessons": lessons,
+	})*/
 }
 
 func (h *AdminHandler) GetPreJournal(c *gin.Context) {
@@ -236,14 +262,14 @@ func (h *AdminHandler) GetPreJournal(c *gin.Context) {
 		return
 	}
 
-	/*c.HTML(200, "", gin.H{
-		"Groups":      groups,
-		"Disciplines": disciplines,
-	})*/
-	c.JSON(http.StatusOK, gin.H{
+	c.HTML(http.StatusOK, "admin_journal.html", gin.H{
 		"Groups":      groups,
 		"Disciplines": disciplines,
 	})
+	/*c.JSON(200, gin.H{
+		"Groups":      groups,
+		"Disciplines": disciplines,
+	})*/
 }
 
 func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
@@ -251,10 +277,10 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 		GradeID        int    `json:"gradeID"`
 		UserName       string `json:"userName"`
 		DisciplineName string `json:"disciplineName"`
-		OldLevel       int    `json:"oldLevel"`
+		OldLevel       string `json:"oldLevel"`
 		OldDate        string `json:"oldDate"`
 		OldComment     string `json:"oldComment,omitempty"`
-		NewLevel       int    `json:"newLevel"`
+		NewLevel       string `json:"newLevel"`
 		NewDate        string `json:"newDate"`
 		NewComment     string `json:"newComment,omitempty"`
 	}
@@ -340,15 +366,15 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 func (h *AdminHandler) GetSchedule(c *gin.Context) {
 	const op = "AdminHandlers.GetSchedule"
 	groupName, exists := c.GetQuery("group")
-	if exists {
-		h.ScheduleWithQueryGroup(groupName)
+	if exists && groupName != "" {
+		h.ScheduleWithQueryGroup(c, groupName)
 		c.Abort()
 		return
 	}
 
 	teacherName, exists := c.GetQuery("teacher")
-	if exists {
-		h.ScheduleWithQueryTeacher(teacherName)
+	if exists && teacherName != "" {
+		h.ScheduleWithQueryTeacher(c, teacherName)
 		c.Abort()
 		return
 	}
@@ -356,103 +382,155 @@ func (h *AdminHandler) GetSchedule(c *gin.Context) {
 	h.GetPreSchedule(c)
 }
 
-func (h *AdminHandler) ScheduleWithQueryGroup(groupName string) gin.HandlerFunc {
+func (h *AdminHandler) ScheduleWithQueryGroup(c *gin.Context, groupName string) {
 	const op = "AdminHandlers.ScheduleWithQueryGroup"
-	return func(c *gin.Context) {
-		schedule, err := h.Storage.ScheduleMethods.GetScheduleByGroupName(groupName)
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		case err != nil:
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-		}
-
-		/*c.HTML(http.StatusOK, "", gin.H{
-			"schedule": schedule,
-		})*/
-		c.JSON(http.StatusOK, gin.H{
-			"Schedule": schedule,
+	schedule, err := h.Storage.ScheduleMethods.GetScheduleByGroupName(groupName)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
 		})
 	}
+
+	groups, err := h.Storage.Groups().GetAllGroups()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	teachers, err := h.Storage.User().GetAllTeachers()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "admin_schedule.html", gin.H{
+		"Schedule": schedule,
+		"Groups":   groups,
+		"Teachers": teachers,
+	})
 }
 
-func (h *AdminHandler) ScheduleWithQueryTeacher(teacherName string) gin.HandlerFunc {
+func (h *AdminHandler) ScheduleWithQueryTeacher(c *gin.Context, teacherName string) {
 	const op = "AdminHandlers.ScheduleWithQueryTeacher"
-	return func(c *gin.Context) {
-		schedule, err := h.Storage.ScheduleMethods.GetScheduleByTeacherName(teacherName)
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		case err != nil:
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		/*c.HTML(http.StatusOK, "", gin.H{
-			"Schedule": schedule,
-		})*/
-		c.JSON(http.StatusOK, gin.H{
-			"Schedule": schedule,
+	schedule, err := h.Storage.ScheduleMethods.GetScheduleByTeacherName(teacherName)
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
 		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
 	}
+
+	groups, err := h.Storage.Groups().GetAllGroups()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	teachers, err := h.Storage.User().GetAllTeachers()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(http.StatusOK, "admin_schedule.html", gin.H{
+		"Schedule": schedule,
+		"Groups":   groups,
+		"Teachers": teachers,
+	})
 }
 
-func (h *AdminHandler) GetPreSchedule(c *gin.Context) gin.HandlerFunc {
+func (h *AdminHandler) GetPreSchedule(c *gin.Context) {
 	const op = "AdminHandlers.GetPreSchedule"
-	return func(c *gin.Context) {
-		groups, err := h.Storage.Groups().GetAllGroups()
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		case err != nil:
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		teachers, err := h.Storage.User().GetAllTeachers()
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		case err != nil:
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		/*c.HTML(200, "", gin.H{
-			"Teachers": teachers,
-			"Groups":   groups,
-		})*/
-		c.JSON(http.StatusOK, gin.H{
-			"Teachers": teachers,
-			"Groups":   groups,
+	groups, err := h.Storage.Groups().GetAllGroups()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
 		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
 	}
+
+	teachers, err := h.Storage.User().GetAllTeachers()
+	switch {
+	case errors.Is(err, sql.ErrNoRows):
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": err,
+		})
+		return
+	case err != nil:
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	c.HTML(200, "admin_schedule.html", gin.H{
+		"Teachers": teachers,
+		"Groups":   groups,
+	})
 }

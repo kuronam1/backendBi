@@ -15,7 +15,7 @@ import (
 
 const (
 	homePageUrl    = "/"
-	LoginPageUrl   = "/login"
+	LoginPageUrl   = "/auth"
 	LogoutPageURl  = "/logout"
 	AdminMenuURL   = "/adminPanel/management"
 	StudentMenuURL = "/studentPanel/menu"
@@ -66,14 +66,14 @@ func (h *handler) Register(router *gin.Engine) {
 	AdminMenuPath.POST("/management/bdBackUp", h.AdminHandler.BackUp)
 	AdminMenuPath.GET("/journal", h.AdminHandler.GetJournal)
 	AdminMenuPath.PATCH("/journal/gradesRef", h.AdminHandler.GradesRefactor())
-	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule) // исправить
+	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule) // исправить + Исправить функцию по генерации имени группы (убрать пробелы) и специальности
 
 	TeacherMenuPath := router.Group("/teacherPanel")
 	TeacherMenuPath.Use(middleware.CheckTeacherAuth(h.storage))
 	TeacherMenuPath.GET("/menu", h.TeacherHandler.Menu)
 	TeacherMenuPath.GET("/journal", h.TeacherHandler.GetJournal)
 	TeacherMenuPath.POST("/journal", h.TeacherHandler.AddGrade())
-	TeacherMenuPath.GET("/schedule", h.TeacherHandler.GetSchedule) // исправить
+	TeacherMenuPath.GET("/schedule", h.TeacherHandler.GetSchedule)
 
 	StudentMenuPath := router.Group("/studentPanel")
 	StudentMenuPath.Use(middleware.CheckStudentAuth(h.storage))
@@ -92,10 +92,7 @@ func (h *handler) HomePage(c *gin.Context) {
 	if c.FullPath() != homePageUrl {
 		c.HTML(404, "", nil)
 	}
-	//c.HTML(200, "index.tmpl", nil)
-	c.JSON(200, gin.H{
-		"OK": "u r on homepage",
-	})
+	c.HTML(200, "index.html", nil)
 }
 
 //??? Обговорить/обдумать идею автоотправления формы на какой-то рабочий email

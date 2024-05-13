@@ -30,7 +30,16 @@ func (h *StudentHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	schedule, err := h.Storage.Schedule().GetScheduleByID(studentId.(int))
+	group, err := h.Storage.Groups().GroupMembership(studentId.(int))
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	schedule, err := h.Storage.Schedule().GetScheduleByGroupName(group.Name)
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/fontello.css">
+    <link rel="shortcut icon" href="media/icon.png" type="image/x-icon">
+    <title>Филиал МАИ РКТ | Расписание, Журнал</title> 
+</head>
+<body onload="loginPopup()">
+        <header id="intro">
+        <nav class="container navbar navbar-expand-lg">
+            <div class="col-md-3 justify-content-start">
+                <a href="index.html" id="brend" class="navbar-brend"><img src="media/logo.png" alt="МАИ РКТ"></a>
+            </div>
+            <div class="col-md-3 justify-content-center text-center"></div>
+            <div class="col-md-3 justify-content-center text-center">
+            </div>
+            <div class="col-md-3 justify-content-end">
+                <div id="circle">
+                    <a href="#" class="nav-link p-0" id="entry"><i class="icon-login"></i></a>
+                </div>
+            </div>            
+        </nav>
+    </header>
+
+    <!-- Banner -->
+
+    <section>
+        <div class="banner">
+            <img src="media/souz.jpg" class="d-block">
+            <div class="welcome-text">
+                <h1 class="welcome-message text-center"><span class="rotate"> ФИЛИАЛ МАИ РКТ, РАСПИСАНИЕ, ЭЛЕКТРОННЫЙ ЖУРНАЛ </span></h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+
+    <footer>
+        <div class="container text-center pb-5 pt-5">
+            <div class="row">
+                <div class="col-md-6 col-sm-12 d-flex align-items-center justify-content-center">
+                    <div class="vk">
+                        <h1>Группа ВК</h1>
+                        <a href="https://vk.com/rkt_mai"><img src="http://qrcoder.ru/code/?https%3A%2F%2Fvk.com%2Frkt_mai&4&0" width="132" height="132" border="0" title="QR код"></a>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-12 col-sm-mt-3">
+                    <form id="newsletter">
+        				<h3 class="text-center mb-3">Оставьте своё сообщение и мы обязательно на него ответим!</h3>
+						<div class="input-box mb-3">
+							<input type="text" name="name" placeholder="Введите ваше ФИО">
+						</div>
+						<div class="input-box mb-3">
+							<input type="email" name="email" required placeholder="Введите ваш E-mail:">
+						</div>
+						<div class="input-box message-box mb-3">
+							<textarea name="message" placeholder="Введите ваше сообщение"></textarea>
+						</div>
+						<button id="newsletter-submit" type="submit">Отправить</button>
+        			</form>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Всплывающее окно -->
+
+    <div class="popup">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form" onclick="oneSelector()">
+            <h2>Авторизация</h2>
+            <form id="login-form" method="post">
+                <div class="form-element">
+                    <label>Логин:</label>
+                    <input type="text" name="login" placeholder="Введите логин">
+                </div>
+                <div class="form-element">
+                   <label>Пароль:</label>
+                   <input type="password" name="password" placeholder="Введите пароль">
+                </div>
+                <div class="form-element">
+                    <button id="enter" type="submit">Войти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="overlay" id="overlay" style="display: none"></div>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/savefile.js"></script>
+</body> 
+</html>

@@ -1,0 +1,538 @@
+:root{
+    --color1: #0095da;
+    --color2: #fff;
+	--color3: #132e49;
+}
+
+
+@media (min-width: 1650px) {
+	body{
+		width: 80%;
+		margin: 0 auto;
+		box-shadow: 0 0 80px gray;
+	}
+}
+
+@font-face {
+    font-family: 'Rubik';
+    src: url('../font/Rubik-Regular.ttf'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+}
+
+* {
+    font-family: 'Rubik, sans-serif';
+}
+
+/* ~~~~~~~~~~~~DEFAULT PAGE~~~~~~~~~~~~~~~~ */
+
+/* Header */
+
+
+header{
+	background-color: var(--color3);
+}
+
+#intro{
+	background-color: var(--color2);
+}
+
+
+#intro .button-nav a{
+	color: var(--color2);
+	border: 2px solid var(--color1);
+	background-color: #0095da;
+	transition: 0.3s;
+}
+
+#intro .button-nav a:hover{
+	transform: scale(1.02);
+	transition: 0.5s;
+	box-shadow: 0 0 4px black;
+}
+
+
+#circle{
+    padding: 10px;
+    background-color: var(--color1);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+	margin: 0 0 0 auto;
+	transition: 0.3s;
+}
+
+#circle:hover{
+	transform: scale(1.02);
+	transition: 0.5s;
+	box-shadow: 0 0 4px black;
+}
+
+.icon-login, .icon-ok, .icon-cancel-1{
+    font-size: 25px;
+    color:  var(--color2);
+}
+
+#entry, #authorized{
+    margin-left: 2px;
+    margin-top: 2px;
+}
+
+
+/* Banner */
+
+.banner{
+    width: 100%;
+    display: block;
+    overflow: hidden;
+    position: relative;
+    z-index: 0;
+}
+
+.banner img{
+    width: 100%;
+    height: auto;
+}
+
+.welcome-text{
+    position: absolute;
+    margin-left: auto;
+    margin-right: auto;
+    left: 0;
+    right: 0;
+    top: 35%;
+    text-align: center;
+    z-index: 1;
+}
+
+.welcome-message {
+    color: var(--color2);
+    font-size: 60px;
+    font-weight: 700;
+}
+
+@media (max-width: 767px){
+    .welcome-message{
+        font-size: 28px;
+    }
+}
+
+/* Footer */
+
+footer{
+    background-color: #555a78;     /* #21325b; */
+    color: white;
+}
+
+.vk{
+	position: relative;
+	top: -50px;
+}
+
+@media (max-width: 767px){
+    .vk{
+        position: static;
+		margin-bottom: 25px;
+    }
+}
+
+#newsletter {
+	display: inline-block;
+	margin-top: 5px;
+	font-size: 20px;
+}
+
+
+#newsletter button{
+	color: #ffffff;
+	background: #0095da;
+	display: inline-block;
+	float: none;
+	transition: all 0.25s;
+	border: 0;
+	border-radius: 5px;
+	padding: 12px 20px;
+}
+
+#newsletter button:hover {
+	background: #ffffff;
+	color: #0095da;
+	box-shadow: 0px 0px 2px gray;
+}
+
+#newsletter input {
+	background: none;
+	box-shadow: none;
+	border: 1px solid #ffffff;
+	color: black;
+	text-align: center;
+	background: #ffffff;
+	height: 48px;
+	width: 70%;
+	padding: 14px;
+	-webkit-transition: all 0.25s;	
+	transition: all 0.25s;
+	border-radius: 5px;
+}
+#newsletter input:focus {
+	outline: none;
+	border-color: black;
+} 
+
+.input-box textarea {
+	height: auto; 
+	width: 70%; 
+	border: none; 
+	border-radius: 5px; 
+	background: #f0f1f8; 
+	padding: 0 20px;
+	resize: none; 
+	padding: 20px;
+}
+
+.input-box textarea:hover{
+	outline: none;
+	border-color: black;
+}
+
+/*  Authentification  */
+
+.popup, .popupScore, .popupSchedule {
+	position: absolute;
+	font-size: 20px;
+	z-index: 10;
+	top: -150%;
+	left: 50%;
+	opacity: 0;
+	transform: translate(-50%, -50%) scale(1.25);
+	width: 450px;
+	padding: 20px 30px;
+	background: var(--color2);
+	box-shadow: 2px 2px 5px 5px rgba(0,0, 0, 0.15);
+	border-radius: 20px;
+	transition: top 0ms ease-in-out 200ms,
+	opacity 0ms ease-in-out 0ms,
+	transform 20ms ease-in-out 0ms;
+
+}
+
+.active{
+	top: 50%;
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+	transition: top 0ms ease-in-out 0ms,
+				opacity 200ms ease-in-out 0ms,
+				transform 20ms ease-in-out 0ms;
+}
+
+.popup .close-btn, .popupScore .close-btn, .popupSchedule .close-btn
+{
+	position: absolute;
+	top: 10px;
+	right: 4px;
+	text-align: center;
+	line-height: 15px;
+	cursor: pointer;
+}
+
+.icon-cancel-circled{
+	font-size: 35px;
+}
+
+
+.popup .form h2, .popupScore h2{
+	text-align: center;
+	color: #222;
+	margin: 10px 0px 20px;
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.popup .form .form-element{
+	margin: 15px 0px;
+}
+
+.popup .form .form-element label {
+	font-size: 25px;
+	color: #222;
+}
+
+.popup .form .form-element input[type="text"],
+.popup .form .form-element input[type="password"],
+.popupScore form input[type="text"]{
+	margin-top: 5px;
+	display: block;
+	width: 100%;
+	padding: 10px;
+	outline: none;
+	border: 1px solid #aaa;
+	border-radius: 5px;
+	font-size: 25px;
+}
+
+.popup .form .form-element button,
+.popupScore form button{
+	width: 100%;
+	margin: 20px 0;
+	padding: 10px 0;
+	border: none;
+	outline: none;
+	font-size: 25px;
+	background: var(--color1);
+	color: #f5f5f5;
+	border-radius: 10px;
+	cursor: pointer;
+	transition: 0.3s;
+	font-weight: bold	;
+}
+
+.popup .form .form-element button:hover{
+	transform: scale(1.0001);
+	transition: 0.5s;
+	box-shadow: 0 0 4px black;
+}
+
+.overlay{
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background: rgba(0,0,0,0.5);
+	z-index: 3;
+  }
+
+  /* ~~~~~~~~~~~~STUDENT JOURNAL~~~~~~~~~~~~~~~~ */
+
+#schedule, #journal, #teacher-schedule,#teacher-journal, #student-journal,#student-schedule{
+	text-decoration: none;
+	font-weight: bolder;
+	color: var(--color2);
+	font-size: 23px;
+	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+	padding: 10px 20px;
+	transform: scale(1.02);
+	transition: 0.5s;
+	border-radius: 10px;
+	border: 2px solid var(--color2);
+	cursor: pointer;
+}
+
+  /* ~~~~~~~~~~~~TEACHER JOURNAL~~~~~~~~~~~~~~~~ */
+
+.button-select form{
+	display: flex;
+	align-items: center;
+    justify-content: center;
+	font-size: 20px;
+}
+
+.button-select form select{
+	margin: 5px;
+	background: none;
+	box-shadow: none;
+	border: 2px solid var(--color3);
+	color: black;
+	text-align: center;
+	background: #ffffff;
+	height: 48px;
+	width: 250px;
+	-webkit-transition: all 0.25s;	
+	transition: all 0.25s;
+	border-radius: 5px;		
+}
+
+.button-select form select>option{
+	font-size: 20px;	
+}
+
+.button-select form button, #saveTable{
+	background: var(--color2);
+	display: inline-block;
+	float: none;
+	transition: all 0.25s;
+	border: 0;
+	border-radius: 5px;
+	margin: 20px;
+	padding: 7.7px 20px;
+	border: 2px solid var(--color3);
+}
+
+.button-select form button:hover, #saveTable:hover{
+	background-color: var(--color3);
+	transition: 0.3s;
+	color: white;
+}
+
+
+@media (max-width: 500px){
+	.button-select form{
+		display: block;
+	}
+    .button-select form select{
+		display: block;
+		margin: 10px auto;
+	}
+	.button-select form button{
+		display: block;
+		margin: 0 auto;
+	}
+	
+}
+
+
+.selectScore{
+	background: 0;
+	border: 0;
+	appearance: none; 
+	width: 50%; 
+	margin: 0 auto; 
+	text-align: center;
+}
+
+#saveTable{
+	margin: 0;
+	font-size: 20px;
+}
+
+/*
+.selectScore>option[value="1"]{
+	color: red;
+	text-decoration: underline;
+}
+*/
+.selectScore option[value="2"]{
+	color: red;
+}
+.selectScore option[value="3"]{
+	color: orange;
+}
+.selectScore option[value="4"]{
+	color: #cccc00;
+}
+.selectScore option[value="5"]{
+	color: green;
+}
+.selectScore option[value="Н"]{
+	color: brown;
+}
+
+/* Admin page */
+
+#brend, #student-brend, #teacher-brend{
+	cursor: pointer;
+}
+
+#admin{
+	background-color: var(--color2);
+	padding-top: 20px;
+	font-size: 20px;
+}
+
+#admin h2{
+	margin-top: 10px;
+	font-weight: bold;
+}
+
+#admin .row{
+	margin: 0 50px;
+}
+
+#admin .col{
+	color: #000;
+	border: 2px solid #48485c;
+	border-radius: 15px;
+	margin: 50px;
+	padding: 40px 0;
+	background-color: var(--color2);
+	box-shadow: 0 0 2px black;
+}
+
+.forCenterBox{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+
+}
+
+.col button{
+	color: #ffffff;
+	background: var(--color3);
+	display: inline-block;
+	float: none;
+	transition: all 0.25s;
+	border: 0;
+	border-radius: 5px;
+	margin: 20px;
+	padding: 8px 20px;
+	font-weight: bolder;
+	border: 2px solid var(--color2);
+}
+
+.col button:hover {
+	background: #ffffff;
+	color: var(--color3);
+	border: 2px solid var(--color3);
+	box-shadow: 0px 0px 2px gray;
+}
+
+.col input[type="text"], .col select {
+	margin: 5px;
+	background: none;
+	box-shadow: none;
+	border: 2px solid var(--color3);
+	font-size: 17px/21px;
+	color: black;
+	text-align: center;
+	background: #ffffff;
+	height: 48px;
+	width: 70%;
+	-webkit-transition: all 0.25s;	
+	transition: all 0.25s;
+	border-radius: 5px;
+}
+
+.col input:focus, select {
+	outline: none;
+	border-color: black;
+} 
+
+/* ADMIN JOURNAL */
+
+.popupScore form input[type="text"]{
+	margin-top: 0;
+}
+
+.popupScore h2{
+	margin-bottom: 10px;
+}
+
+.popupScore form button{
+	background-color: var(--color3);
+}
+
+.popupScore form select{
+	width: 25%;
+	text-align: center;
+	padding: 18px;
+	border: 2px solid #aaa;
+	border-radius: 5px;
+	display: block;
+    margin: 20px auto;
+	text-indent: 10px;
+}
+
+.popupScore form select option[value="5"]{
+	color: green;
+}
+.popupScore form select option[value="4"]{
+	color: #cccc00;
+}
+.popupScore form select option[value="3"]{
+	color: orangered;
+}
+.popupScore form select option[value="2"]{
+	color: red;
+}
+.popupScore form select option[value="Н"]{
+	color: brown;
+}
+

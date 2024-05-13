@@ -32,8 +32,9 @@ CREATE TABLE IF NOT EXISTS disciplines (
 CREATE TABLE IF NOT EXISTS lessons ( --вариант для храниея рассписания всех групп в одной таблице
                                        lesson_id SERIAL PRIMARY KEY,
                                        group_id INTEGER NOT NULL REFERENCES groups(group_id),
-                                       time TIMESTAMP NOT NULL,
+                                       time DATE NOT NULL,
                                        discipline_id INTEGER NOT NULL REFERENCES disciplines(discipline_id),
+                                       teacher_id INTEGER NOT NULL REFERENCES users(user_id),
                                        audience VARCHAR(10) NOT NULL,
                                        description VARCHAR NOT NULL,
                                        lesson_order INTEGER NOT NULL

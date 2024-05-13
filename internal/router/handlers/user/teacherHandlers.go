@@ -90,7 +90,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 	type request struct {
 		StudentName    string `json:"studentName"`
 		DisciplineName string `json:"disciplineName"`
-		Level          int    `json:"level"`
+		Level          string `json:"level"`
 		Date           string `json:"date"`
 		Comment        string `json:"comment,omitempty"`
 	}
@@ -164,22 +164,12 @@ func (h *TeacherHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Storage.User().GetUserByID(teacherID.(int))
+	schedule, err := h.Storage.Schedule().GetScheduleByTeacherID(teacherID.(int))
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
 		})
-		return
-	}
-
-	schedule, err := h.Storage.Schedule().GetScheduleByTeacherName(user.FullName)
-	if err != nil {
-		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-			"error": err,
-		})
-		return
 	}
 
 	/*c.HTML(http.StatusOK, "", gin.H{

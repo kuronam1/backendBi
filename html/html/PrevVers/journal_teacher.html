@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/fontello.css">
+    <link rel="shortcut icon" href="media/icon.png" type="image/x-icon">
+    <title>Филиал МАИ РКТ | Журнал *Имя преподавателя*</title> 
+</head>
+<body onload="restyleLinks(), logOutPopup(), setScoreInPopup('tchr'), changeColor()">  <!-- "tchr" - временно-->
+
+    <!-- Header -->
+
+    <header>
+        <nav class="container navbar navbar-expand-lg">
+            <div class="col-md-3 justify-content-start">
+                <a href="index.html" class="navbar-brend"><img src="media/logo.png" alt="МАИ РКТ"></a>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a href="schedule_teacher.html" id="schedule">Расписание</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a href="journal_teacher_before.html" id="journal">Журнал</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-end">
+                <div id="circle">
+                    <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
+                </div>  
+            </div>               
+        </nav>
+    </header>
+
+    <!-- Таблица успеваемости -->
+    
+    <section class="pb-3">
+        <div class="button-select">
+            <form action="#">
+                <select id="teacher-group" name="group">
+                    <option selected disabled hidden>Выберите группу</option>
+                    {{ range .Groups }}   <!--.Groups - Массив доступных групп -->
+                    <option name="group" value="{{.}}">{{.}}</option>
+                    {{ end }}
+                </select>
+                <select id="teacher-discipline" name="discipline">
+                    <option selected disabled hidden>Выберите дисциплину</option>
+                    <option selected disabled hidden name="discipline" value="false">Выберите дисциплину</option>
+                    {{ range .Disciplines }}   <!--.Disciplines - Массив доступных групп -->
+                    <option name="discipline" value="{{.}}">{{.}}</option>
+                    {{ end }}
+                </select>
+                <button id="teacher-get-journal" onclick="selectGroupAndObject()">
+                    Вывести
+                </button>
+            </form>
+        </div>
+        
+        
+
+        <form>  <!-- Расписание начинается от сюда. Весь этот блок должен быть выдан с бэка -->
+            <h1 class="text-center">Журнал группы N по предмету M</h1>
+            <div class="container mb-4 table-responsive">
+                <table id="table" class="table table-bordered text-center table-responsive justify-content-center">
+                    <thead>
+                      <tr>
+                        <th style="width: 15%;" scope="col">ФИО студента</th>
+                        <th class="dates" scope="col">01.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th class="dates" scope="col">02.02.24</th>
+                        <th style="width: 15%;" scope="col">Пропуски</th>
+                        <th style="width: 15%;" scope="col">Средний балл</th>
+                        <th style="width: 15%;" scope="col">Итоговая оценка</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Ашноков А.С.</td>
+                        <td class="score">2</td>
+                        <td class="score">Н</td>
+                        <td class="score">3</td>
+                        <td class="score">Н</td>
+                        <td class="score">5</td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Бенке М.С.</td>
+                        <td class="score">Н</td>
+                        <td class="score">5</td>
+                        <td class="score">5</td>
+                        <td class="score">5</td>
+                        <td class="score">5</td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                      <tr>
+                        <td>Гаврилов Ю.А.</td>
+                        <td class="score">5</td>
+                        <td class="score">5</td>
+                        <td class="score">5</td>
+                        <td class="score">4</td>
+                        <td class="score">2</td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        <td class="score"></td>
+                        
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                      </tr>
+                    </tbody>
+                </table>
+            </div>
+        </form>
+    </section>
+
+    <!-- Всплывающее окно для выхода -->
+
+    <div class="popup">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <h2>Вы уверены, что хотите выйти?</h2>
+            <form action="#" method="#">
+                <div class="form-element">
+                    <button type="submit">Выйти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="overlay" id="overlay" style="display: none"></div>
+
+    <div class="popupScore">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <form method="post">
+                <h2>Выберите оценку</h2>
+                <select id="score" name="score">
+                    <option selected disabled hidden>...</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="Н">Н</option>
+                </select>
+                <input id="score-comment" name="comment" type="text" id="comment" placeholder="Оставьте комментарий">
+                <button id="teacher-new-score" type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+
+
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/script.js"></script>
+<script src="js/savefile.js"></script>
+</body>
+</html>

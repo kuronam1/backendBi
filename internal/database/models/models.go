@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 type User struct {
 	UserID   int
@@ -14,13 +16,14 @@ type Grade struct {
 	GradeID      int
 	StudentID    int
 	DisciplineID int
-	Level        int
+	Level        string
 	Date         time.Time
 	Comment      string
 }
 
 type Journal struct {
-	Grades map[string][]Grade
+	Grades  map[string][]Grade
+	Headers []string
 }
 
 type Schedule struct {
@@ -40,8 +43,8 @@ type Lesson struct {
 
 type Group struct {
 	Id         int
-	Name       string
 	Speciality string
+	Name       string
 	Number     int
 	Course     int
 }
@@ -52,4 +55,15 @@ type Discipline struct {
 	DisciplineName string
 	Speciality     string
 	Course         int
+}
+
+type ParseLessons struct {
+	LessonID     int
+	GroupID      int
+	Time         time.Time
+	DisciplineID int
+	TeacherID    int
+	Audience     string
+	Description  string
+	LessonOrder  int
 }

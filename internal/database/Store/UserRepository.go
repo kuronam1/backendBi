@@ -187,3 +187,36 @@ func (u *UserRepository) GetAllTeachers() ([]models.User, error) {
 
 	return res, nil
 }
+
+func (u *UserRepository) GetUserNamesByGroup(groupName string) ([]string, error) {
+	group, err := u.store.Groups().GetGroupByName(groupName)
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := u.store.DB.Prepare("SELECT u.full_name FROM users u JOIN group_students gs ON u.user_id = gs.student_id WHERE group_id = $1 ORDER BY u.full_name")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(group.Id)
+	if err != nil {
+		return nil, err
+	}
+
+	var studentNames []string
+	for rows.Next() {
+		var name string
+		err = rows.Scan(&name)
+		if err != nil {
+			return nil, err
+		}
+		studentNames = append(studentNames, name)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return studentNames, nil
+}

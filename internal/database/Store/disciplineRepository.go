@@ -10,7 +10,7 @@ type DisciplineRepository struct {
 	store *Storage
 }
 
-func (d *DisciplineRepository) GetDisciplineByName(name string) (*models.Discipline, error) {
+func (d *DisciplineRepository) GetDisciplineByName(name interface{}) (*models.Discipline, error) {
 	const op = "fc.journalRep.GetDisciplineByName"
 	stmt, err := d.store.DB.Prepare("SELECT discipline_id, teacher_id, speciality, course FROM disciplines WHERE discipline_name = $1")
 	if err != nil {
@@ -19,7 +19,7 @@ func (d *DisciplineRepository) GetDisciplineByName(name string) (*models.Discipl
 	defer stmt.Close()
 
 	var dis = models.Discipline{
-		DisciplineName: name,
+		DisciplineName: name.(string),
 	}
 	err = stmt.QueryRow(name).Scan(
 		&dis.DisciplineID,
@@ -59,7 +59,7 @@ func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, s
 	return id, nil
 }
 
-func (d *DisciplineRepository) GetAllDisciplines() ([]models.Discipline, error) {
+func (d *DisciplineRepository) GetAllDisciplines() ([]*models.Discipline, error) {
 	const op = "fc.discRep.GetAllDisciplines"
 	stmt, err := d.store.DB.Prepare("SELECT teacher_id, discipline_name, speciality, course FROM disciplines")
 	if err != nil {
@@ -73,9 +73,9 @@ func (d *DisciplineRepository) GetAllDisciplines() ([]models.Discipline, error) 
 	}
 	defer rows.Close()
 
-	var res []models.Discipline
+	var res []*models.Discipline
 	for rows.Next() {
-		var discipline models.Discipline
+		discipline := &models.Discipline{}
 		err = rows.Scan(
 			&discipline.TeacherID,
 			&discipline.DisciplineName,
@@ -88,4 +88,92 @@ func (d *DisciplineRepository) GetAllDisciplines() ([]models.Discipline, error) 
 	}
 
 	return res, nil
+}
+
+func (d *DisciplineRepository) GetGroupDisciplineNames(groupName string) ([]string, error) {
+	group, err := d.store.Groups().GetGroupByName(groupName)
+	if err != nil {
+		return nil, err
+	}
+
+	stmt, err := d.store.DB.Prepare("SELECT discipline_name FROM disciplines WHERE speciality = $1 AND course = $2 ORDER BY discipline_name")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(group.Speciality, group.Course)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var disciplines []string
+	for rows.Next() {
+		var disciplineName string
+		err = rows.Scan(&disciplineName)
+		if err != nil {
+			return nil, err
+		}
+		disciplines = append(disciplines, disciplineName)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return disciplines, nil
+}
+
+func (d *DisciplineRepository) GetDisciplinesByTeacherId(id int) ([]*models.Discipline, error) {
+	stmt, err := d.store.DB.Prepare("SELECT discipline_id, discipline_name, speciality, course FROM disciplines WHERE teacher_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(id)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var res []*models.Discipline
+	for rows.Next() {
+		discipline := &models.Discipline{}
+		err := rows.Scan(
+			&discipline.DisciplineID,
+			&discipline.DisciplineName,
+			&discipline.Speciality,
+			&discipline.Course,
+		)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, discipline)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (d *DisciplineRepository) GetDisciplineByID(id int) (*models.Discipline, error) {
+	stmt, err := d.store.DB.Prepare("SELECT teacher_id, discipline_name, speciality, course FROM disciplines WHERE disciplines.discipline_id = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	discipline := &models.Discipline{}
+	err = stmt.QueryRow(id).Scan(
+		&discipline.TeacherID,
+		&discipline.DisciplineName,
+		&discipline.Speciality,
+		&discipline.Course)
+	if err != nil {
+		return nil, err
+	}
+
+	return discipline, nil
 }

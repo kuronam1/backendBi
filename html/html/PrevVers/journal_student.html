@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/fontello.css">
+    <link rel="shortcut icon" href="media/icon.png" type="image/x-icon">
+    <title>Филиал МАИ РКТ | Журнал *Имя студента*</title> 
+</head>
+<body onload="restyleLinks(), logOutPopup(), changeColor()">
+
+    <!-- Header -->
+
+    <header>
+        <nav class="container navbar navbar-expand-lg">
+            <div class="col-md-3 justify-content-start">
+                <a href="index.html" class="navbar-brend"><img src="media/logo.png" alt="МАИ РКТ"></a>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a href="schedule_student.html" id="schedule">Расписание</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+                <div class="button-nav">
+                    <a href="journal_student.html" id="journal">Журнал</a>
+                </div>
+            </div>
+            <div class="col-md-3 justify-content-end">
+                <div id="circle">
+                    <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
+                </div>  
+            </div>            
+        </nav>
+    </header>
+
+    <!-- Журнал начинется тут, должен быть выдан с бэка -->
+
+    <section class="pb-3 pt-3">
+        <div class="nameLesson text-center">
+            <h1>Студент *ФИО*</h1>
+        </div>
+        <div class="container mt-4 mb-4">
+            <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th style="width: 15%;" scope="col">Предмет</th>
+                    <th style="width: 40%;" scope="col">Оценки</th>
+                    <th style="width: 15%;" scope="col">Пропуски</th>
+                    <th style="width: 15%;" scope="col">Средний балл</th>
+                    <th style="width: 15%;" scope="col">Итоговая оценка</th>
+                  </tr>
+                </thead>
+                <tbody>
+                {{range}}
+                  <tr>
+                    <td scope="row">{{range}}</td>
+                    <td scope="row">
+                        {{range}}
+                        <span class="score">{{.}}</span>
+                        {{end}}
+                    </td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                    <td scope="row">{{.}}</td>
+                  </tr>
+                {{end}}
+
+                </tbody>
+            </table>  
+        </div>
+            
+    </section>
+
+    <!-- Выйти из аккаунта -->
+
+    <div class="popup">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <h2>Вы уверены, что хотите выйти?</h2>
+            <form action="#" method="#">
+                <div class="form-element">
+                    <button id="cancel-button" type="submit">Выйти</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="overlay" id="overlay" style="display: none"></div>
+    <div class="popupScore">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <form action="#" method="#">
+                <h2>Выберите оценку</h2>
+                <select id="">
+                    <option selected disabled hidden>...</option>
+                    <option value="5">5</option>
+                    <option value="4">4</option>
+                    <option value="3">3</option>
+                    <option value="2">2</option>
+                    <option value="Н">Н</option>
+                </select>
+                <input type="text" id="comment" placeholder="Оставьте комментарий">
+                <button type="submit">Сохранить</button>
+            </form>
+        </div>
+    </div>
+    <script src="js/bootstrap.min.js"></script>
+    <script src="js/jquery.js"></script>
+    <script src="js/script.js"></script>
+    <script src="js/savefile.js"></script>
+</body>
+</html>
