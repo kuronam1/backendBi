@@ -275,7 +275,7 @@ function changeColor(){
       score[i].style.color = "orange"
     } else if (score[i].innerHTML == 2){
       score[i].style.color = "red"
-    } else if (score[i].innerHTML == 'Н'){
+    } else if (score[i].innerHTML == 'н'){
       score[i].style.color = "brown"
     }
   }
@@ -294,36 +294,35 @@ function changeRole(){
   })
 }
 
-/* Выбор для журнала Администратора на один селектор */ 
+/* Выбор для журнала Администратора на один селектор */
 
 function oneSelector(){
   let selectGroup = document.getElementById("group")
   let selectTeacher = document.getElementById("teacher")
   let selectForm = document.getElementById("selectForm")
-  
+
   selectForm.addEventListener('change', () => {
-    if (selectGroup.value != "false"){  // Если выбирается селектор Группа, то селектор Преподаватель неактивен
+    if (selectGroup.value != ""){  // Если выбирается селектор Группа, то селектор Преподаватель неактивен
       selectTeacher.setAttribute("disabled", true)
       selectTeacher.style.backgroundColor = "gray"
-    } else if (selectTeacher.value != "0"){ // Если выбирается селектор Преподаватель, то селектор Группа неактивен
+    } else if (selectTeacher.value != ""){ // Если выбирается селектор Преподаватель, то селектор Группа неактивен
       selectGroup.setAttribute("disabled", true)
       selectGroup.style.backgroundColor = "gray"
     }
   });
-
   selectForm.addEventListener('change', () => {  // Если селекторы сбрасываются на дефолт, то оба селектора активны
-    if (selectGroup.value === "false" && selectTeacher.value === "false"){
+    if (selectGroup.value === "" && selectTeacher.value === ""){
       selectTeacher.removeAttribute("disabled", true)
       selectGroup.removeAttribute("disabled", true)
       selectGroup.style.backgroundColor = "white"
       selectTeacher.style.backgroundColor = "white"
-    } else if (selectGroup.value === "0"){
+    } else if (selectGroup.value === ""){
       selectTeacher.removeAttribute("disabled", true)
-    } else if (selectTeacher.value === "0"){
+    } else if (selectTeacher.value === ""){
       selectGroup.removeAttribute("disabled", true)
     }
   });
-  
+
 }
 
 /* Окно для оценок */
@@ -342,7 +341,7 @@ function popupForScore(){
 
 /* Выставление оценок в всплывающем окне */
 
-let nameStudent, date;
+let nameStudent, date, scoreLevel, levelID, disciplineID;
 
 function setScoreInPopup(role){
   var tab=document.getElementById("table");
@@ -356,6 +355,9 @@ function setScoreInPopup(role){
             if (tab.rows[this.i].cells[this.j].innerHTML != ''){ // Вариант, когда оценка стоит, т.е. её можно только изменить (для админа)
               nameStudent = '';
               date = "";
+              levelID = tab.rows[this.i].cells[this.j].attributes.level.value
+              disciplineID = tab.rows[this.i].cells[this.j].attributes.discipline.value
+              scoreScore = tab.rows[this.i].cells[this.j].innerHTML
               nameStudent = tab.rows[this.i].cells[0].innerHTML
               date = tab.rows[0].cells[this.j].innerHTML
               popupForScore()
@@ -366,6 +368,7 @@ function setScoreInPopup(role){
             if (tab.rows[this.i].cells[this.j].innerHTML === ''){ // Вариант, когда оценка не стоит, т.е. её можно только проставить (для учителя)
               nameStudent = '';
               date = "";
+              scoreLevel = tab.rows[this.i].cells[this.j].innerHTML
               nameStudent = tab.rows[this.i].cells[0].innerHTML
               date = tab.rows[0].cells[this.j].innerHTM
               popupForScore()

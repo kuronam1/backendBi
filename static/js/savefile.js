@@ -9,20 +9,16 @@ $('#files').on('change', function(){
         fileInput.value = '';   // Конец быдлокода
     } else files = this.files;
 });
+
 $('#submit_button').on( 'click', function( event ){
 
     event.stopPropagation();
     event.preventDefault();
     if( typeof files == 'undefined' ) return;
     var data = new FormData();
-    $.each( files, function( key, value ){
-        console.log(key);
-        console.log(value);
-        data.append( key, value );
-    });
-    data.append( 'my_file_upload', 1 );
+    data.append('file', files);
     $.ajax({
-        url         : 'adminPanel/management/scheduleReg',
+        url         : '/adminPanel/management/scheduleReg',
         type        : 'POST',
         data        : data,
         cache       : false,
@@ -38,6 +34,7 @@ $('#submit_button').on( 'click', function( event ){
     });
 
 });
+
 $('#enter').on( 'click', function( event ){
         let login = 'login';
         let loginValue = document.getElementById("index-login").value;
@@ -63,6 +60,7 @@ $('#enter').on( 'click', function( event ){
         }
     });
 });
+
 $('#newsletter-submit').on( 'click', function( event ){
     let fio = 'fio';
     let fioVale = document.getElementById("fio").value;
@@ -87,16 +85,15 @@ $('#newsletter-submit').on( 'click', function( event ){
         }
     });
 });
+
 $('#student-brend').on('click', function( event ){
     $.ajax({
         url         : '/studentPanel/menu',
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -106,10 +103,8 @@ $('#student-journal').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 })
@@ -119,10 +114,8 @@ $('#student-journal').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -132,10 +125,8 @@ $('#teacher-brend').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -145,10 +136,8 @@ $('#teacher-journal').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -158,10 +147,8 @@ $('#teacher-schedule').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -174,7 +161,6 @@ $('#brend').on('click', function( event ){
             window.location.href = '/adminPanel/management';
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -184,10 +170,8 @@ $('#journal').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -197,10 +181,8 @@ $('#schedule').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
         },
         error: function() {
-            alert("Проблемы");
         }
     });
 });
@@ -235,21 +217,21 @@ $('#new-user-reg').on( 'click', function( event ){
     } else {
         let role = 'role';
         let roleVale = document.getElementById("role").value;
-        let group = 'group';
+        let groupName = 'group';
         let groupValue = document.getElementById("group").value;
-        let name = 'name';
+        let userName = 'name';
         let nameValue = document.getElementById("name").value;
         let login = 'login';
         let loginValue = document.getElementById("login").value;
         let password = 'password';
         let passValue = document.getElementById("password").value;
         $.ajax({
-            url: '/adminPanel/management/userRegistration',
+            url: '/adminPanel/management/userReg',
             type: 'POST',
             data: JSON.stringify({
                 role : roleVale,
-                group : groupValue,
-                name : nameValue,
+                groupName : groupValue,
+                userName : nameValue,
                 login : loginValue,
                 password : passValue
             }),
@@ -266,8 +248,8 @@ $('#new-user-reg').on( 'click', function( event ){
 });
 $('#add-group').on( 'click', function( event ){
     let speciality = 'speciality';
-    let specialityValue = document.getElementById("role").value;
-    let group = 'group';
+    let specialityValue = document.getElementById("groupSpeciality").value;
+    let number = 'group';
     let groupValue = document.getElementById("groupNumber").value
     let course = 'course';
     let courseValue = document.getElementById("groupCourse").value
@@ -276,7 +258,7 @@ $('#add-group').on( 'click', function( event ){
         type        : 'POST',
         data        : JSON.stringify({
                 speciality : specialityValue,
-                group : groupValue,
+                number : groupValue,
                 course : courseValue
         }),
         dataType    : 'json',
@@ -291,31 +273,31 @@ $('#add-group').on( 'click', function( event ){
 });
 $('#admin-schedule-submit').on( 'click', function( event ){
     if(document.getElementById("group").value === 'false'){
-        let group = 'teacher';
+        let teacher = 'teacher';
         let value = document.getElementById("teacher").value;
         $.ajax({
             url         : '/adminPanel/schedule', //Проверить на правильность пути к хандлеру
             type        : 'GET',
-            data        :JSON.stringify( {
-                group : value
-            }),
+            data        : {
+                teacher : value
+            },
             success     : function(data) {
-                alert(data);
+
             },
             error: function() {
             }
         });
     } else if (document.getElementById("teacher").value === 'false'){
-        let teacher = 'group';
+        let group = 'group';
         let value = document.getElementById("group").value;
         $.ajax({
             url         : '/adminPanel/schedule', //Проверить на правильность пути к хандлеру
             type        : 'GET',
-            data        : JSON.stringify({
-                teacher : value
-            }),
+            data        : {
+                group : value
+            },
             success     : function(data) {
-                alert(data);
+
             },
             error: function() {
             }
@@ -325,7 +307,7 @@ $('#admin-schedule-submit').on( 'click', function( event ){
             url         : '/adminPanel/schedule', //Проверить на правильность пути к хандлеру
             type        : 'GET',
             success     : function(data) {
-                alert($(data).html());
+
             },
             error: function() {
             }
@@ -344,7 +326,6 @@ $('#cancel-button').on( 'click', function( event ){
             //Пока это оставим пустым, потом если надо, что-то придумаем
         },
         error: function() {
-            alert('logout');
         }
     });
 });
@@ -354,14 +335,13 @@ $('#admin-get-journale-group').on( 'click', function( event ){
     let discipline = 'discipline';
     let disciplineValue = document.getElementById("discipline").value;
     $.ajax({
-        url         : '/adminPanel/schedule',
+        url         : '/adminPanel/journal',
         type        : 'GET',
-        data        : JSON.stringify({
+        data        : {
                 group : groupValue,
                 discipline : disciplineValue
-        }),
+        },
         success     : function(data) {
-            alert(data);
         },
         error: function() {
         }
@@ -380,7 +360,6 @@ $('#teacher-get-journal').on( 'click', function( event ){
             group : groupValue
         }),
         success     : function(data) {
-            alert(data);
         },
         error: function() {
         }
@@ -398,7 +377,7 @@ $('#teacher-new-score').on( 'click', function( event ){
     let comment = 'comment';
     let commentValue = document.getElementById("score-comment").value;
     $.ajax({
-        url         : 'teacherPanel/journal',
+        url         : '/teacherPanel/journal',
         type        : 'POST',
         data        : JSON.stringify({
             name : studentName,
@@ -414,28 +393,31 @@ $('#teacher-new-score').on( 'click', function( event ){
 
         },
         error: function() {
-            alert('Ошибка');
         }
     });
 });
 $('#admin-grade-add').on( 'click', function( event ){
-    let discipline = 'discipline';
-    let disciplineValue = document.getElementById("discipline").value;
-    let name = 'name';
+    let discipline = 'disciplineID';
+    let disciplineValue = disciplineID;
+    let name = 'userName';
     let studentName = nameStudent;
-    let dateName = 'date';
+    let oldlevel = "oldlevel";
+    let oldLevel = scoreLevel;
+    let dateName = 'newDate';
     let dateValue = date;
-    let gradeName = 'grade'
+    let gradeID = "gradeID"
+    let gradeName = 'newLevel'
     let gradeValue = document.getElementById("admin-grade").value;
-    alert(gradeValue);
-    let comment = 'comment';
+    let comment = 'newComment';
     let commentValue = document.getElementById("admin-comment").value;
     $.ajax({
         url         : '/adminPanel/journal/gradesRef',
         type        : 'PATCH',
         data        : JSON.stringify({
+            gradeID : levelID,
             name : studentName,
             discipline : disciplineValue,
+            oldLevel : oldLevel,
             dateName : dateValue,
             gradeName : gradeValue,
             comment : commentValue
@@ -444,14 +426,9 @@ $('#admin-grade-add').on( 'click', function( event ){
         processData : false,
         contentType : 'application/json',
         success     : function(data) {
-
+            window.location.reload();
         },
         error: function() {
-            alert('Ошибка');
         }
     });
 });
-//     encodeURIComponent( {
-//             discipline : disciplineValue,
-//             group : groupValue
-//         }),

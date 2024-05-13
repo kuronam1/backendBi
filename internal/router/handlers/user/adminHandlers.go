@@ -55,6 +55,7 @@ func (h *AdminHandler) Management(c *gin.Context) {
 
 func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	const op = "AdminHandlers.ScheduleRegister"
+	fmt.Println(*c.Request)
 	file, err := c.FormFile("file")
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -152,6 +153,8 @@ func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 			})
 			return
 		}
+
+		h.Logger.Info("%v", req)
 
 		number, err := strconv.Atoi(req.Number)
 		if err != nil {
@@ -295,15 +298,13 @@ func (h *AdminHandler) GetPreJournal(c *gin.Context) {
 
 func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 	type Request struct {
-		GradeID        int    `json:"gradeID"`
-		UserName       string `json:"userName"`
-		DisciplineName string `json:"disciplineName"`
-		OldLevel       string `json:"oldLevel"`
-		OldDate        string `json:"oldDate"`
-		OldComment     string `json:"oldComment,omitempty"`
-		NewLevel       string `json:"newLevel"`
-		NewDate        string `json:"newDate"`
-		NewComment     string `json:"newComment,omitempty"`
+		GradeID      string `json:"gradeID"`
+		UserName     string `json:"name"`
+		DisciplineID string `json:"discipline"`
+		OldLevel     string `json:"oldLevel"`
+		NewDate      string `json:"dateName"`
+		NewLevel     string `json:"gradeName"`
+		NewComment   string `json:"comment,omitempty"`
 	}
 	return func(c *gin.Context) {
 		const op = "AdminHandlers.GradesRefactor"
@@ -316,6 +317,8 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			return
 		}
 
+		h.Logger.Info(req.UserName)
+
 		user, err := h.Storage.User().GetUserByName(req.UserName)
 		if err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s in getUser", op, err))
@@ -325,18 +328,9 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			return
 		}
 
-		discipline, err := h.Storage.Disciplines().GetDisciplineByName(req.DisciplineName)
+		id, err := strconv.Atoi(req.DisciplineID)
 		if err != nil {
-			h.Logger.Error(fmt.Sprintf("%s - %s getDis", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		oldGradeDate, err := time.Parse(time.DateOnly, req.OldDate)
-		if err != nil {
-			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
+			h.Logger.Error(fmt.Sprintf("%s - %s in getUser", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
@@ -352,18 +346,26 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			return
 		}
 
+		Gradeid, err := strconv.Atoi(req.GradeID)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+			return
+		}
+
 		oldGrade := &models.Grade{
-			GradeID:      req.GradeID,
+			GradeID:      Gradeid,
 			StudentID:    user.UserID,
-			DisciplineID: discipline.DisciplineID,
+			DisciplineID: id,
+			Date:         newGradeDate,
 			Level:        req.OldLevel,
-			Date:         oldGradeDate,
-			Comment:      req.OldComment,
 		}
 
 		NewGrade := &models.Grade{
 			StudentID:    user.UserID,
-			DisciplineID: discipline.DisciplineID,
+			DisciplineID: id,
 			Level:        req.NewLevel,
 			Date:         newGradeDate,
 			Comment:      req.NewComment,
@@ -386,26 +388,24 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 
 func (h *AdminHandler) GetSchedule(c *gin.Context) {
 	const op = "AdminHandlers.GetSchedule"
-	groupName, exists := c.GetQuery("group")
-	if exists && groupName != "" {
-		h.ScheduleWithQueryGroup(c, groupName)
-		c.Abort()
-		return
-	}
-
-	teacherName, exists := c.GetQuery("teacher")
-	if exists && teacherName != "" {
+	groupName, existsG := c.GetQuery("group")
+	teacherName, existsT := c.GetQuery("teacher")
+	switch {
+	case existsT && !existsG:
 		h.ScheduleWithQueryTeacher(c, teacherName)
-		c.Abort()
+		return
+	case !existsT && existsG:
+		h.ScheduleWithQueryGroup(c, groupName)
+		return
+	default:
+		h.GetPreSchedule(c)
 		return
 	}
-
-	h.GetPreSchedule(c)
 }
 
 func (h *AdminHandler) ScheduleWithQueryGroup(c *gin.Context, groupName string) {
 	const op = "AdminHandlers.ScheduleWithQueryGroup"
-	schedule, err := h.Storage.ScheduleMethods.GetScheduleByGroupName(groupName)
+	schedule, err := h.Storage.Schedule().GetScheduleByGroupName(groupName)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -453,16 +453,16 @@ func (h *AdminHandler) ScheduleWithQueryGroup(c *gin.Context, groupName string) 
 	}
 
 	c.HTML(http.StatusOK, "admin_schedule.html", gin.H{
-		"Schedule": schedule,
-		"Groups":   groups,
-		"Teachers": teachers,
-		"Pre":      0,
+		"Schedule":  schedule,
+		"Groups":    groups,
+		"Teachers":  teachers,
+		"ShowTable": 1,
 	})
 }
 
 func (h *AdminHandler) ScheduleWithQueryTeacher(c *gin.Context, teacherName string) {
 	const op = "AdminHandlers.ScheduleWithQueryTeacher"
-	schedule, err := h.Storage.ScheduleMethods.GetScheduleByTeacherName(teacherName)
+	schedule, err := h.Storage.Schedule().GetScheduleByTeacherName(teacherName)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -511,10 +511,10 @@ func (h *AdminHandler) ScheduleWithQueryTeacher(c *gin.Context, teacherName stri
 	}
 
 	c.HTML(http.StatusOK, "admin_schedule.html", gin.H{
-		"Schedule": schedule,
-		"Groups":   groups,
-		"Teachers": teachers,
-		"Pre":      0,
+		"Schedule":  schedule,
+		"Groups":    groups,
+		"Teachers":  teachers,
+		"ShowTable": 1,
 	})
 }
 
@@ -553,8 +553,8 @@ func (h *AdminHandler) GetPreSchedule(c *gin.Context) {
 	}
 
 	c.HTML(200, "admin_schedule.html", gin.H{
-		"Teachers": teachers,
-		"Groups":   groups,
-		"Pre":      1,
+		"Teachers":  teachers,
+		"Groups":    groups,
+		"ShowTable": 0,
 	})
 }

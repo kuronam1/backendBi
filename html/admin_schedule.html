@@ -38,28 +38,29 @@
 
     <section class="pb-3">
         <div class="button-select text-center">
-            <form id="selectForm">
-                <select id="group" name="groupName">
-                    <option value="false" name="groupName" selected>Выберите группу</option>
+            <form id="selectForm" action="/adminPanel/schedule" method="get">
+                <select id="group" name="group">
+                    <option value="" name="group" selected>Выберите группу</option>
                     {{ range .Groups }}   <!--.Groups - Массив доступных групп -->
-                    <option name="groupName" value="{{.}}">{{.Name}}</option>
+                    <option name="group" value="{{.Name}}">{{.Name}}</option>
                     {{ end }}
                 </select>
-                <select id="teacher" name="teacherName">
-                    <option value="false" selected>Выберите преподавателя</option>
+                <select id="teacher" name="teacher">
+                    <option value="" name="teacher" selected>Выберите преподавателя</option>
                     {{ range .Teachers }}   <!--.Teachers - Массив доступных учителей -->
-                    <option name="groupName" value="{{.}}">{{.FullName}}</option>
+                    <option name="teacher" value="{{.FullName}}">{{.FullName}}</option>
                     {{ end }}
                 </select>
-                <button id="admin-schedule-submit" type="button">
+                <button id="admin-schedule-submit" type="submit">
                     Вывести
                 </button>
             </form>
         </div>
 
-        {{if eq .Pre 0}}
+        {{.ShowTable}}
+        {{if eq .ShowTable 1}}
         <div class="container mb-4"> <!-- Расписание начинается от сюда. Весь этот блок должен быть выдан с бэка -->
-            <h1 class="text-center">Расписание группы/преподавателя N</h1>
+            <h1 class="text-center">Расписание {{.Name}}</h1>
             <table id="table" class="table table-bordered table-striped">
                 <thead>
                 <tr>
@@ -78,11 +79,15 @@
                 {{ range .Schedule }}
                 {{range $DoW, $lessons := .}}
                 <tr>
-                    <td scope="row">{{range $lessons}} {{.Data}} {{break}} {{end}}</td>
+                    <td scope="row">{{range $lessons}}
+                        {{if ne .DisciplineName ""}}
+                        {{.Time}}{{break}}
+                        {{end}}
+                        {{end}}</td>
                     <td scope="row">{{$DoW}}</td>
                     {{range $lessons}}
                     {{if ne .DisciplineName ""}}
-                    <td scope="row">{{.DisciplineName | .Audience}}</td>
+                    <td scope="row">{{.DisciplineName}} | {{.Audience}}</td>
                     {{else}}
                     <td scope="row"></td>
                     {{end}}

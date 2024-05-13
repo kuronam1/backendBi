@@ -17,7 +17,6 @@ type GroupRepository struct {
 
 func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	const op = "fc.Storage.GetAllGroups"
-	//GetLogger()
 
 	stmt, err := g.store.DB.Prepare("SELECT group_id, group_name, number, speciality, course FROM groups")
 	if err != nil {
@@ -53,27 +52,28 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 	return res, nil
 }
 
-func (g *GroupRepository) GetGroupByName(name interface{}) (models.Group, error) {
+func (g *GroupRepository) GetGroupByName(name interface{}) (*models.Group, error) {
 	const op = "fc.groupRep.GetGroupByName"
 	fmt.Println("i am here 2")
-	stmt, err := g.store.DB.Prepare("SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_name = $1")
+	stmt, err := g.store.DB.Prepare("SELECT group_id, group_name, number, speciality, course FROM groups WHERE group_name = $1")
 	if err != nil {
-		return models.Group{}, err
+		return nil, err
 	}
 	fmt.Println("i am here 1123123")
 	defer stmt.Close()
 
-	gr := models.Group{}
-	err = stmt.QueryRow(name.(string)).Scan(&gr.Id, &gr.Speciality, &gr.Name, &gr.Number, &gr.Course)
+	group := &models.Group{}
+	err = stmt.QueryRow(name).Scan(&group.Id, &group.Name, &group.Number, &group.Speciality, &group.Course)
 	fmt.Println("i am here 1123123")
-	switch {
-	case errors.Is(err, sql.ErrNoRows):
-		return models.Group{}, GroupNotRegistered
-	case err != nil:
-		return models.Group{}, err
-	default:
-		return gr, nil
+	if err != nil {
+		return nil, err
 	}
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, GroupNotRegistered
+	} else if err != nil {
+		return nil, err
+	}
+	return group, nil
 }
 
 func (g *GroupRepository) GroupRegistration(group *models.Group) error {
@@ -92,13 +92,13 @@ func (g *GroupRepository) GroupRegistration(group *models.Group) error {
 func configurationGroupName(speciality string, number, course int) string {
 	switch speciality {
 	case "ЭВМ":
-		return fmt.Sprintf("ЭВМ %d-%d", course, number)
+		return fmt.Sprintf("ЭВМ%d-%d", course, number)
 	case "БИ":
-		return fmt.Sprintf("БИ %d-%d", course, number)
+		return fmt.Sprintf("БИ%d-%d", course, number)
 	case "ПМ":
-		return fmt.Sprintf("ПМ %d-%d", course, number)
+		return fmt.Sprintf("ПМ%d-%d", course, number)
 	default:
-		return fmt.Sprintf("БП %d-%d", course, number)
+		return fmt.Sprintf("БП%d-%d", course, number)
 	}
 }
 

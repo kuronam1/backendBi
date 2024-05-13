@@ -59,9 +59,7 @@
                 </form>
             </div>
 
-
             {{if eq .Pre 0}}
-
             <form>  <!-- Журнал начинается от сюда. Весь этот блок должен быть выдан с бэка -->
                 <h1 class="text-center">Журнал группы N по предмету M</h1>
                 <div class="container mb-4 table-responsive">
@@ -81,10 +79,10 @@
                         {{ range .Journal }}
                         {{ range $FIO, $grades := . }}
                         <tr>
-                            <td class="FIO">{{$FIO}}</td><!-- ФИО -->
+                            <td>{{$FIO}}</td><!-- ФИО -->
                             {{ range $grades }}
-                            <td level="{{.GradeID}}" discipline="{{.DisciplineID}}" >{{.Level}}</td>
-                            {{ end }}   
+                            <td>{{.Level}}</td>
+                            {{ end }}
                             <td></td><!-- пропуски -->
                             <td></td><!-- средний балл -->
                             <td></td><!-- итоговая оценка -->
@@ -122,7 +120,7 @@
                     <option value="4">4</option>
                     <option value="3">3</option>
                     <option value="2">2</option>
-                    <option value="н">н</option>
+                    <option value="Н">Н</option>
                 </select>
                 <input type="text" id="admin-comment" placeholder="Измените комментарий">
                 <button id="admin-grade-add" type="button">Сохранить</button>
