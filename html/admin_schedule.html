@@ -16,23 +16,23 @@
     <header>
         <nav class="container navbar navbar-expand-lg">
             <div class="col-md-3 justify-content-start">
-                <a id="brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
+                <a href="/adminPanel/management" id="brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
             </div>
             <div class="col-md-3 justify-content-center text-center">
                 <div class="button-nav">
-                    <a id="schedule">Расписание</a>
+                    <a href="/adminPanel/schedule" id="schedule">Расписание</a>
                 </div>
             </div>
             <div class="col-md-3 justify-content-center text-center">
                 <div class="button-nav">
-                    <a id="journal">Журнал</a>
+                    <a href="/adminPanel/journal" id="journal">Журнал</a>
                 </div>
             </div>
             <div class="col-md-3 justify-content-end">
                 <div id="circle">
                     <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
-                </div>  
-            </div>               
+                </div>
+            </div>
         </nav>
     </header>
 
@@ -56,7 +56,8 @@
                 </button>
             </form>
         </div>
-        
+
+        {{if eq .Pre 0}}
         <div class="container mb-4"> <!-- Расписание начинается от сюда. Весь этот блок должен быть выдан с бэка -->
             <h1 class="text-center">Расписание группы/преподавателя N</h1>
             <table id="table" class="table table-bordered table-striped">
@@ -92,7 +93,9 @@
                 </tbody>
             </table>
         </div>
-     
+        {{else}}
+
+        {{end}}
     </section>
 
     <div class="popup">

@@ -28,6 +28,7 @@ type Journal struct {
 
 type Schedule struct {
 	Lessons map[time.Weekday][]Lesson
+	Headers []string
 }
 
 type Lesson struct {

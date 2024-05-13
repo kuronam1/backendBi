@@ -22,11 +22,11 @@ $('#submit_button').on( 'click', function( event ){
     });
     data.append( 'my_file_upload', 1 );
     $.ajax({
-        url         : '',
+        url         : 'adminPanel/management/scheduleReg',
         type        : 'POST',
         data        : data,
         cache       : false,
-        dataType    : 'json',
+        dataType    : 'multipart/form-data',
         processData : false,
         contentType : false,
         success     : function() {
@@ -171,7 +171,7 @@ $('#brend').on('click', function( event ){
         type        : 'GET',
         dataType    : 'text/html',
         success     : function(data) {
-            alert($(data).html());
+            window.location.href = '/adminPanel/management';
         },
         error: function() {
             alert("Проблемы");
@@ -215,7 +215,7 @@ $('#new-user-reg').on( 'click', function( event ){
         let password = 'password';
         let passValue = document.getElementById("password").value;
     $.ajax({
-        url: '/adminPanel/management/userRegistration',
+        url: '/adminPanel/management/userReg',
         type: 'POST',
         data: JSON.stringify({
             role : roleVale,
@@ -272,7 +272,7 @@ $('#add-group').on( 'click', function( event ){
     let course = 'course';
     let courseValue = document.getElementById("groupCourse").value
     $.ajax({
-        url         : '/adminPanel/managment/groupReg', //Проверить на правильность пути к хандлеру
+        url         : '/adminPanel/management/groupReg', //Проверить на правильность пути к хандлеру
         type        : 'POST',
         data        : JSON.stringify({
                 speciality : specialityValue,
@@ -325,7 +325,7 @@ $('#admin-schedule-submit').on( 'click', function( event ){
             url         : '/adminPanel/schedule', //Проверить на правильность пути к хандлеру
             type        : 'GET',
             success     : function(data) {
-                alert(data);
+                alert($(data).html());
             },
             error: function() {
             }
@@ -431,8 +431,8 @@ $('#admin-grade-add').on( 'click', function( event ){
     let comment = 'comment';
     let commentValue = document.getElementById("admin-comment").value;
     $.ajax({
-        url         : 'teacherPanel/journal',
-        type        : 'POST',
+        url         : '/adminPanel/journal/gradesRef',
+        type        : 'PATCH',
         data        : JSON.stringify({
             name : studentName,
             discipline : disciplineValue,

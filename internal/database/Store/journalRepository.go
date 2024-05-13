@@ -14,7 +14,7 @@ type JournalRepository struct {
 	store *Storage
 }
 
-func (j *JournalRepository) GetJournalByStudentID(id int) (*models.Journal, error) {
+func (j *JournalRepository) GetJournalByStudentID(id int) ([]map[string][]models.Grade, error) {
 	const op = "fc.journalRep.UpdateGrade"
 	stmt, err := j.store.DB.Prepare(`
 SELECT d.discipline_name, g.grade, g.date, g.comment FROM grades g
@@ -65,8 +65,19 @@ ORDER BY g.date`)
 		return nil, err
 	}
 
-	return journal, nil
+	result := make([]map[string][]models.Grade, len(journal.Headers))
+	for i := 0; i < len(journal.Headers); i++ {
+		mp := make(map[string][]models.Grade)
+		var disciplineGrades []models.Grade
+		mp[journal.Headers[i]] = disciplineGrades
+		_, inMap := journal.Grades[journal.Headers[i]]
+		if inMap {
+			mp[journal.Headers[i]] = journal.Grades[journal.Headers[i]]
+		}
+		result[i] = mp
+	}
 
+	return result, nil
 }
 
 func (j *JournalRepository) UpdateGrade(oldGrade, newGrade *models.Grade) error {

@@ -55,14 +55,17 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 
 func (g *GroupRepository) GetGroupByName(name interface{}) (models.Group, error) {
 	const op = "fc.groupRep.GetGroupByName"
+	fmt.Println("i am here 2")
 	stmt, err := g.store.DB.Prepare("SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_name = $1")
 	if err != nil {
 		return models.Group{}, err
 	}
+	fmt.Println("i am here 1123123")
 	defer stmt.Close()
 
 	gr := models.Group{}
-	err = stmt.QueryRow(name).Scan(&gr.Id, &gr.Speciality, &gr.Name, &gr.Number, &gr.Course)
+	err = stmt.QueryRow(name.(string)).Scan(&gr.Id, &gr.Speciality, &gr.Name, &gr.Number, &gr.Course)
+	fmt.Println("i am here 1123123")
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return models.Group{}, GroupNotRegistered

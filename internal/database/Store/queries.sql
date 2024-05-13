@@ -187,4 +187,4 @@ SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_
 
 INSERT INTO grades VALUES (1, 2, 1, '4', '11-05-2024', 'Контрольная работа');
 INSERT INTO grades VALUES (2, 3, 1, '3', '10-05-2024', 'Контрольная работа');
-UPDATE groups SET group_name = 'ЭВМ2-2' WHERE group_id = 2;
+SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_name = 'ЭВМ2-2';

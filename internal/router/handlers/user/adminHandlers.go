@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"sbitnev_back/internal/database/Store"
 	"sbitnev_back/internal/database/models"
+	"strconv"
 	"time"
 )
 
@@ -138,8 +139,8 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 	type request struct {
 		Speciality string `json:"speciality"`
-		Number     int    `json:"number"`
-		Course     int    `json:"course"`
+		Number     string `json:"number"`
+		Course     string `json:"course"`
 	}
 	return func(c *gin.Context) {
 		const op = "AdminHandlers.GroupRegister"
@@ -152,10 +153,28 @@ func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 			return
 		}
 
+		number, err := strconv.Atoi(req.Number)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in number", op, err))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": err,
+			})
+			return
+		}
+
+		course, err := strconv.Atoi(req.Course)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s in course", op, err))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": err,
+			})
+			return
+		}
+
 		group := &models.Group{
-			Number:     req.Number,
+			Number:     number,
 			Speciality: req.Speciality,
-			Course:     req.Course,
+			Course:     course,
 		}
 		if err := h.Storage.Groups().GroupRegistration(group); err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -235,6 +254,7 @@ func (h *AdminHandler) GetJournal(c *gin.Context) {
 		"Lessons":     lessons,
 		"Groups":      groups,
 		"Disciplines": disciplines,
+		"Pre":         0,
 	})
 	/*c.JSON(200, gin.H{
 		"Journal": journal,
@@ -265,6 +285,7 @@ func (h *AdminHandler) GetPreJournal(c *gin.Context) {
 	c.HTML(http.StatusOK, "admin_journal.html", gin.H{
 		"Groups":      groups,
 		"Disciplines": disciplines,
+		"Pre":         1,
 	})
 	/*c.JSON(200, gin.H{
 		"Groups":      groups,
@@ -435,6 +456,7 @@ func (h *AdminHandler) ScheduleWithQueryGroup(c *gin.Context, groupName string) 
 		"Schedule": schedule,
 		"Groups":   groups,
 		"Teachers": teachers,
+		"Pre":      0,
 	})
 }
 
@@ -492,6 +514,7 @@ func (h *AdminHandler) ScheduleWithQueryTeacher(c *gin.Context, teacherName stri
 		"Schedule": schedule,
 		"Groups":   groups,
 		"Teachers": teachers,
+		"Pre":      0,
 	})
 }
 
@@ -532,5 +555,6 @@ func (h *AdminHandler) GetPreSchedule(c *gin.Context) {
 	c.HTML(200, "admin_schedule.html", gin.H{
 		"Teachers": teachers,
 		"Groups":   groups,
+		"Pre":      1,
 	})
 }

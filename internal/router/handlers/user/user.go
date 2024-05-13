@@ -109,21 +109,18 @@ func (h *handler) FeedBack(c *gin.Context) {
 //Не забыть про хедеры ...
 
 func (h *handler) UserIdent() gin.HandlerFunc {
-	type request struct {
-		Login    string `json:"login"`
-		Password string `json:"password"`
-	}
 	return func(c *gin.Context) {
-		var req request
-		if err := c.BindJSON(&req); err != nil {
+		login := c.PostForm("login")
+		password := c.PostForm("password")
+
+		if login == "" && password == "" {
 			c.JSON(http.StatusBadRequest, gin.H{
-				"err in bind": err,
+				"error in bind": "bad data",
 			})
-			return
 		}
 
 		userRep := h.storage.User()
-		userData, err := userRep.GetUserByLogin(req.Login)
+		userData, err := userRep.GetUserByLogin(login)
 		if err != nil {
 			h.logger.Error(fmt.Sprintf("[UserIdent] error while identifing user: %s", err))
 			switch {
@@ -138,7 +135,7 @@ func (h *handler) UserIdent() gin.HandlerFunc {
 			}
 		}
 
-		if req.Password != userData.Password {
+		if password != userData.Password {
 			c.String(http.StatusForbidden, "error: wrong login or password")
 			return
 		}

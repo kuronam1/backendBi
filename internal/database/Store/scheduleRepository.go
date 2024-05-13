@@ -3,6 +3,7 @@ package Store
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/xuri/excelize/v2"
 	"sbitnev_back/internal/database/models"
 	"strconv"
@@ -59,12 +60,12 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 			return err
 		}
 
-		stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
+		stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
 		if err != nil {
 			return err
 		}
 
-		_, err = stmt.Exec(group.Id, lesson.Time, disID, lesson.Audience, lesson.Description)
+		_, err = stmt.Exec(group.Id, lesson.Time, disID, lesson.Audience, lesson.Description) // добавить teacherID
 		if err != nil {
 			return err
 		}
@@ -72,14 +73,20 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 	return nil
 }
 
-func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) (*models.Schedule, error) {
+func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) ([]map[string][]models.Lesson, error) {
 	const op = "fc.scheduleRep.GetScheduleByGroupName"
-	schedule := make(map[time.Weekday][]models.Lesson)
+	schedule := models.Schedule{
+		Lessons: make(map[time.Weekday][]models.Lesson),
+	}
+
+	fmt.Println("i am here 1")
 
 	group, err := s.store.Groups().GetGroupByName(groupName)
 	if err != nil {
 		return nil, err
 	}
+
+	fmt.Println("i am here", group)
 
 	stmt, err := s.store.DB.Prepare("SELECT lesson_id, time, discipline_id, teacher_id, audience, description, lesson_order FROM lessons WHERE group_id = $1")
 	if err != nil {
@@ -129,10 +136,32 @@ func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) (*mod
 			TeacherName:    teacher.FullName,
 			LessonOrder:    parse.LessonOrder,
 		}
-		schedule[lesson.Time.Weekday()] = append(schedule[lesson.Time.Weekday()], lesson) // Sunday = 0, ... !
+		schedule.Lessons[lesson.Time.Weekday()] = append(schedule.Lessons[lesson.Time.Weekday()], lesson) // Sunday = 0, ... !
 	}
 
-	return &models.Schedule{Lessons: schedule}, err
+	schedule.Headers = []string{"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"}
+
+	result := make([]map[string][]models.Lesson, len(schedule.Headers))
+	for i := time.Weekday(0); i < time.Weekday(6); i++ {
+		mp := make(map[string][]models.Lesson)
+		lessons := make([]models.Lesson, 4)
+		for j := 1; j <= 4; j++ {
+			lesson, inMap := schedule.Lessons[i]
+			if inMap {
+				for _, l := range lesson {
+					if l.LessonOrder == j {
+						lessons[j] = l
+					}
+				}
+			}
+		}
+		mp[schedule.Headers[i]] = lessons
+		result[i] = mp
+	}
+
+	fmt.Println(result)
+
+	return result, err
 }
 
 func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) (*models.Schedule, error) {

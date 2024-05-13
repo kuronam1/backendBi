@@ -69,26 +69,27 @@
 
     <!-- Всплывающее окно -->
 
-    <div class="popup">
-        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
-        <div class="form" onclick="oneSelector()">
-            <h2>Авторизация</h2>
-            <form id="login-form">
-                <div class="form-element">
-                    <label>Логин:</label>
-                    <input id="index-login" type="text" name="login" placeholder="Введите логин">
-                </div>
-                <div class="form-element">
-                   <label>Пароль:</label>
-                   <input id="index-pass" type="password" name="password" placeholder="Введите пароль">
-                </div>
-                <div class="form-element">
-                    <button id="enter" type="button">Войти</button>
-                </div>
-            </form>
+        <div class="popup">
+            <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+            <div class="form" onclick="oneSelector()">
+                <h2>Авторизация</h2>
+                <form method="post" action="/auth" id="login-form">
+                    <div class="form-element">
+                        <label>Логин:</label>
+                        <input id="index-login" type="text" name="login" placeholder="Введите логин">
+                    </div>
+                    <div class="form-element">
+                        <label>Пароль:</label>
+                        <input id="index-pass" type="password" name="password" placeholder="Введите пароль">
+                    </div>
+                    <div class="form-element">
+                        <button id="enter" type="submit">Войти</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <div class="overlay" id="overlay" style="display: none"></div>
+
+        <div class="overlay" id="overlay" style="display: none"></div>
     <script src="../static/js/bootstrap.min.js"></script>
     <script src="../static/js/jquery.js"></script>
     <script src="../static/js/script.js"></script>

@@ -48,10 +48,7 @@ func (h *StudentHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	/*c.HTML(http.StatusOK, "", gin.H{
-		"Schedule": schedule,
-	})*/
-	c.JSON(http.StatusOK, gin.H{
+	c.HTML(http.StatusOK, "", gin.H{
 		"Schedule": schedule,
 	})
 }
