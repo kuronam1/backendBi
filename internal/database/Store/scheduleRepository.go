@@ -225,8 +225,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 	result := make([]map[string][]models.Lesson, len(schedule.Headers))
 	for i := time.Weekday(0); i <= time.Weekday(6); i++ {
 		mp := make(map[string][]models.Lesson)
-		lessons := make([]models.Lesson, 6)
-		for j := 1; j <= 6; j++ {
+		lessons := make([]models.Lesson, 5)
+		for j := 0; j < 5; j++ {
 			lesson, inMap := schedule.Lessons[i]
 			if inMap {
 				for _, l := range lesson {
@@ -243,7 +243,7 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 	return result, nil
 }
 
-func (s *ScheduleRepository) GetScheduleByTeacherID(id int) (*models.Schedule, error) {
+func (s *ScheduleRepository) GetScheduleByTeacherID(id int) ([]map[string][]models.Lesson, error) {
 	const op = "fc.scheduleRep.GetScheduleByTeacherID"
 	teacher, err := s.store.User().GetUserByID(id)
 	if err != nil {
@@ -305,7 +305,27 @@ func (s *ScheduleRepository) GetScheduleByTeacherID(id int) (*models.Schedule, e
 		return nil, err
 	}
 
-	return schedule, nil
+	schedule.Headers = []string{"Вс", "Пн", "Вт", "Ср", "Чт", "Пт", "Сб"}
+
+	result := make([]map[string][]models.Lesson, len(schedule.Headers))
+	for i := time.Weekday(0); i <= time.Weekday(6); i++ {
+		mp := make(map[string][]models.Lesson)
+		lessons := make([]models.Lesson, 5)
+		for j := 0; j < 5; j++ {
+			lesson, inMap := schedule.Lessons[i]
+			if inMap {
+				for _, l := range lesson {
+					if l.LessonOrder == j {
+						lessons[j] = l
+					}
+				}
+			}
+		}
+		mp[schedule.Headers[i]] = lessons
+		result[i] = mp
+	}
+
+	return result, nil
 }
 
 func (s *ScheduleRepository) GetAllGroupsLessonsOneDis(groupName, disciplineName interface{}) ([]string, error) {

@@ -84,10 +84,10 @@
                             <td class="FIO">{{$FIO}}</td><!-- ФИО -->
                             {{ range $grades }}
                             <td level="{{.GradeID}}" discipline="{{.DisciplineID}}" >{{.Level}}</td>
-                            {{ end }}   
-                            <td></td><!-- пропуски -->
-                            <td></td><!-- средний балл -->
+                            <td>{{Count $grades}}</td><!-- пропуски -->
+                            <td>{{Avg $grades}}</td><!-- средний балл -->
                             <td></td><!-- итоговая оценка -->
+                            {{ end }}
                         </tr>
                         {{end}}
                         {{end}}

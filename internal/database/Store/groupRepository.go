@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sbitnev_back/internal/database/models"
+	"slices"
 )
 
 var (
@@ -54,17 +55,14 @@ func (g *GroupRepository) GetAllGroups() ([]models.Group, error) {
 
 func (g *GroupRepository) GetGroupByName(name interface{}) (*models.Group, error) {
 	const op = "fc.groupRep.GetGroupByName"
-	fmt.Println("i am here 2")
 	stmt, err := g.store.DB.Prepare("SELECT group_id, group_name, number, speciality, course FROM groups WHERE group_name = $1")
 	if err != nil {
 		return nil, err
 	}
-	fmt.Println("i am here 1123123")
 	defer stmt.Close()
 
 	group := &models.Group{}
 	err = stmt.QueryRow(name).Scan(&group.Id, &group.Name, &group.Number, &group.Speciality, &group.Course)
-	fmt.Println("i am here 1123123")
 	if err != nil {
 		return nil, err
 	}
@@ -168,4 +166,37 @@ func (g *GroupRepository) GroupMembership(studentID int) (*models.Group, error) 
 	}
 
 	return group, nil
+}
+
+func (g *GroupRepository) GetAllTeachersGroups(teacherID int) ([]string, error) {
+	stmt, err := g.store.DB.Prepare(`SELECT group_name FROM groups g
+    JOIN disciplines d ON d.course = g.course AND d.speciality = g.speciality
+WHERE teacher_id = $1`)
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(teacherID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []string
+	for rows.Next() {
+		var groupName string
+		err := rows.Scan(&groupName)
+		if err != nil {
+			return nil, err
+		}
+		if !slices.Contains(result, groupName) {
+			result = append(result, groupName)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

@@ -57,7 +57,6 @@
             </form>
         </div>
 
-        {{.ShowTable}}
         {{if eq .ShowTable 1}}
         <div class="container mb-4"> <!-- Расписание начинается от сюда. Весь этот блок должен быть выдан с бэка -->
             <h1 class="text-center">Расписание {{.Name}}</h1>
@@ -71,7 +70,7 @@
                     <th scope="col">12:40 - 14:10</th>
                     <th scope="col">14:20 - 15:50</th>
                     <th scope="col">16:00 - 17:30</th>
-                    <th scope="col">17:40 - 19:10</th>
+                    <!--<th scope="col">17:40 - 19:10</th>-->
                 </tr>
                 </thead>
                 <!--.Schedule - map, где ключ - dayOfWeek, значение - структуры Lesson за этот день -->
@@ -81,7 +80,7 @@
                 <tr>
                     <td scope="row">{{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        {{.Time}}{{break}}
+                        {{TFormat .Time}}{{break}}
                         {{end}}
                         {{end}}</td>
                     <td scope="row">{{$DoW}}</td>

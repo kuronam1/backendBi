@@ -1,7 +1,6 @@
 package router
 
 import (
-	"github.com/emirpasic/gods/maps/treemap"
 	"github.com/gin-gonic/gin"
 	"html/template"
 	"log/slog"
@@ -10,6 +9,8 @@ import (
 	"sbitnev_back/internal/database/models"
 	"sbitnev_back/internal/router/handlers/user"
 	"sbitnev_back/internal/router/middleware"
+	"strconv"
+	"time"
 )
 
 func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
@@ -18,9 +19,11 @@ func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
 	router.Use(gin.Recovery(), middleware.LoggingReq(log))
 	//router.LoadHTMLGlob("html/*")
 	router.SetFuncMap(template.FuncMap{
-		"Get": GetFunc,
+		"TFormat": TFormat,
+		"Count":   CountN,
+		"Avg":     Avg,
 	})
-	router.LoadHTMLFiles("html/admin_journal.html", "html/admin_schedule.html", "html/index.html", "html/admin_management.html")
+	router.LoadHTMLGlob("html/*")
 	router.Static("/static", "./static")
 
 	handler := user.NewHandler(log, db)
@@ -28,10 +31,27 @@ func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
 	return router
 }
 
-func GetFunc(key string, m *treemap.Map) []models.Grade {
-	res, exist := m.Get(key)
-	if !exist {
-		return nil
+func TFormat(t time.Time) string {
+	return t.Format(time.DateOnly)
+}
+
+func CountN(grades []models.Grade) int {
+	counter := 0
+	for _, value := range grades {
+		if value.Level == "н" {
+			counter++
+		}
 	}
-	return res.([]models.Grade)
+	return counter
+}
+
+func Avg(grades []models.Grade) float64 {
+	sum := 0
+	for _, value := range grades {
+		if value.Level != "н" {
+			num, _ := strconv.Atoi(value.Level)
+			sum += num
+		}
+	}
+	return float64(sum) / float64(len(grades))
 }

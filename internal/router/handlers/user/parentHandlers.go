@@ -8,18 +8,18 @@ import (
 	"sbitnev_back/internal/database/Store"
 )
 
-type StudentHandler struct {
+type ParentHandler struct {
 	Logger  *slog.Logger
 	Storage *Store.Storage
 }
 
-func (h *StudentHandler) Menu(c *gin.Context) {
+func (h *ParentHandler) Menu(c *gin.Context) {
 	c.HTML(http.StatusOK, "homepage_student.html", nil)
 }
 
-func (h *StudentHandler) GetSchedule(c *gin.Context) {
+func (h *ParentHandler) GetSchedule(c *gin.Context) {
 	const op = "StudentHandlers.GetSchedule"
-	studentId, exists := c.Get("id")
+	parentId, exists := c.Get("id")
 	if !exists {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "cannot identify",
@@ -27,7 +27,9 @@ func (h *StudentHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	group, err := h.Storage.Groups().GroupMembership(studentId.(int))
+	studentId, err := h.Storage.User().GetStudentIDByParentID(parentId.(int))
+
+	group, err := h.Storage.Groups().GroupMembership(studentId)
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -51,9 +53,9 @@ func (h *StudentHandler) GetSchedule(c *gin.Context) {
 	})
 }
 
-func (h *StudentHandler) GetJournal(c *gin.Context) {
+func (h *ParentHandler) GetJournal(c *gin.Context) {
 	const op = "StudentHandlers.GetJournal"
-	studentId, exists := c.Get("id")
+	parentId, exists := c.Get("id")
 	if !exists {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "cannot identify",
@@ -61,9 +63,11 @@ func (h *StudentHandler) GetJournal(c *gin.Context) {
 		return
 	}
 
-	user, err := h.Storage.User().GetUserByID(studentId.(int))
+	studentId, err := h.Storage.User().GetStudentIDByParentID(parentId.(int))
 
-	journal, err := h.Storage.Journal().GetJournalByStudentID(studentId.(int))
+	user, err := h.Storage.User().GetUserByID(studentId)
+
+	journal, err := h.Storage.Journal().GetJournalByStudentID(studentId)
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

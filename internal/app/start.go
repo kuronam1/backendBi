@@ -22,7 +22,7 @@ func Run(cfg *config.Config) {
 		os.Exit(1)
 	}
 
-	/*if err := database.PrepareTables(); err != nil {
+	/*	if err := database.PrepareTables(); err != nil {
 		logger.Error(fmt.Sprintf("[DB]: Error while initializing - %s", err))
 		os.Exit(1)
 	}*/

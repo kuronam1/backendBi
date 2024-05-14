@@ -353,12 +353,12 @@ $('#teacher-get-journal').on( 'click', function( event ){
     let discipline = 'discipline';
     let disciplineValue = document.getElementById("teacher-discipline").value;
     $.ajax({
-        url         : '/teacherPanel/schedule',
+        url         : '/teacherPanel/journal',
         type        : 'GET',
-        data        : JSON.stringify({
+        data        : {
             discipline : disciplineValue,
             group : groupValue
-        }),
+        },
         success     : function(data) {
         },
         error: function() {

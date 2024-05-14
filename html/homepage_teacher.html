@@ -13,19 +13,19 @@
 
     <!-- Header -->
 
-        <header id="intro">
+    <header id="intro">
         <nav class="container navbar navbar-expand-lg">
             <div class="col-md-3 justify-content-start">
-                <a id="teacher-brend" class="navbar-brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
+                <a href="/teacherPanel/menu" id="teacher-brend" class="navbar-brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
             </div>
             <div class="col-md-3 justify-content-center text-center">
                 <div class="button-nav">
-                    <a id="teacher-schedule">Расписание</a>
+                    <a href="/teacherPanel/schedule" id="teacher-schedule">Расписание</a>
                 </div>
             </div>
             <div class="col-md-3 justify-content-center text-center">
                 <div class="button-nav">
-                    <a id="teacher-journal">Журнал</a>
+                    <a href="/teacherPanel/journal" id="teacher-journal">Журнал</a>
                 </div>
 
             </div>
@@ -33,7 +33,7 @@
                 <div id="circle">
                     <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
                 </div>
-            </div>            
+            </div>
         </nav>
     </header>
 
@@ -41,7 +41,7 @@
 
     <section>
         <div class="banner">
-            <img src="media/souz.jpg" class="d-block">
+            <img src="../static/media/souz.jpg" class="d-block">
             <div class="welcome-text">
                 <h1 class="welcome-message text-center"><span class="rotate"> ФИЛИАЛ МАИ РКТ, РАСПИСАНИЕ, ЭЛЕКТРОННЫЙ ЖУРНАЛ </span></h1>
             </div>
@@ -79,14 +79,13 @@
     </footer>
 
     <!-- Всплывающее окно. Тут нужно сделать выход с сайта.  -->
-
     <div class="popup">
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
         <div class="form">
             <h2>Вы уверены, что хотите выйти?</h2>
-            <form>
+            <form method="post" action="/logout">
                 <div class="form-element">
-                    <button id="cancel-button" type="button">Выйти</button>
+                    <button id="cancel-button" type="submit">Выйти</button>
                 </div>
             </form>
         </div>

@@ -124,13 +124,22 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 			return
 		}
 
-		if err := rep.CreateUserLink(id, request.GroupName); err != nil {
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"error": err,
-			})
-			return
+		switch user.Role {
+		case "teacher":
+			//if err := rep.CreateTeacherDisciplineLink()
+		case "student":
+			if err := rep.CreateGroupUserLink(id, request.GroupName); err != nil {
+				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+		case "parent":
+			//group, err := h.Storage.User().GetUserByName()
+			//if err := rep.CreateParentStudentLink()
 		}
+
 		c.JSON(http.StatusCreated, gin.H{
 			"status": "user registered",
 		})

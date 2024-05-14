@@ -188,3 +188,8 @@ SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_
 INSERT INTO grades VALUES (1, 2, 1, '4', '11-05-2024', 'Контрольная работа');
 INSERT INTO grades VALUES (2, 3, 1, '3', '10-05-2024', 'Контрольная работа');
 SELECT group_id, speciality, group_name, number, course FROM groups WHERE group_name = 'ЭВМ2-2';
+
+SELECT g.group_name, d.discipline_name FROM groups g
+    JOIN disciplines d ON d.course = g.course AND d.speciality = g.speciality
+WHERE teacher_id = 28;
+
