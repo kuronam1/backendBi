@@ -3,6 +3,7 @@ package Store
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"github.com/xuri/excelize/v2"
 	"sbitnev_back/internal/database/models"
 	"strconv"
@@ -32,10 +33,11 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 
 	var stmt *sql.Stmt
 	defer stmt.Close()
+lvl:
 	for _, row := range rows {
-		var lesson models.Lesson
+		lesson := models.Lesson{}
 		lesson.GroupName = row[0]
-		lesson.Time, err = time.Parse("1/2/06 15:04", row[1])
+		lesson.Time, err = time.Parse(time.DateOnly, row[1])
 		if err != nil {
 			return err
 		}
@@ -55,10 +57,25 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 
 		disID, err := s.store.Disciplines().RegisterDiscipline(teacherName,
 			lesson.DisciplineName, group.Speciality, group.Course)
-		if err != nil {
+		switch {
+		case errors.Is(err, fmt.Errorf("exists")):
+			disId, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
+			if err != nil {
+				return err
+			}
+			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
+			if err != nil {
+				return err
+			}
+
+			_, err = stmt.Exec(group.Id, lesson.Time, disId, lesson.Audience, lesson.Description) // добавить teacherID
+			if err != nil {
+				return err
+			}
+			goto lvl
+		case err != nil:
 			return err
 		}
-
 		stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
 		if err != nil {
 			return err
@@ -69,6 +86,7 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -139,8 +157,8 @@ func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) ([]ma
 	result := make([]map[string][]models.Lesson, len(schedule.Headers))
 	for i := time.Weekday(0); i <= time.Weekday(6); i++ {
 		mp := make(map[string][]models.Lesson)
-		lessons := make([]models.Lesson, 6)
-		for j := 1; j <= 6; j++ {
+		lessons := make([]models.Lesson, 5)
+		for j := 0; j < 5; j++ {
 			lesson, inMap := schedule.Lessons[i]
 			if inMap {
 				for _, l := range lesson {
@@ -239,6 +257,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 		mp[schedule.Headers[i]] = lessons
 		result[i] = mp
 	}
+
+	fmt.Println(result)
 
 	return result, nil
 }

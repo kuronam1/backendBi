@@ -1,4 +1,4 @@
-var files;
+/*var files;
 $('#files').on('change', function(){
     var fileInput = document.getElementById('files'); // Начало быдлокода
     var filePath = fileInput.value;
@@ -10,10 +10,7 @@ $('#files').on('change', function(){
     } else files = this.files;
 });
 
-$('#submit_button').on( 'click', function( event ){
-
-    event.stopPropagation();
-    event.preventDefault();
+$('#submit_button').on( 'click', function(){
     if( typeof files == 'undefined' ) return;
     var data = new FormData();
     data.append('file', files);
@@ -33,33 +30,33 @@ $('#submit_button').on( 'click', function( event ){
         }
     });
 
-});
+});*/
 
-$('#enter').on( 'click', function( event ){
-        let login = 'login';
-        let loginValue = document.getElementById("index-login").value;
-        let password = 'password';
-        let passValue = document.getElementById("index-pass").value;
-    $.ajax({
-        url         : '/auth',
-        type        : 'POST',
-        data        : JSON.stringify({
-            login : loginValue,
-            password : passValue
-        }),
-        dataType    : 'json',
-        processData : false,
-        contentType : 'application/json',
-        success     : function(data) {
-            if(data.redirectUrl) {
-                window.location.href = data.redirectUrl;
-            }
-            },
-        error: function() {
+// $('#enter').on( 'click', function( event ){
+//         let login = 'login';
+//         let loginValue = document.getElementById("index-login").value;
+//         let password = 'password';
+//         let passValue = document.getElementById("index-pass").value;
+//     $.ajax({
+//         url         : '/auth',
+//         type        : 'POST',
+//         data        : JSON.stringify({
+//             login : loginValue,
+//             password : passValue
+//         }),
+//         dataType    : 'json',
+//         processData : false,
+//         contentType : 'application/json',
+//         success     : function(data) {
+//             if(data.redirectUrl) {
+//                 window.location.href = data.redirectUrl;
+//             }
+//             },
+//         error: function() {
 
-        }
-    });
-});
+//         }
+//     });
+// });
 
 $('#newsletter-submit').on( 'click', function( event ){
     let fio = 'fio';
@@ -209,7 +206,7 @@ $('#new-user-reg').on( 'click', function( event ){
         processData: false,
         contentType: 'application/json',
         success: function () {
-            //Пока это оставим пустым, потом если надо, что-то придумаем
+            alert("Пользователь успешно добавлен")  // Сообщение об успешном добавлении пользователя
         },
         error: function () {
         }
@@ -265,7 +262,7 @@ $('#add-group').on( 'click', function( event ){
         processData : false,
         contentType : 'application/json',
         success     : function() {
-            //Пока это оставим пустым, потом если надо, что-то придумаем
+            alert("Группа успешно добавлена")
         },
         error: function() {
         }
@@ -314,85 +311,81 @@ $('#admin-schedule-submit').on( 'click', function( event ){
         });
     }
 });
-$('#cancel-button').on( 'click', function( event ){
-    $.ajax({
-        url         : '/logout',
-        type        : 'POST',
-        date : JSON.stringify({}),
-        dataType    : 'json',
-        processData : false,
-        contentType : 'application/json',
-        success     : function() {
-            //Пока это оставим пустым, потом если надо, что-то придумаем
-        },
-        error: function() {
-        }
-    });
-});
-$('#admin-get-journale-group').on( 'click', function( event ){
-    let group = 'group';
-    let groupValue = document.getElementById("admin-group").value;
-    let discipline = 'discipline';
-    let disciplineValue = document.getElementById("discipline").value;
-    $.ajax({
-        url         : '/adminPanel/journal',
-        type        : 'GET',
-        data        : {
-                group : groupValue,
-                discipline : disciplineValue
-        },
-        success     : function(data) {
-        },
-        error: function() {
-        }
-    });
-});
-$('#teacher-get-journal').on( 'click', function( event ){
-    let group = 'group';
-    let groupValue = document.getElementById("teacher-group").value;
-    let discipline = 'discipline';
-    let disciplineValue = document.getElementById("teacher-discipline").value;
-    $.ajax({
-        url         : '/teacherPanel/journal',
-        type        : 'GET',
-        data        : {
-            discipline : disciplineValue,
-            group : groupValue
-        },
-        success     : function(data) {
-        },
-        error: function() {
-        }
-    });
-});
+// $('#cancel-button').on( 'click', function( event ){
+//     $.ajax({
+//         url         : '/logout',
+//         type        : 'POST',
+//         date : JSON.stringify({}),
+//         dataType    : 'json',
+//         processData : false,
+//         contentType : 'application/json',
+//         success     : function() {
+//             //Пока это оставим пустым, потом если надо, что-то придумаем
+//         },
+//         error: function() {
+//         }
+//     });
+// });
+// $('#admin-get-journale-group').on( 'click', function( event ){
+//     let group = 'group';
+//     let groupValue = document.getElementById("admin-group").value;
+//     let discipline = 'discipline';
+//     let disciplineValue = document.getElementById("discipline").value;
+//     $.ajax({
+//         url         : '/adminPanel/journal',
+//         type        : 'GET',
+//         data        : {
+//                 group : groupValue,
+//                 discipline : disciplineValue
+//         },
+//         success     : function(data) {
+//         },
+//         error: function() {
+//         }
+//     });
+// });
+// $('#teacher-get-journal').on( 'click', function( event ){
+//     let group = 'group';
+//     let groupValue = document.getElementById("teacher-group").value;
+//     let discipline = 'discipline';
+//     let disciplineValue = document.getElementById("teacher-discipline").value;
+//     $.ajax({
+//         url         : '/teacherPanel/journal',
+//         type        : 'GET',
+//         data        : {
+//             discipline : disciplineValue,
+//             group : groupValue
+//         },
+//         success     : function(data) {
+//         },
+//         error: function() {
+//         }
+//     });
+// });
 $('#teacher-new-score').on( 'click', function( event ){
-    let discipline = 'discipline';
-    let disciplineValue = document.getElementById("teacher-discipline").value;
-    let name = 'name';
+    let disciplineValue = disciplineID;
     let studentName = nameStudent;
-    let dateName = 'date';
     let dateValue = date;
-    let gradeName = 'grade'
     let gradeValue = document.getElementById("score").value;
-    let comment = 'comment';
     let commentValue = document.getElementById("score-comment").value;
     $.ajax({
         url         : '/teacherPanel/journal',
         type        : 'POST',
         data        : JSON.stringify({
-            name : studentName,
-            discipline : disciplineValue,
-            dateName : dateValue,
-            gradeName : gradeValue,
-            comment : commentValue
+            'studentName' : studentName,
+            'disciplineID' : disciplineValue,
+            'date' : dateValue,
+            'level' : gradeValue,
+            'comment' : commentValue
         }),
         dataType    : 'json',
         processData : false,
         contentType : 'application/json',
         success     : function(data) {
-
+            window.location.reload();
         },
         error: function() {
+            alert("Ошибка")
         }
     });
 });

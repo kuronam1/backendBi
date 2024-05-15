@@ -1,13 +1,15 @@
 package user
 
 import (
+	"bytes"
 	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"io"
+	"log"
 	"log/slog"
 	"net/http"
-	"path/filepath"
 	"sbitnev_back/internal/database/Store"
 	"sbitnev_back/internal/database/models"
 	"strconv"
@@ -36,6 +38,15 @@ func (h *AdminHandler) Management(c *gin.Context) {
 		return
 	}
 
+	students, err := h.Storage.User().GetUserByRole("student")
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
 	specialities, err := h.Storage.Groups().GetAllSpecialities()
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -46,6 +57,7 @@ func (h *AdminHandler) Management(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "admin_management.html", gin.H{
+		"Students":     students,
 		"Groups":       groups,
 		"Specialities": specialities,
 	})
@@ -55,7 +67,33 @@ func (h *AdminHandler) Management(c *gin.Context) {
 
 func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	const op = "AdminHandlers.ScheduleRegister"
-	fmt.Println(*c.Request)
+	log.Println("inUploadFile")
+	log.Println("Content-Type:", c.Request.Header["Content-Type"])
+	if body, err := io.ReadAll(c.Request.Body); err != nil {
+		panic(err)
+	} else {
+		log.Println("Body:", string(body))
+		// Нужно заново прикрепить тело к запросу, так как после `ReadAll` тело пустое.
+		c.Request.Body = io.NopCloser(bytes.NewReader(body))
+	}
+	// Для проверки распечатка полей формы как application/x-www-form-urlencoded
+	log.Println("PostFormArray", c.PostFormArray("file"))
+	log.Println("PostForm", c.PostForm("file"))
+
+	// Извлечение файлов из Multi-part
+	form, _ := c.MultipartForm()
+	log.Println("Form", form)
+	for i, fh := range form.File["file"] {
+		log.Println("File #", i)
+		log.Println("  file name", fh.Filename)
+		log.Println("  file size", fh.Size)
+		// Чтение содержимого файла
+		fileReader, _ := fh.Open()
+		contents, _ := io.ReadAll(fileReader)
+		log.Println("  file contents: ", string(contents))
+		fileReader.Close()
+	}
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -65,7 +103,12 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 		return
 	}
 
-	filePath := filepath.Join("/schedule", file.Filename)
+	h.Logger.Debug("file grabbed")
+
+	filePath := fmt.Sprintf("./schedule/%v", file.Filename)
+
+	h.Logger.Debug(fmt.Sprintf("filePath: %v", filePath))
+
 	err = c.SaveUploadedFile(file, filePath)
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -90,11 +133,12 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 
 func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 	type Request struct {
-		Login     string `json:"login"`
-		Password  string `json:"password"`
-		UserName  string `json:"userName"`
-		Role      string `json:"role"`
-		GroupName string `json:"groupName,omitempty"`
+		Login       string `json:"login"`
+		Password    string `json:"password"`
+		UserName    string `json:"userName"`
+		Role        string `json:"role"`
+		GroupName   string `json:"groupName,omitempty"`
+		StudentName string `json:"studentName,omitempty"`
 	}
 	return func(c *gin.Context) {
 		const op = "AdminHandlers.UserRegister"
@@ -126,18 +170,40 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 
 		switch user.Role {
 		case "teacher":
-			//if err := rep.CreateTeacherDisciplineLink()
+			if err := rep.CreateTeacherDisciplineLink(id); err != nil {
+				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"StatusCode":  http.StatusInternalServerError,
+					"Description": "Ошибка создания связи",
+				})
+				return
+			}
 		case "student":
 			if err := rep.CreateGroupUserLink(id, request.GroupName); err != nil {
 				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-					"error": err,
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"StatusCode":  http.StatusInternalServerError,
+					"Description": "Ошибка создания связи",
 				})
 				return
 			}
 		case "parent":
-			//group, err := h.Storage.User().GetUserByName()
-			//if err := rep.CreateParentStudentLink()
+			student, err := h.Storage.User().GetUserByName(request.StudentName)
+			if err != nil {
+				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"StatusCode":  http.StatusInternalServerError,
+					"Description": "Ошибка создания связи",
+				})
+				return
+			}
+			if err := rep.CreateParentStudentLink(id, student.UserID); err != nil {
+				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+					"StatusCode":  http.StatusInternalServerError,
+					"Description": "Ошибка создания связи",
+				})
+				return
+			}
 		}
 
 		c.JSON(http.StatusCreated, gin.H{
@@ -262,16 +328,14 @@ func (h *AdminHandler) GetJournal(c *gin.Context) {
 	}
 
 	c.HTML(http.StatusOK, "admin_journal.html", gin.H{
-		"Journal":     journal,
-		"Lessons":     lessons,
-		"Groups":      groups,
-		"Disciplines": disciplines,
-		"Pre":         0,
+		"Journal":        journal,
+		"GroupName":      groupName,
+		"DisciplineName": disciplineName,
+		"Lessons":        lessons,
+		"Groups":         groups,
+		"Disciplines":    disciplines,
+		"Pre":            0,
 	})
-	/*c.JSON(200, gin.H{
-		"Journal": journal,
-		"Lessons": lessons,
-	})*/
 }
 
 func (h *AdminHandler) GetPreJournal(c *gin.Context) {
@@ -465,7 +529,8 @@ func (h *AdminHandler) ScheduleWithQueryGroup(c *gin.Context, groupName string) 
 		"Schedule":  schedule,
 		"Groups":    groups,
 		"Teachers":  teachers,
-		"ShowTable": 1,
+		"Table":     "group",
+		"GroupName": groupName,
 	})
 }
 
@@ -520,10 +585,11 @@ func (h *AdminHandler) ScheduleWithQueryTeacher(c *gin.Context, teacherName stri
 	}
 
 	c.HTML(http.StatusOK, "admin_schedule.html", gin.H{
-		"Schedule":  schedule,
-		"Groups":    groups,
-		"Teachers":  teachers,
-		"ShowTable": 1,
+		"Schedule":    schedule,
+		"Groups":      groups,
+		"Teachers":    teachers,
+		"Table":       "teacher",
+		"TeacherName": teacherName,
 	})
 }
 
@@ -564,6 +630,6 @@ func (h *AdminHandler) GetPreSchedule(c *gin.Context) {
 	c.HTML(200, "admin_schedule.html", gin.H{
 		"Teachers":  teachers,
 		"Groups":    groups,
-		"ShowTable": 0,
+		"ShowTable": "none",
 	})
 }

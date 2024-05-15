@@ -3,6 +3,7 @@ package Store
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 	"sbitnev_back/internal/database/models"
 )
 
@@ -49,12 +50,18 @@ func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, s
 		return 0, err
 	}
 
-	res, err := stmt.Exec(teacher.UserID, disciplineName, speciality, course)
+	_, err = stmt.Exec(teacher.UserID, disciplineName, speciality, course)
+	if err != nil {
+		return 0, fmt.Errorf("exists")
+	}
+
+	query := `SELECT discipline_id FROM disciplines WHERE discipline_name = $1`
+
+	var id int64
+	err = d.store.DB.QueryRow(query, disciplineName).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
-
-	id, err := res.LastInsertId()
 
 	return id, nil
 }
@@ -90,13 +97,13 @@ func (d *DisciplineRepository) GetAllDisciplines() ([]*models.Discipline, error)
 	return res, nil
 }
 
-func (d *DisciplineRepository) GetGroupDisciplineNames(groupName string) ([]string, error) {
+func (d *DisciplineRepository) GetGroupDisciplines(groupName string) ([]models.Discipline, error) {
 	group, err := d.store.Groups().GetGroupByName(groupName)
 	if err != nil {
 		return nil, err
 	}
 
-	stmt, err := d.store.DB.Prepare("SELECT discipline_name FROM disciplines WHERE speciality = $1 AND course = $2 ORDER BY discipline_name")
+	stmt, err := d.store.DB.Prepare("SELECT discipline_id, teacher_id, discipline_name, speciality, course FROM disciplines WHERE speciality = $1 AND course = $2 ORDER BY discipline_name")
 	if err != nil {
 		return nil, err
 	}
@@ -108,14 +115,19 @@ func (d *DisciplineRepository) GetGroupDisciplineNames(groupName string) ([]stri
 	}
 	defer rows.Close()
 
-	var disciplines []string
+	var disciplines []models.Discipline
 	for rows.Next() {
-		var disciplineName string
-		err = rows.Scan(&disciplineName)
+		var discipline models.Discipline
+		err = rows.Scan(
+			&discipline.DisciplineID,
+			&discipline.TeacherID,
+			&discipline.DisciplineName,
+			&discipline.Speciality,
+			&discipline.Course)
 		if err != nil {
 			return nil, err
 		}
-		disciplines = append(disciplines, disciplineName)
+		disciplines = append(disciplines, discipline)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, err

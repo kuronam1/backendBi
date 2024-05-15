@@ -151,14 +151,14 @@ func (u *UserRepository) CreateGroupUserLink(userID int, groupName string) error
 	return nil
 }
 
-func (u *UserRepository) CreateTeacherDisciplineLink(teacherID int, disciplineName string) error {
-	stmt, err := u.store.DB.Prepare("UPDATE disciplines SET teacher_id = $1 WHERE discipline_name = $2")
+func (u *UserRepository) CreateTeacherDisciplineLink(teacherID int) error {
+	stmt, err := u.store.DB.Prepare("INSERT INTO disciplines(teacher_id) VALUES ($1)")
 	if err != nil {
 		return err
 	}
 	defer stmt.Close()
 
-	_, err = stmt.Exec(teacherID, disciplineName)
+	_, err = stmt.Exec(teacherID)
 	if err != nil {
 		return err
 	}
@@ -264,5 +264,41 @@ func (u *UserRepository) GetStudentIDByParentID(parentID int) (int, error) {
 	}
 
 	return studentID, nil
+}
 
+func (u *UserRepository) GetUserByRole(role string) ([]models.User, error) {
+	stmt, err := u.store.DB.Prepare("SELECT user_id, login, full_name, role FROM users WHERE role = $1")
+	if err != nil {
+		return nil, err
+	}
+	defer stmt.Close()
+
+	rows, err := stmt.Query(role)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []models.User
+	for rows.Next() {
+		var user models.User
+		err := rows.Scan(
+			&user.UserID,
+			&user.Login,
+			&user.FullName,
+			&user.Role)
+		switch {
+		case errors.Is(err, sql.ErrNoRows):
+			return nil, invalidUser
+		case err != nil:
+			return nil, err
+		default:
+			result = append(result, user)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }

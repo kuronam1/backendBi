@@ -8,18 +8,18 @@
 @media (min-width: 1650px) {
 	body{
 		width: 80%;
-		margin: 0 auto;
+		margin: 0 auto !important;
 		box-shadow: 0 0 80px gray;
 	}
 }
 
 @font-face {
     font-family: 'Rubik';
-    src: url('../font/Rubik-Regular.ttf'), /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
+    src: url('../font/Rubik-Regular.ttf'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
 * {
-    font-family: 'Rubik, sans-serif';
+    font-family: 'Rubik, sans-serif';	
 }
 
 /* ~~~~~~~~~~~~DEFAULT PAGE~~~~~~~~~~~~~~~~ */
@@ -35,6 +35,17 @@ header{
 	background-color: var(--color2);
 }
 
+.button-nav a{
+	letter-spacing: 1px;
+}
+
+.hoverLinks:hover{
+	transition: 0.3s;
+	box-shadow: 0 0 4px black;
+	border: 2px solid var(--color2);
+	background-color: var(--color2);
+	color: var(--color3) !important;
+}
 
 #intro .button-nav a{
 	color: var(--color2);
@@ -44,9 +55,12 @@ header{
 }
 
 #intro .button-nav a:hover{
-	transform: scale(1.02);
-	transition: 0.5s;
+	transition: 0.3s;
 	box-shadow: 0 0 4px black;
+	border: 2px solid var(--color1);
+	background-color: var(--color2);
+	color: var(--color1);
+
 }
 
 
@@ -58,6 +72,7 @@ header{
     height: 60px;
 	margin: 0 0 0 auto;
 	transition: 0.3s;
+	cursor: pointer;
 }
 
 #circle:hover{
@@ -202,16 +217,19 @@ footer{
 	top: -150%;
 	left: 50%;
 	opacity: 0;
-	transform: translate(-50%, -50%) scale(1.25);
+	transform: translate(-50%, -50%) scale(0.8);
 	width: 450px;
 	padding: 20px 30px;
 	background: var(--color2);
 	box-shadow: 2px 2px 5px 5px rgba(0,0, 0, 0.15);
 	border-radius: 20px;
 	transition: top 0ms ease-in-out 200ms,
-	opacity 0ms ease-in-out 0ms,
-	transform 20ms ease-in-out 0ms;
+	opacity 50ms ease-in-out 0ms,
+	transform 50ms ease-in-out 0ms;
+}
 
+.popupSchedule{
+	width: 600px;
 }
 
 .active{
@@ -220,7 +238,7 @@ footer{
 	transform: translate(-50%, -50%) scale(1);
 	transition: top 0ms ease-in-out 0ms,
 				opacity 200ms ease-in-out 0ms,
-				transform 20ms ease-in-out 0ms;
+				transform 200ms ease-in-out 0ms;
 }
 
 .popup .close-btn, .popupScore .close-btn, .popupSchedule .close-btn
@@ -309,11 +327,22 @@ footer{
 	font-size: 23px;
 	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 	padding: 10px 20px;
-	transform: scale(1.02);
-	transition: 0.5s;
+	transition: 0.3s;
 	border-radius: 10px;
 	border: 2px solid var(--color2);
 	cursor: pointer;
+}
+
+#dataForPopup{
+	padding: 20px 0;
+}
+
+#dataForPopup p{
+	font-weight: bold;
+}
+
+#dataForPopup p span{
+	font-weight: normal;
 }
 
   /* ~~~~~~~~~~~~TEACHER JOURNAL~~~~~~~~~~~~~~~~ */
@@ -355,6 +384,8 @@ footer{
 	padding: 7.7px 20px;
 	border: 2px solid var(--color3);
 }
+
+
 
 .button-select form button:hover, #saveTable:hover{
 	background-color: var(--color3);
@@ -409,11 +440,37 @@ footer{
 	color: #cccc00;
 }
 .selectScore option[value="5"]{
-	color: green;
+	color: blue;
 }
-.selectScore option[value="Н"]{
+.selectScore option[value="н"]{
 	color: brown;
 }
+
+#windowSchedule{
+	text-align: center;
+	margin: 20px 0 10px 0;
+}
+
+#windowSchedule p{
+	font-size: 25px !important;
+	display: block !important;
+}
+
+#ThemesHomeWork{
+	margin: 0 0 20px 0;
+}
+
+#ThemesHomeWork input[type="text"]{
+	margin: 10px auto;
+	display: block;
+	width: 70%;
+	padding: 10px;
+	outline: none;
+	border: 1px solid var(--color3);
+	border-radius: 10px;
+	font-size: 20px;
+}
+
 
 /* Admin page */
 
@@ -495,6 +552,8 @@ footer{
 	border-color: black;
 } 
 
+
+
 /* ADMIN JOURNAL */
 
 .popupScore form input[type="text"]{
@@ -512,12 +571,17 @@ footer{
 .popupScore form select{
 	width: 25%;
 	text-align: center;
-	padding: 18px;
+	padding: 12.5px;
 	border: 2px solid #aaa;
 	border-radius: 5px;
 	display: block;
     margin: 20px auto;
 	text-indent: 10px;
+	font-size: 25px;
+}
+
+.popupScore form select option{
+	font-size: 25px;
 }
 
 .popupScore form select option[value="5"]{
@@ -536,3 +600,61 @@ footer{
 	color: brown;
 }
 
+/* Error Page */
+
+#error{
+	display: flex;
+	width: 100%;
+	margin: 0 10%;
+	height: 70vh
+}
+
+.imageElefant{
+	width: 40%;
+	text-align: center;
+}
+
+.sorry{
+	width: 40%;
+	padding: 100px 50px;
+	font-size: 6vh;
+}
+
+.sorry p{
+	margin: auto 0;
+	line-height: 50px;
+}
+
+#else, #errorID{
+	font-size: 4vh;
+}
+
+#errorID{
+	font-style: italic;
+	margin: 5px 0;
+}
+
+.sorry button{
+	font-size: 35px;
+	border-radius: 10px;
+	background-color: var(--color3);
+	border: 2px solid var(--color3);
+	color: white;
+	padding: 3px 10px;
+	transition: 0.3s;
+}
+
+.sorry button:hover{
+	background-color: var(--color2);
+	color: var(--color3);
+	transition: 0.5s;
+	box-shadow: 0 0 px gainsboro;
+}
+
+#ups{
+	font-weight: bold;
+}
+
+.imageElefant img{
+	width: 90%;
+}

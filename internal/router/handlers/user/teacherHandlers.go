@@ -88,10 +88,11 @@ func (h *TeacherHandler) GetJournal(c *gin.Context) {
 		"Journal":        journal,
 		"LessonsTime":    lessonsTime,
 		"Disciplines":    disciplines,
-		"GroupNames":     groupNames,
+		"GroupsNames":    groupNames,
 		"TeacherName":    teacher.FullName,
 		"GroupName":      groupName,
-		"DisciplineName": disciplineName,
+		"UsedDiscipline": disciplineName,
+		"Table":          true,
 	})
 }
 
@@ -135,13 +136,14 @@ func (h *TeacherHandler) GetPreJournal(c *gin.Context) {
 		"GroupsNames": groupNames,
 		"Disciplines": disciplines,
 		"TeacherName": teacher.FullName,
+		"Table":       false,
 	})
 }
 
 func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 	type request struct {
 		StudentName    string `json:"studentName"`
-		DisciplineName string `json:"disciplineName"`
+		DisciplineName string `json:"disciplineID"`
 		Level          string `json:"level"`
 		Date           string `json:"date"`
 		Comment        string `json:"comment,omitempty"`
@@ -157,19 +159,12 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 			return
 		}
 
+		h.Logger.Info("%v", req)
+
 		user, err := h.Storage.User().GetUserByName(req.StudentName)
 		if err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": err,
-			})
-			return
-		}
-
-		discipline, err := h.Storage.Disciplines().GetDisciplineByName(req.DisciplineName)
-		if err != nil {
-			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
 			return
@@ -183,6 +178,8 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 			})
 			return
 		}
+
+		discipline, err := h.Storage.Disciplines().GetDisciplineByName(req.DisciplineName)
 
 		grade := &models.Grade{
 			StudentID:    user.UserID,

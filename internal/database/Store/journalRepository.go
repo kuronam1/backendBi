@@ -2,6 +2,7 @@ package Store
 
 import (
 	"errors"
+	"fmt"
 	"sbitnev_back/internal/database/models"
 	"time"
 )
@@ -61,9 +62,13 @@ ORDER BY g.date`)
 		return nil, err
 	}
 
-	journal.Headers, err = j.store.Disciplines().GetGroupDisciplineNames(group.Name)
+	GroupDis, err := j.store.Disciplines().GetGroupDisciplines(group.Name)
 	if err != nil {
 		return nil, err
+	}
+
+	for i := 0; i < len(GroupDis); i++ {
+		journal.Headers = append(journal.Headers, GroupDis[i].DisciplineName)
 	}
 
 	result := make([]map[string][]models.Grade, len(journal.Headers))
@@ -100,7 +105,7 @@ func (j *JournalRepository) UpdateGrade(oldGrade, newGrade *models.Grade) error 
 func (j *JournalRepository) GetGroupJournalByDiscipline(groupName, disciplineName string) ([]map[string][]models.Grade, error) {
 	const op = "fc.journalRep.GetAdminJournal"
 	stmt, err := j.store.DB.Prepare(`
-SELECT g.grade_id, g.grade, g.date, g.comment, u.full_name
+SELECT g.grade_id, g.discipline_id, g.grade, g.date, g.comment, u.full_name
 FROM grades g
 			JOIN users u ON g.student_id = u.user_id
 			JOIN disciplines d ON d.discipline_id = g.discipline_id
@@ -129,6 +134,7 @@ ORDER BY u.full_name`)
 		)
 		err = rows.Scan(
 			&grade.GradeID,
+			&grade.DisciplineID,
 			&grade.Level,
 			&grade.Date,
 			&grade.Comment,
@@ -136,6 +142,7 @@ ORDER BY u.full_name`)
 		if err != nil {
 			return nil, err
 		}
+		fmt.Println(grade)
 		journal.Grades[fullName] = append(journal.Grades[fullName], grade)
 	}
 	if err := rows.Err(); err != nil {

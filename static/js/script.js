@@ -245,7 +245,7 @@ function restyleLinksStudent(){
 
 function restyleLinksTeacher(){
   let substringTeacherSchedule = "schedule";
-  let suubstringTeacherJournal = "journal";
+  let substringTeacherJournal = "journal";
 
   // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
 
@@ -254,7 +254,7 @@ function restyleLinksTeacher(){
     link.setAttribute("onclick", "return false");
     link.style.boxShadow = "0px 0px 5px var(--color1)";
     link.style.cursor = "default";
-  } else if (document.URL.includes(suubstringTeacherJournal)){  // Для журнала
+  } else if (document.URL.includes(substringTeacherJournal)){  // Для журнала
     let link = document.getElementById("teacher-journal");
     link.setAttribute("onclick", "return false");
     link.style.boxShadow = "0px 0px 5px var(--color1)";
@@ -286,9 +286,14 @@ function changeColor(){
 function changeRole(){
   var selectRole = document.getElementById("role");
   selectRole.addEventListener("click", function(){
-    if (selectRole.value == "student" || selectRole.value == "parent"){
+    if (selectRole.value == "student"){
+      document.getElementById("changeStudent").style.display = "none";
       document.getElementById("group").style.display = "inline-block";
-    } else {
+    } else if (selectRole.value == "parent") {
+      document.getElementById("changeStudent").style.display = "inline-block";
+      document.getElementById("group").style.display = "none";
+    } else if (selectRole.value == "teacher") {
+      document.getElementById("changeStudent").style.display = "none";
       document.getElementById("group").style.display = "none";
     }
   })
@@ -368,9 +373,11 @@ function setScoreInPopup(role){
             if (tab.rows[this.i].cells[this.j].innerHTML === ''){ // Вариант, когда оценка не стоит, т.е. её можно только проставить (для учителя)
               nameStudent = '';
               date = "";
+              disciplineID = document.getElementById("dis").attributes[2].value
+              console.log(disciplineID)
               scoreLevel = tab.rows[this.i].cells[this.j].innerHTML
               nameStudent = tab.rows[this.i].cells[0].innerHTML
-              date = tab.rows[0].cells[this.j].innerHTM
+              date = tab.rows[0].cells[this.j].innerHTML
               popupForScore()
             } else {
               console.log("Нельзя изменить оценку!")
@@ -378,6 +385,22 @@ function setScoreInPopup(role){
           }
         }
       }
+    }
+  }
+}
+
+/* Попап для журнала студента */
+
+function checkLevelStnd(){
+  var str = document.getElementsByClassName("score");
+  for(let i = 0; i < str.length; i++){
+    str[i].i = i;
+    str[i].onclick=function(){
+      let comment = str[this.i].attributes[1].value;
+      document.getElementById("comment").innerHTML = comment;
+      let score = str[this.i].innerHTML;
+      document.getElementById("yourScore").innerHTML = score;
+      popupForScore()
     }
   }
 }
@@ -404,8 +427,54 @@ function checkSchedule(){
       tab.rows[i].cells[j].i=i;
       tab.rows[i].cells[j].j=j;
       tab.rows[i].cells[j].onclick=function(){
-        popupForSchedule(tab.rows[this.i].cells[this.j].innerHTML)
+        if (tab.rows[this.i].cells[this.j].innerHTML != ""){
+          popupForSchedule(tab.rows[this.i].cells[this.j].innerHTML)
+        }
       }
     }
+  }
+}
+
+/* Цвет ячейки расписания */
+
+function colorForSchedule(){
+  let masLessons = document.getElementsByClassName("tableLessons")
+  for (let i = 0; i < masLessons.length; i++){
+    if (masLessons[i].attributes.typeLessons.value == "Лекция"){
+      masLessons[i].style.backgroundColor = "#ffffcc"
+    } else if (masLessons[i].attributes.typeLessons.value == "Семенар"){
+      masLessons[i].style.backgroundColor = "#ccccff"
+    }
+  }
+}
+
+/* Подсчет Н-ок и средней оценки */ 
+
+function avgSkips(){
+  let countH = 0;
+  let countLevel = 0;
+  let summLevel = 0;
+  let num = 0;
+  let tab = document.getElementById("table")
+  for(let i = 1; i < tab.rows.length; i++){
+    for(let j = 1; j < tab.rows[i].cells.length-3; j++){
+      if (tab.rows[i].cells[j].innerHTML == "н"){
+        countH += 1;
+      } else if(tab.rows[i].cells[j].innerHTML == "5" || tab.rows[i].cells[j].innerHTML == "4" || tab.rows[i].cells[j].innerHTML == "3" || tab.rows[i].cells[j].innerHTML == "2"){
+        countLevel += 1
+        summLevel += parseInt(tab.rows[i].cells[j].innerHTML)
+      }
+    }
+    console.log(summLevel, countLevel)
+    tab.rows[i].cells[tab.rows[i].cells.length-3].innerHTML = countH;
+    if (countLevel == 0){
+      tab.rows[i].cells[tab.rows[i].cells.length-2].innerHTML = ""
+    } else{
+      num = summLevel/countLevel;
+      tab.rows[i].cells[tab.rows[i].cells.length-2].innerHTML = num.toFixed(2);
+    }
+    countH = 0;
+    summLevel = 0;
+    countLevel = 0;
   }
 }

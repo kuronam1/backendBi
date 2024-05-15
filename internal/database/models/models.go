@@ -21,6 +21,15 @@ type Grade struct {
 	Comment      string
 }
 
+type ParseGrade struct {
+	GradeID      int
+	StudentID    int
+	DisciplineID int
+	Level        string
+	Date         time.Time
+	Comment      string
+}
+
 type Journal struct {
 	Grades  map[string][]Grade
 	Headers []string

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" id="adminPages">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+    <link rel="stylesheet" href="../static/css/fontello.css">
+    <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
+    <title>Филиал МАИ РКТ | Ошибка</title> 
+</head>
+<body onload="logOutPopup(), changeRole(), restyleLinks()">
+
+    <!-- Header -->
+
+    <header>
+        <nav class="container navbar navbar-expand-lg">
+            <div class="col-md-3 justify-content-start">
+                <img src="../static/media/logo.png" alt="МАИ РКТ">
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+            </div>
+            <div class="col-md-3 justify-content-center text-center">
+            </div>
+            <div class="col-md-3 justify-content-end">
+            </div>
+        </nav>
+    </header>
+    
+    <!-- Блок с основными функциями-->
+
+    <section id="error">
+        <div class="sorry">
+            <p id="ups">Упс... Похоже произошла ошибка {{.Code}}:</p>
+            <p id="errorID">{{.Description}}</p>
+            <p id="else">Зато вы теперь видели слоника Тома</p>
+            <button onclick="window.history.go(-1); return false;" type="button">Вернуться назад</button>
+        </div>
+        <div class="imageElefant">
+            <img src="../static/media/6759115.jpg">
+        </div>
+    </section>
+
+    <script src="../static/js/bootstrap.min.js"></script>
+    <script src="../static/js/jquery.js"></script>
+    <script src="../static/js/script.js"></script>
+    <script src="../static/js/savefile.js"></script>
+</body> 
+</html>

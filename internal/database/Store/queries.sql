@@ -193,3 +193,10 @@ SELECT g.group_name, d.discipline_name FROM groups g
     JOIN disciplines d ON d.course = g.course AND d.speciality = g.speciality
 WHERE teacher_id = 28;
 
+SELECT g.grade_id, g.discipline_id, g.grade, g.date, g.comment, u.full_name
+FROM grades g
+         JOIN users u ON g.student_id = u.user_id
+         JOIN disciplines d ON d.discipline_id = g.discipline_id
+         JOIN groups gr ON d.speciality = gr.speciality AND d.course = gr.course
+WHERE gr.group_name = 'ИСП2-2' AND d.discipline_name = 'Основы философии'
+ORDER BY u.full_name;
