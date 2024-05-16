@@ -33,10 +33,11 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 
 	var stmt *sql.Stmt
 	defer stmt.Close()
-lvl:
+
 	for _, row := range rows {
 		lesson := models.Lesson{}
 		lesson.GroupName = row[0]
+		fmt.Println(lesson.GroupName)
 		lesson.Time, err = time.Parse(time.DateOnly, row[1])
 		if err != nil {
 			return err
@@ -55,38 +56,50 @@ lvl:
 			return err
 		}
 
-		disID, err := s.store.Disciplines().RegisterDiscipline(teacherName,
-			lesson.DisciplineName, group.Speciality, group.Course)
+		discipline, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
 		switch {
-		case errors.Is(err, fmt.Errorf("exists")):
-			disId, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
+		case errors.Is(err, sql.ErrNoRows):
+			disId, err := s.store.Disciplines().RegisterDiscipline(teacherName,
+				lesson.DisciplineName, group.Speciality, group.Course)
 			if err != nil {
-				return err
+				return fmt.Errorf("error while registering discipline")
 			}
-			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
+
+			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6, $7)")
 			if err != nil {
 				return err
 			}
 
-			_, err = stmt.Exec(group.Id, lesson.Time, disId, lesson.Audience, lesson.Description) // добавить teacherID
+			teacher, err := s.store.User().GetUserByName(teacherName)
+			if err != nil {
+				return fmt.Errorf("teacher not found")
+			}
+
+			_, err = stmt.Exec(group.Id, lesson.Time, disId, teacher.UserID, lesson.Audience, lesson.Description, lesson.LessonOrder) // добавить teacherID
 			if err != nil {
 				return err
 			}
-			goto lvl
+
+			return nil
 		case err != nil:
 			return err
-		}
-		stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6)")
-		if err != nil {
-			return err
-		}
+		default:
+			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6, $7)")
+			if err != nil {
+				return err
+			}
 
-		_, err = stmt.Exec(group.Id, lesson.Time, disID, lesson.Audience, lesson.Description) // добавить teacherID
-		if err != nil {
-			return err
+			teacher, err := s.store.User().GetUserByName(teacherName)
+			if err != nil {
+				return fmt.Errorf("teacher not found")
+			}
+
+			_, err = stmt.Exec(group.Id, lesson.Time, discipline.DisciplineID, teacher.UserID, lesson.Audience, lesson.Description, lesson.LessonOrder) // добавить teacherID
+			if err != nil {
+				return err
+			}
 		}
 	}
-
 	return nil
 }
 
