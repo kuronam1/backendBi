@@ -1,62 +1,4 @@
-/*var files;
-$('#files').on('change', function(){
-    var fileInput = document.getElementById('files'); // Начало быдлокода
-    var filePath = fileInput.value;
-    var allowedExtensions =
-        /(\.xlsx|\.xls)$/i;
-    if (!allowedExtensions.exec(filePath)) {
-        alert('Неверный формат файла');
-        fileInput.value = '';   // Конец быдлокода
-    } else files = this.files;
-});
 
-$('#submit_button').on( 'click', function(){
-    if( typeof files == 'undefined' ) return;
-    var data = new FormData();
-    data.append('file', files);
-    $.ajax({
-        url         : '/adminPanel/management/scheduleReg',
-        type        : 'POST',
-        data        : data,
-        cache       : false,
-        dataType    : 'multipart/form-data',
-        processData : false,
-        contentType : false,
-        success     : function() {
-            alert('Файл отправлен')
-        },
-        error: function() {
-            alert('Ошибка передачи файла');
-        }
-    });
-
-});*/
-
-// $('#enter').on( 'click', function( event ){
-//         let login = 'login';
-//         let loginValue = document.getElementById("index-login").value;
-//         let password = 'password';
-//         let passValue = document.getElementById("index-pass").value;
-//     $.ajax({
-//         url         : '/auth',
-//         type        : 'POST',
-//         data        : JSON.stringify({
-//             login : loginValue,
-//             password : passValue
-//         }),
-//         dataType    : 'json',
-//         processData : false,
-//         contentType : 'application/json',
-//         success     : function(data) {
-//             if(data.redirectUrl) {
-//                 window.location.href = data.redirectUrl;
-//             }
-//             },
-//         error: function() {
-
-//         }
-//     });
-// });
 
 $('#newsletter-submit').on( 'click', function( event ){
     let fio = 'fio';
@@ -434,6 +376,29 @@ $('#admin-grade-add').on( 'click', function( event ){
             dateName : dateValue,
             gradeName : gradeValue,
             comment : commentValue
+        }),
+        dataType    : 'json',
+        processData : false,
+        contentType : 'application/json',
+        success     : function(data) {
+            window.location.reload();
+        },
+        error: function() {
+        }
+    });
+});
+$('#sendNewHMandT').on( 'click', function( event ){
+    let lessonID = document.getElementById("ThemesHomeWork").attributes[1].value;
+    let newHomework = document.getElementById("homeworkNew").value;
+    let newThemes = document.getElementById("themesNew").value;
+    console.log(lessonID, newHomework, newThemes)
+    $.ajax({
+        url         : '/teacherPanel/schedule',
+        type        : 'POST',
+        data        : JSON.stringify({
+            'lessonID' : lessonID,
+            'subject' : newThemes,
+            'homeWork' : newHomework,
         }),
         dataType    : 'json',
         processData : false,

@@ -101,7 +101,7 @@ func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) ([]ma
 		return nil, err
 	}
 
-	stmt, err := s.store.DB.Prepare("SELECT lesson_id, time, discipline_id, teacher_id, audience, description, lesson_order FROM lessons WHERE group_id = $1")
+	stmt, err := s.store.DB.Prepare("SELECT lesson_id, time, discipline_id, teacher_id, audience, description, subject, homework, lesson_order FROM lessons WHERE group_id = $1")
 	if err != nil {
 		return nil, err
 	}
@@ -124,6 +124,8 @@ func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) ([]ma
 			&parse.TeacherID,
 			&parse.Audience,
 			&parse.Description,
+			&parse.Subject,
+			&parse.HomeWork,
 			&parse.LessonOrder)
 		if err != nil {
 			return nil, err
@@ -147,6 +149,8 @@ func (s *ScheduleRepository) GetScheduleByGroupName(groupName interface{}) ([]ma
 			Audience:       parse.Audience,
 			Description:    parse.Description,
 			TeacherName:    teacher.FullName,
+			Subject:        parse.Subject.String,
+			HomeWork:       parse.HomeWork.String,
 			LessonOrder:    parse.LessonOrder,
 		}
 		schedule.Lessons[lesson.Time.Weekday()] = append(schedule.Lessons[lesson.Time.Weekday()], lesson) // Sunday = 0, ... !
@@ -183,7 +187,7 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 		return nil, err
 	}
 
-	stmt, err := s.store.DB.Prepare("SELECT lesson_id, group_id, time, discipline_id, audience, description, lesson_order FROM lessons WHERE teacher_id = $1")
+	stmt, err := s.store.DB.Prepare("SELECT lesson_id, group_id, time, discipline_id, audience, description, subject, homework, lesson_order FROM lessons WHERE teacher_id = $1")
 	if err != nil {
 		return nil, err
 	}
@@ -207,6 +211,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 			&parse.DisciplineID,
 			&parse.Audience,
 			&parse.Description,
+			&parse.Subject,
+			&parse.HomeWork,
 			&parse.LessonOrder)
 		if err != nil {
 			return nil, err
@@ -230,6 +236,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 			Audience:       parse.Audience,
 			Description:    parse.Description,
 			TeacherName:    teacher.FullName,
+			Subject:        parse.Subject.String,
+			HomeWork:       parse.HomeWork.String,
 			LessonOrder:    parse.LessonOrder,
 		}
 		schedule.Lessons[lesson.Time.Weekday()] = append(schedule.Lessons[lesson.Time.Weekday()], lesson)
@@ -270,7 +278,7 @@ func (s *ScheduleRepository) GetScheduleByTeacherID(id int) ([]map[string][]mode
 		return nil, err
 	}
 
-	stmt, err := s.store.DB.Prepare("SELECT lesson_id, group_id, time, discipline_id, audience, description, lesson_order FROM lessons WHERE teacher_id = $1")
+	stmt, err := s.store.DB.Prepare("SELECT lesson_id, group_id, time, discipline_id, audience, description, subject, homework, lesson_order FROM lessons WHERE teacher_id = $1")
 	if err != nil {
 		return nil, err
 	}
@@ -294,6 +302,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherID(id int) ([]map[string][]mode
 			&parse.DisciplineID,
 			&parse.Audience,
 			&parse.Description,
+			&parse.Subject,
+			&parse.HomeWork,
 			&parse.LessonOrder)
 		if err != nil {
 			return nil, err
@@ -317,6 +327,8 @@ func (s *ScheduleRepository) GetScheduleByTeacherID(id int) ([]map[string][]mode
 			Audience:       parse.Audience,
 			Description:    parse.Description,
 			TeacherName:    teacher.FullName,
+			Subject:        parse.Subject.String,
+			HomeWork:       parse.HomeWork.String,
 			LessonOrder:    parse.LessonOrder,
 		}
 		schedule.Lessons[lesson.Time.Weekday()] = append(schedule.Lessons[lesson.Time.Weekday()], lesson)
@@ -383,4 +395,41 @@ func (s *ScheduleRepository) GetAllGroupsLessonsOneDis(groupName, disciplineName
 	}
 
 	return res, nil
+}
+
+func (s *ScheduleRepository) UpdateHomeWork(homeWork string, id int) error {
+	stmt, err := s.store.DB.Prepare("UPDATE lessons SET homework = $1 WHERE lesson_id = $2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(homeWork, id)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *ScheduleRepository) UpdateSubject(subject string, id int) error {
+	stmt, err := s.store.DB.Prepare("UPDATE lessons SET subject = $1 WHERE lesson_id = $2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(subject, id)
+	return err
+}
+
+func (s *ScheduleRepository) UpdateSubjectAndHomeWork(subject, homeWork string, id int) error {
+	stmt, err := s.store.DB.Prepare("UPDATE lessons SET subject = $1, homework = $2 WHERE lesson_id = $3")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(subject, homeWork, id)
+	return err
 }

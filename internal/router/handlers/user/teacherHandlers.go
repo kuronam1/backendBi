@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"sbitnev_back/internal/database/Store"
 	"sbitnev_back/internal/database/models"
+	"strconv"
 	"time"
 )
 
@@ -214,8 +215,6 @@ func (h *TeacherHandler) GetSchedule(c *gin.Context) {
 	}
 
 	teacher, err := h.Storage.User().GetUserByID(teacherID.(int))
-
-	schedule, err := h.Storage.Schedule().GetScheduleByTeacherID(teacherID.(int))
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -223,8 +222,89 @@ func (h *TeacherHandler) GetSchedule(c *gin.Context) {
 		})
 	}
 
+	schedule, err := h.Storage.Schedule().GetScheduleByTeacherID(teacherID.(int))
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
 	c.HTML(http.StatusOK, "schedule_teacher.html", gin.H{
 		"Schedule": schedule,
 		"FullName": teacher.FullName,
 	})
+}
+
+func (h *TeacherHandler) UpdateHomeWorkAndSubject() gin.HandlerFunc {
+	const op = "TeacherHandlers.UpdateHomeWorkAndSubject"
+	type request struct {
+		LessonID string `json:"lessonID"`
+		Subject  string `json:"subject,omitempty"`
+		HomeWork string `json:"homeWork,omitempty"`
+	}
+	return func(c *gin.Context) {
+		h.Logger.Debug(fmt.Sprintf("Body: %v", c.Request.Body))
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": "cannot parse data",
+			})
+			return
+		}
+
+		id, err := strconv.Atoi(req.LessonID)
+		if err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err,
+			})
+			return
+		}
+
+		switch {
+		case req.Subject == "" && req.HomeWork != "" && id != 0:
+			if err := h.Storage.Schedule().UpdateHomeWork(req.HomeWork, id); err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+
+			c.JSON(200, gin.H{
+				"status": "Homework updated",
+			})
+			return
+		case req.Subject != "" && req.HomeWork == "" && id != 0:
+			if err := h.Storage.Schedule().UpdateSubject(req.Subject, id); err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+
+			c.JSON(200, gin.H{
+				"status": "Subject updated",
+			})
+			return
+		case req.Subject != "" && req.HomeWork != "" && id != 0:
+			if err := h.Storage.Schedule().UpdateSubjectAndHomeWork(
+				req.Subject, req.HomeWork, id); err != nil {
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{
+				"status": "Subject and HomeworkUpdated",
+			})
+			return
+		default:
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": "Bad request",
+			})
+			return
+		}
+	}
 }

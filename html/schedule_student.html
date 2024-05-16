@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Расписание Группа {{.GroupName}}</title>
 </head>
-<body onload="logOutPopup(), restyleLinksStudent(), checkSchedule(), colorForSchedule()">
+<body onload="logOutPopup(), restyleLinksStudent(), checkScheduleStudent(), colorForSchedule()">
 
     <!-- Header -->
 
@@ -64,13 +64,12 @@
                         <td scope="row">{{$DoW}}</td>
                         {{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        <td class="tableLessons" typeLessons="{{.Description}}" scope="row">
+                        <td class="tableLessons" typeLessons="{{.Description}}" themes="{{.Subject}}" homeworks="{{.HomeWork}}" scope="row">
                             <p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p>
                             <p style="margin: 0; font-size: 15px;">{{.TeacherName}}</p>
                             <p style="margin: 0; text-decoration: underline;">{{.Audience}}</p>
                             <p style="display: none;">{{.Description}}</p>
                         </td>
-
                         {{else}}
                         <td scope="row"></td>
                         {{end}}
@@ -100,6 +99,10 @@
     <div class="popupSchedule">
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
         <div id="windowSchedule">
+        </div>
+        <div id="ThemesHomeWork">
+            <p>Текущая тема: <span id="theme"></span></p>
+            <p>Текущее ДЗ: <span id="homework"></span></p>
         </div>
     </div>
     <script src="../static/js/bootstrap.min.js"></script>

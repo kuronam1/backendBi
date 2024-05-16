@@ -1,6 +1,7 @@
 package models
 
 import (
+	"database/sql"
 	"time"
 )
 
@@ -48,6 +49,8 @@ type Lesson struct {
 	Audience       string
 	Description    string
 	TeacherName    string
+	Subject        string
+	HomeWork       string
 	LessonOrder    int
 }
 
@@ -75,5 +78,7 @@ type ParseLessons struct {
 	TeacherID    int
 	Audience     string
 	Description  string
+	Subject      sql.NullString
+	HomeWork     sql.NullString
 	LessonOrder  int
 }

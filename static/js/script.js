@@ -374,7 +374,6 @@ function setScoreInPopup(role){
               nameStudent = '';
               date = "";
               disciplineID = document.getElementById("dis").attributes[2].value
-              console.log(disciplineID)
               scoreLevel = tab.rows[this.i].cells[this.j].innerHTML
               nameStudent = tab.rows[this.i].cells[0].innerHTML
               date = tab.rows[0].cells[this.j].innerHTML
@@ -418,6 +417,45 @@ function popupForSchedule(data){
     document.querySelector(".popupSchedule").classList.remove("active");
     document.getElementById("overlay").style.display = "none";
   });
+}
+
+/* Добавление ДЗ и темы */
+
+function checkScheduleTeacher(){
+  let themes, homework;
+  let tab = document.getElementById("table");
+  for (let i = 1; i < tab.rows.length; i++){
+    for (let j = 2; j < tab.rows[i].cells.length; j++){
+        tab.rows[i].cells[j].i=i;
+        tab.rows[i].cells[j].j=j;
+        tab.rows[i].cells[j].onclick=function(){
+          themes = tab.rows[this.i].cells[this.j].attributes[2].value;
+          homework = tab.rows[this.i].cells[this.j].attributes[3].value;
+          document.getElementById("ThemesHomeWork").setAttribute("lesID", tab.rows[this.i].cells[this.j].attributes[4].value);   
+          document.getElementById("theme").innerHTML = themes;
+          document.getElementById("homework").innerHTML = homework;
+          popupForSchedule(tab.rows[this.i].cells[this.j].innerHTML)
+        }
+    }
+  }
+}
+
+function checkScheduleStudent(){
+  let themes, homework;
+  let tab = document.getElementById("table");
+  for (let i = 1; i < tab.rows.length; i++){
+    for (let j = 2; j < tab.rows[i].cells.length; j++){
+        tab.rows[i].cells[j].i=i;
+        tab.rows[i].cells[j].j=j;
+        tab.rows[i].cells[j].onclick=function(){
+          themes = tab.rows[this.i].cells[this.j].attributes[2].value;
+          homework = tab.rows[this.i].cells[this.j].attributes[3].value;
+          document.getElementById("theme").innerHTML = themes;
+          document.getElementById("homework").innerHTML = homework;
+          popupForSchedule(tab.rows[this.i].cells[this.j].innerHTML)
+        }
+    }
+  }
 }
 
 /* Слушатель для ячеек расписания */

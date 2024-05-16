@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS lessons ( --вариант для храниея ра
                                        teacher_id INTEGER NOT NULL REFERENCES users(user_id),
                                        audience VARCHAR(10) NOT NULL,
                                        description VARCHAR NOT NULL,
-                                       thema VARCHAR DEFAULT NULL,
+                                       subject VARCHAR DEFAULT NULL,
                                        homework VARCHAR DEFAULT NULL,
                                        lesson_order INTEGER NOT NULL
 );
@@ -62,8 +62,6 @@ CREATE TABLE IF NOT EXISTS specialities (
                                       group_id INTEGER REFERENCES groups(group_id),
                                       discipline_id INTEGER REFERENCES disciplines(discipline_id)
 );
-
-CREATE TABLE IF NOT EXISTS
 
 INSERT INTO users (login, password, full_name, role) VALUES ('mylogin', 'mypassword', 'Андрей Горбунов', 'admin');
 INSERT INTO users (login, password, full_name, role) VALUES ('aliev', '1111111111', 'Алиев Алексей Алексеевич', 'student');
@@ -170,8 +168,7 @@ INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, descri
 INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 8:30:00', '8', '27', 'А-9', 'Лекция', '0');
 INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 10:10:00', '9', '28', 'А-9', 'Лекция', '1');
 INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 10:10:00', '9', '28', 'А-9', 'Лекция', '1');
-INSERT INTO
-    lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 12:40:00', '7', '26', 'А-6', 'Семенар', '2');
+INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 12:40:00', '7', '26', 'А-6', 'Семенар', '2');
 INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 12:40:00', '6', '25', 'А-3', 'Семенар', '2');
 
 INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-16 8:30:00', '1', '20', 'А-3', 'Лекция', '0');

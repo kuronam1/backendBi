@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Расписание {{.FullName}}</title> 
 </head>
-<body onload="logOutPopup(), restyleLinksTeacher(), checkSchedule(), colorForSchedule()">
+<body onload="logOutPopup(), restyleLinksTeacher(), checkScheduleTeacher(), colorForSchedule()">
 
     <!-- Header -->
 
@@ -66,7 +66,7 @@
                         <td scope="row">{{$DoW}}</td>
                         {{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        <td class="tableLessons" typeLessons="{{.Description}}">
+                        <td class="tableLessons" typeLessons="{{.Description}}" themes="{{.Subject}}" homeworks="{{.HomeWork}}" lessonID="{{.LessonId}}">
                             <p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p>
                             <p style="margin: 0; font-size: 15px;">{{.GroupName}}</p>
                             <p style="margin: 0; text-decoration: underline;">{{.Audience}}</p>
@@ -101,8 +101,11 @@
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
         <div id="windowSchedule"></div>
         <div id="ThemesHomeWork">
-            <input type="text" placeholder="Укажите тему занятия">
-            <input type="text" placeholder="Укажите домашнее задание">
+            <p>Текущая тема: <span id="theme"></span></p>
+            <input id="themesNew" type="text" placeholder="Изменить тему занятия">
+            <p>Текущее ДЗ: <span id="homework"></span></p>
+            <input id="homeworkNew" type="text" placeholder="Изменить домашнее задание">
+            <button id="sendNewHMandT" type="button">Добавить ДЗ и/или тему занятия</button>
         </div>
     </div>
     <div class="overlay" id="overlay" style="display: none"></div>

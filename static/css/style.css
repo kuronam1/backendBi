@@ -446,12 +446,12 @@ footer{
 	color: brown;
 }
 
-#windowSchedule{
+#windowSchedule, #ThemesHomeWork{
 	text-align: center;
 	margin: 20px 0 10px 0;
 }
 
-#windowSchedule p{
+#windowSchedule p, #ThemesHomeWork p{
 	font-size: 25px !important;
 	display: block !important;
 }
@@ -471,6 +471,26 @@ footer{
 	font-size: 20px;
 }
 
+#ThemesHomeWork button{
+	width: 70%;
+	color: #ffffff;
+	background: var(--color3);
+	display: inline-block;
+	float: none;
+	transition: all 0.25s;
+	border: 0;
+	border-radius: 10px;
+	padding: 10px 20px;
+	font-weight: bolder;
+	border: 2px solid var(--color3);
+	margin: 10px auto 0;
+}
+
+#ThemesHomeWork button:hover{
+	color: var(--color3);
+	background-color: var(--color2);
+
+}
 
 /* Admin page */
 
@@ -523,6 +543,8 @@ footer{
 	font-weight: bolder;
 	border: 2px solid var(--color2);
 }
+
+
 
 .col button:hover {
 	background: #ffffff;

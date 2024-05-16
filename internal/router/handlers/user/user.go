@@ -74,6 +74,7 @@ func (h *handler) Register(router *gin.Engine) {
 	TeacherMenuPath.GET("/journal", h.TeacherHandler.GetJournal)
 	TeacherMenuPath.POST("/journal", h.TeacherHandler.AddGrade())
 	TeacherMenuPath.GET("/schedule", h.TeacherHandler.GetSchedule)
+	TeacherMenuPath.POST("/schedule", h.TeacherHandler.UpdateHomeWorkAndSubject())
 
 	StudentMenuPath := router.Group("/studentPanel")
 	StudentMenuPath.Use(middleware.CheckStudentAuth(h.storage))
