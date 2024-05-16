@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/Sbitnev.iml" filepath="$PROJECT_DIR$/.idea/Sbitnev.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/backendBi.iml" filepath="$PROJECT_DIR$/.idea/backendBi.iml" />
     </modules>
   </component>
 </project>

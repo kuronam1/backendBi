@@ -84,7 +84,12 @@
                         <td scope="row">{{$DoW}}</td>
                         {{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        <td class="tableLessons" typeLessons="{{.Description}}" scope="row"><p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p><p style="margin: 0; font-size: 15px;">{{.TeacherName}}</p><p style="margin: 0; text-decoration: underline;">{{.Audience}}</p></td>
+                        <td class="tableLessons" typeLessons="{{.Description}}" scope="row">
+                            <p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p>
+                            <p style="margin: 0; font-size: 15px;">{{.TeacherName}}</p>
+                            <p style="margin: 0; text-decoration: underline;">{{.Audience}}</p>
+                            <p style="display: none;">{{.Description}}</p>
+                        </td>
                         {{else}}
                         <td scope="row"></td>
                         {{end}}
@@ -122,7 +127,12 @@
                         <td scope="row">{{$DoW}}</td>
                         {{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        <td id="tableLessons" typeLessons="{{.Description}}" scope="row"><p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p><p style="margin: 0; font-size: 15px;">{{.GroupName}}</p><p style="margin: 0; text-decoration: underline;">{{.Audience}}</p></td>
+                        <td class="tableLessons" typeLessons="{{.Description}}" scope="row">
+                            <p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p>
+                            <p style="margin: 0; font-size: 15px;">{{.GroupName}}</p>
+                            <p style="margin: 0; text-decoration: underline;">{{.Audience}}</p>
+                            <p style="display: none;">{{.Description}}</p>
+                        </td>
                         {{else}}
                         <td scope="row"></td>
                         {{end}}

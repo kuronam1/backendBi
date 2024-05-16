@@ -396,10 +396,12 @@ function checkLevelStnd(){
   for(let i = 0; i < str.length; i++){
     str[i].i = i;
     str[i].onclick=function(){
-      let comment = str[this.i].attributes[1].value;
+      let comment = str[this.i].attributes[3].value;
       document.getElementById("comment").innerHTML = comment;
       let score = str[this.i].innerHTML;
       document.getElementById("yourScore").innerHTML = score;
+      let date = str[this.i].attributes[2].value;
+      document.getElementById("date").innerHTML = date;
       popupForScore()
     }
   }
@@ -465,7 +467,6 @@ function avgSkips(){
         summLevel += parseInt(tab.rows[i].cells[j].innerHTML)
       }
     }
-    console.log(summLevel, countLevel)
     tab.rows[i].cells[tab.rows[i].cells.length-3].innerHTML = countH;
     if (countLevel == 0){
       tab.rows[i].cells[tab.rows[i].cells.length-2].innerHTML = ""
@@ -476,5 +477,52 @@ function avgSkips(){
     countH = 0;
     summLevel = 0;
     countLevel = 0;
+  }
+}
+
+function avgSkipsStdt(){
+  let countH = 0;
+  let countLevel = 0;
+  let summLevel = 0;
+  let num = 0;
+  let tab = document.getElementById("table")
+  let stroke = document.getElementsByClassName("score");
+  let n = 0;
+  let a = ""
+  let k = 0
+  let count = 0;
+  for(let i = 1; i < tab.rows.length; i++){
+    if (tab.rows[i].cells[1].innerHTML != ""){
+      a = tab.rows[i].cells[1].innerHTML
+      while (a.indexOf("span", k) != -1){
+        k = a.indexOf("span", k) + 1
+        count += 1
+      }
+      console.log(count/2)
+      for(let j = 0; j < count/2; j++){
+        if (stroke[n].innerHTML == "н"){
+          countH += 1;
+          n += 1
+        } else if(stroke[n].innerHTML == "5" || stroke[n].innerHTML == "4" || stroke[n].innerHTML == "3" || stroke[n].innerHTML == "2"){
+          countLevel += 1
+          summLevel += parseInt(stroke[n].innerHTML)
+          n += 1
+        }
+      }
+    }
+    console.log(summLevel, countLevel, countH)
+    tab.rows[i].cells[2].innerHTML = countH;
+    if (countLevel == 0){
+      tab.rows[i].cells[3].innerHTML = ""
+    } else{
+      num = summLevel/countLevel;
+      tab.rows[i].cells[3].innerHTML = num.toFixed(2);
+    }
+    countH = 0;
+    summLevel = 0;
+    countLevel = 0;
+    count = 0;
+    a = ""
+    k = 0
   }
 }

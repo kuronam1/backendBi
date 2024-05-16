@@ -90,13 +90,13 @@ func (g *GroupRepository) GroupRegistration(group *models.Group) error {
 func configurationGroupName(speciality string, number, course int) string {
 	switch speciality {
 	case "ЭВМ":
-		return fmt.Sprintf("ЭВМ%d-%d", course, number)
+		return fmt.Sprintf("ЭВМ%d%d", course, number)
 	case "БИ":
-		return fmt.Sprintf("БИ%d-%d", course, number)
+		return fmt.Sprintf("БИ%d%d", course, number)
 	case "ПМ":
-		return fmt.Sprintf("ПМ%d-%d", course, number)
+		return fmt.Sprintf("ПМ%d%d", course, number)
 	default:
-		return fmt.Sprintf("БП%d-%d", course, number)
+		return fmt.Sprintf("БП%d%d", course, number)
 	}
 }
 

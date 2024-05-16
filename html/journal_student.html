@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Журнал {{.StudentName}}</title> 
 </head>
-<body onload="restyleLinksStudent(), logOutPopup(), changeColor(), checkLevelStnd(), avgSkips()">
+<body onload="restyleLinksStudent(), logOutPopup(), changeColor(), checkLevelStnd(), avgSkipsStdt()">
 
     <!-- Header -->
 
@@ -57,7 +57,7 @@
                     {{ range $FIO, $grades := . }}
                     <tr>
                         <td>{{$FIO}}</td><!-- ФИО -->
-                        <td >{{range $grades}}<span class="score" date="{{.Date}}" com="{{.Comment}}"> {{.Level}}</span>{{end}}</td> 
+                        <td>{{range $grades}}<span class="score" id="scoreStyle" date="{{TFormat .Date}}" com="{{.Comment}}">{{.Level}}</span>{{end}}</td>
                         <td></td><!-- пропуски -->
                         <td></td>
                         <td></td><!-- итоговая оценка -->
@@ -89,8 +89,8 @@
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
         <div id="dataForPopup">
             <p>Ваша оценка: <span id="yourScore"></span></p>
-            <p>Комментарий: </p><span id="comment"></span>
-            <p>Дата оценки: </p><span id="date"></span>
+            <p>Комментарий: <span id="comment"></span></p></span>
+            <p>Дата оценки: <span id="date"></span></p></span>
         </div>
     </div>
 

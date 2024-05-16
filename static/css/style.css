@@ -658,3 +658,8 @@ footer{
 .imageElefant img{
 	width: 90%;
 }
+
+#scoreStyle{
+	margin: 0 2px;
+	padding: 0 1px;
+}

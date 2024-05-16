@@ -193,34 +193,54 @@ $('#new-user-reg').on( 'click', function( event ){
         let loginValue = document.getElementById("login").value;
         let password = 'password';
         let passValue = document.getElementById("password").value;
-    $.ajax({
-        url: '/adminPanel/management/userReg',
-        type: 'POST',
-        data: JSON.stringify({
-            role : roleVale,
-            name : nameValue,
-            login : loginValue,
-            password : passValue
-        }),
-        dataType: 'json',
-        processData: false,
-        contentType: 'application/json',
-        success: function () {
-            alert("Пользователь успешно добавлен")  // Сообщение об успешном добавлении пользователя
-        },
-        error: function () {
-        }
-    });
-    } else {
-        let role = 'role';
+        $.ajax({
+            url: '/adminPanel/management/userReg',
+            type: 'POST',
+            data: JSON.stringify({
+                role : roleVale,
+                username : nameValue,
+                login : loginValue,
+                password : passValue
+            }),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json',
+            success: function () {
+                alert("Пользователь успешно добавлен")  // Сообщение об успешном добавлении пользователя
+            },
+            error: function () {
+            }
+        });
+    } else if (document.getElementById("role").value === 'parent') {
         let roleVale = document.getElementById("role").value;
-        let groupName = 'group';
-        let groupValue = document.getElementById("group").value;
-        let userName = 'name';
         let nameValue = document.getElementById("name").value;
-        let login = 'login';
         let loginValue = document.getElementById("login").value;
-        let password = 'password';
+        let passValue = document.getElementById("password").value;
+        let stndtName = document.getElementById("changeStudent").value;
+        $.ajax({
+            url: '/adminPanel/management/userReg',
+            type: 'POST',
+            data: JSON.stringify({
+                role : roleVale,
+                userName : nameValue,
+                login : loginValue,
+                password : passValue,
+                studentName : stndtName
+            }),
+            dataType: 'json',
+            processData: false,
+            contentType: 'application/json',
+            success: function () {
+                alert("Пользователь успешно добавлен")
+            },
+            error: function () {
+            }
+        });
+    } else if (document.getElementById("role").value === 'student') {
+        let roleVale = document.getElementById("role").value;
+        let groupValue = document.getElementById("group").value;
+        let nameValue = document.getElementById("name").value;
+        let loginValue = document.getElementById("login").value;
         let passValue = document.getElementById("password").value;
         $.ajax({
             url: '/adminPanel/management/userReg',
@@ -236,7 +256,7 @@ $('#new-user-reg').on( 'click', function( event ){
             processData: false,
             contentType: 'application/json',
             success: function () {
-                //Пока это оставим пустым, потом если надо, что-то придумаем
+                alert("Пользователь успешно добавлен")
             },
             error: function () {
             }

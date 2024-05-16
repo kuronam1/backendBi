@@ -153,6 +153,10 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 			return
 		}
 
+		h.Logger.Debug(fmt.Sprintf("USER:%v", request))
+		c.AbortWithStatusJSON(200, gin.H{})
+		return
+
 		user := &models.User{
 			Login:    request.Login,
 			Password: request.Password,
