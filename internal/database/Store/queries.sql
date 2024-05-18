@@ -200,3 +200,6 @@ FROM grades g
          JOIN groups gr ON d.speciality = gr.speciality AND d.course = gr.course
 WHERE gr.group_name = 'ИСП2-2' AND d.discipline_name = 'Основы философии'
 ORDER BY u.full_name;
+
+DELETE FROM lessons WHERE lesson_id = 42;
+DELETE FROM disciplines WHERE discipline_id = 19;

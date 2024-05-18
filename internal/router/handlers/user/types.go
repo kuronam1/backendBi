@@ -16,4 +16,5 @@ type handler struct {
 	AdminHandler   *AdminHandler
 	StudentHandler *StudentHandler
 	TeacherHandler *TeacherHandler
+	ParentHandler  *ParentHandler
 }

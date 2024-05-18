@@ -37,7 +37,6 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 	for _, row := range rows {
 		lesson := models.Lesson{}
 		lesson.GroupName = row[0]
-		fmt.Println(lesson.GroupName)
 		lesson.Time, err = time.Parse(time.DateOnly, row[1])
 		if err != nil {
 			return err
@@ -53,51 +52,42 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 
 		group, err := s.store.Groups().GetGroupByName(lesson.GroupName)
 		if err != nil {
+			return fmt.Errorf("group not found")
+		}
+
+		var disciplineID int64
+		discipline, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
+		if err != nil {
+			if errors.Is(err, NotRegistered) {
+				disciplineID, err = s.store.Disciplines().RegisterDiscipline(teacherName,
+					lesson.DisciplineName, group.Speciality, group.Course)
+				if err != nil {
+					return fmt.Errorf("error while registering discipline")
+				}
+			} else {
+				return err
+			}
+		} else {
+			disciplineID = int64(discipline.DisciplineID)
+		}
+
+		stmt, err = s.store.DB.Prepare(`
+				INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order)
+				VALUES ($1, $2, $3, $4, $5, $6, $7)`)
+		if err != nil {
 			return err
 		}
 
-		discipline, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
-		switch {
-		case errors.Is(err, sql.ErrNoRows):
-			disId, err := s.store.Disciplines().RegisterDiscipline(teacherName,
-				lesson.DisciplineName, group.Speciality, group.Course)
-			if err != nil {
-				return fmt.Errorf("error while registering discipline")
-			}
+		teacher, err := s.store.User().GetUserByName(teacherName)
+		if err != nil {
+			return fmt.Errorf("teacher not found")
+		}
 
-			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6, $7)")
-			if err != nil {
-				return err
-			}
-
-			teacher, err := s.store.User().GetUserByName(teacherName)
-			if err != nil {
-				return fmt.Errorf("teacher not found")
-			}
-
-			_, err = stmt.Exec(group.Id, lesson.Time, disId, teacher.UserID, lesson.Audience, lesson.Description, lesson.LessonOrder) // добавить teacherID
-			if err != nil {
-				return err
-			}
-
-			return nil
-		case err != nil:
+		_, err = stmt.Exec(group.Id, lesson.Time,
+			disciplineID, teacher.UserID, lesson.Audience,
+			lesson.Description, lesson.LessonOrder)
+		if err != nil {
 			return err
-		default:
-			stmt, err = s.store.DB.Prepare("INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ($1, $2, $3, $4, $5, $6, $7)")
-			if err != nil {
-				return err
-			}
-
-			teacher, err := s.store.User().GetUserByName(teacherName)
-			if err != nil {
-				return fmt.Errorf("teacher not found")
-			}
-
-			_, err = stmt.Exec(group.Id, lesson.Time, discipline.DisciplineID, teacher.UserID, lesson.Audience, lesson.Description, lesson.LessonOrder) // добавить teacherID
-			if err != nil {
-				return err
-			}
 		}
 	}
 	return nil
@@ -278,8 +268,6 @@ func (s *ScheduleRepository) GetScheduleByTeacherName(teacherName string) ([]map
 		mp[schedule.Headers[i]] = lessons
 		result[i] = mp
 	}
-
-	fmt.Println(result)
 
 	return result, nil
 }

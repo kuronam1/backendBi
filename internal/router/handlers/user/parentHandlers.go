@@ -14,13 +14,14 @@ type ParentHandler struct {
 }
 
 func (h *ParentHandler) Menu(c *gin.Context) {
-	c.HTML(http.StatusOK, "homepage_student.html", nil)
+	c.HTML(http.StatusOK, "homepage_parent.html", nil)
 }
 
 func (h *ParentHandler) GetSchedule(c *gin.Context) {
-	const op = "StudentHandlers.GetSchedule"
+	const op = "ParentHandler.GetSchedule"
 	parentId, exists := c.Get("id")
 	if !exists {
+		h.Logger.Error(fmt.Sprintf("%s - cannot get parentID", op))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": "cannot identify",
 		})
@@ -28,6 +29,13 @@ func (h *ParentHandler) GetSchedule(c *gin.Context) {
 	}
 
 	studentId, err := h.Storage.User().GetStudentIDByParentID(parentId.(int))
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
 
 	group, err := h.Storage.Groups().GroupMembership(studentId)
 	if err != nil {
@@ -47,7 +55,7 @@ func (h *ParentHandler) GetSchedule(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "schedule_student.html", gin.H{
+	c.HTML(http.StatusOK, "schedule_parent.html", gin.H{
 		"Schedule":  schedule,
 		"GroupName": group.Name,
 	})
@@ -76,7 +84,7 @@ func (h *ParentHandler) GetJournal(c *gin.Context) {
 		return
 	}
 
-	c.HTML(http.StatusOK, "journal_student.html", gin.H{
+	c.HTML(http.StatusOK, "journal_parent.html", gin.H{
 		"Journal":     journal,
 		"StudentName": user.FullName,
 	})

@@ -3,7 +3,6 @@ package Store
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"sbitnev_back/internal/database/models"
 )
 
@@ -40,7 +39,11 @@ func (d *DisciplineRepository) GetDisciplineByName(name interface{}) (*models.Di
 
 func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, speciality string, course int) (int64, error) {
 	const op = "fc.discRep.RegisterDiscipline"
-	stmt, err := d.store.DB.Prepare("INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES ($1, $2, $3, $4) ON CONFLICT DO NOTHING;")
+	stmt, err := d.store.DB.Prepare(`
+UPDATE disciplines
+SET discipline_name = $1, speciality = $2, course = $3
+WHERE teacher_id = $4
+RETURNING discipline_id`)
 	if err != nil {
 		return 0, err
 	}
@@ -50,15 +53,12 @@ func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, s
 		return 0, err
 	}
 
-	_, err = stmt.Exec(teacher.UserID, disciplineName, speciality, course)
+	result, err := stmt.Exec(disciplineName, speciality, course, teacher.UserID)
 	if err != nil {
-		return 0, fmt.Errorf("exists")
+		return 0, err
 	}
 
-	query := `SELECT discipline_id FROM disciplines WHERE discipline_name = $1`
-
-	var id int64
-	err = d.store.DB.QueryRow(query, disciplineName).Scan(&id)
+	id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
 	}

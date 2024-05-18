@@ -320,7 +320,7 @@ footer{
 
   /* ~~~~~~~~~~~~STUDENT JOURNAL~~~~~~~~~~~~~~~~ */
 
-#schedule, #journal, #teacher-schedule,#teacher-journal, #student-journal,#student-schedule{
+#schedule, #journal, #teacher-schedule,#teacher-journal, #student-journal,#student-schedule, #parent-schedule, #parent-journal{
 	text-decoration: none;
 	font-weight: bolder;
 	color: var(--color2);
@@ -494,7 +494,7 @@ footer{
 
 /* Admin page */
 
-#brend, #student-brend, #teacher-brend{
+#brend, #student-brend, #teacher-brend, #parent-brend{
 	cursor: pointer;
 }
 

@@ -126,24 +126,18 @@ func (u *UserRepository) UpdateUser(user *models.User) error {
 func (u *UserRepository) CreateGroupUserLink(userID int, groupName string) error {
 	const op = "fc.userRep.CreateUserLink"
 
-	selectStmt, err := u.store.DB.Prepare("SELECT group_id FROM groups WHERE group_name = $1")
+	group, err := u.store.Groups().GetGroupByName(groupName)
 	if err != nil {
 		return err
 	}
-	defer selectStmt.Close()
 
-	insertStmt, err := u.store.DB.Prepare("INSERT INTO group_students VALUES ($1, $2)")
+	stmt, err := u.store.DB.Prepare("INSERT INTO group_students VALUES ($1, $2)")
 	if err != nil {
 		return err
 	}
-	defer insertStmt.Close()
+	defer stmt.Close()
 
-	var groupID int
-	if err := selectStmt.QueryRow(groupName).Scan(&groupID); err != nil {
-		return err
-	}
-
-	_, err = insertStmt.Exec(groupID, userID)
+	_, err = stmt.Exec(group.Id, userID)
 	if err != nil {
 		return err
 	}
@@ -259,7 +253,7 @@ func (u *UserRepository) GetStudentIDByParentID(parentID int) (int, error) {
 	defer stmt.Close()
 
 	var studentID int
-	if err = stmt.QueryRow(parentID).Scan(studentID); err != nil {
+	if err = stmt.QueryRow(parentID).Scan(&studentID); err != nil {
 		return 0, err
 	}
 

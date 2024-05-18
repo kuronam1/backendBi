@@ -1,4 +1,5 @@
 
+/* Обратная связь */
 
 $('#newsletter-submit').on( 'click', function( event ){
     let fio = 'fio';
@@ -25,7 +26,9 @@ $('#newsletter-submit').on( 'click', function( event ){
     });
 });
 
-$('#student-brend').on('click', function( event ){
+/* Студент Homepage */
+
+/*$('#student-brend').on('click', function( event ){
     $.ajax({
         url         : '/studentPanel/menu',
         type        : 'GET',
@@ -57,8 +60,47 @@ $('#student-journal').on('click', function( event ){
         error: function() {
         }
     });
-});
-$('#teacher-brend').on('click', function( event ){
+});*/
+
+/* Parent Homepage */
+
+/*$('#parent-brend').on('click', function( event ){
+    $.ajax({
+        url         : '/parentPanel/menu',
+        type        : 'GET',
+        dataType    : 'text/html',
+        success     : function(data) {
+        },
+        error: function() {
+        }
+    });
+});*/
+/*$('#parent-journal').on('click', function( event ){
+    $.ajax({
+        url         : '/parentPanel/journal',
+        type        : 'GET',
+        dataType    : 'text/html',
+        success     : function(data) {
+        },
+        error: function() {
+        }
+    });
+})*/
+/*;$('#parent-schedule').on('click', function( event ){
+    $.ajax({
+        url         : '/parentPanel/schedule',
+        type        : 'GET',
+        dataType    : 'text/html',
+        success     : function(data) {
+        },
+        error: function() {
+        }
+    });
+});*/
+
+/* Учительский Homepage */
+
+/*$('#teacher-brend').on('click', function( event ){
     $.ajax({
         url         : '/teacherPanel/menu',
         type        : 'GET',
@@ -90,8 +132,11 @@ $('#teacher-schedule').on('click', function( event ){
         error: function() {
         }
     });
-});
-$('#brend').on('click', function( event ){
+});*/
+
+/* Админ */
+
+/*$('#brend').on('click', function( event ){
     $.ajax({
         url         : '/adminPanel/management',
         type        : 'GET',
@@ -124,7 +169,10 @@ $('#schedule').on('click', function( event ){
         error: function() {
         }
     });
-});
+});*/
+
+/* Добавление нового пользователя */
+
 $('#new-user-reg').on( 'click', function( event ){
     if(document.getElementById("role").value === 'teacher'){
         let role = 'role';
@@ -205,6 +253,9 @@ $('#new-user-reg').on( 'click', function( event ){
         });
     }
 });
+
+/* Добавление новой группы */
+
 $('#add-group').on( 'click', function( event ){
     let speciality = 'speciality';
     let specialityValue = document.getElementById("groupSpeciality").value;
@@ -230,6 +281,9 @@ $('#add-group').on( 'click', function( event ){
         }
     });
 });
+
+/* Админское расписание */
+
 $('#admin-schedule-submit').on( 'click', function( event ){
     if(document.getElementById("group").value === 'false'){
         let teacher = 'teacher';
@@ -273,57 +327,9 @@ $('#admin-schedule-submit').on( 'click', function( event ){
         });
     }
 });
-// $('#cancel-button').on( 'click', function( event ){
-//     $.ajax({
-//         url         : '/logout',
-//         type        : 'POST',
-//         date : JSON.stringify({}),
-//         dataType    : 'json',
-//         processData : false,
-//         contentType : 'application/json',
-//         success     : function() {
-//             //Пока это оставим пустым, потом если надо, что-то придумаем
-//         },
-//         error: function() {
-//         }
-//     });
-// });
-// $('#admin-get-journale-group').on( 'click', function( event ){
-//     let group = 'group';
-//     let groupValue = document.getElementById("admin-group").value;
-//     let discipline = 'discipline';
-//     let disciplineValue = document.getElementById("discipline").value;
-//     $.ajax({
-//         url         : '/adminPanel/journal',
-//         type        : 'GET',
-//         data        : {
-//                 group : groupValue,
-//                 discipline : disciplineValue
-//         },
-//         success     : function(data) {
-//         },
-//         error: function() {
-//         }
-//     });
-// });
-// $('#teacher-get-journal').on( 'click', function( event ){
-//     let group = 'group';
-//     let groupValue = document.getElementById("teacher-group").value;
-//     let discipline = 'discipline';
-//     let disciplineValue = document.getElementById("teacher-discipline").value;
-//     $.ajax({
-//         url         : '/teacherPanel/journal',
-//         type        : 'GET',
-//         data        : {
-//             discipline : disciplineValue,
-//             group : groupValue
-//         },
-//         success     : function(data) {
-//         },
-//         error: function() {
-//         }
-//     });
-// });
+
+/* Добавление новой оценки */
+
 $('#teacher-new-score').on( 'click', function( event ){
     let disciplineValue = disciplineID;
     let studentName = nameStudent;
@@ -351,6 +357,9 @@ $('#teacher-new-score').on( 'click', function( event ){
         }
     });
 });
+
+/* Изменение оценки */
+
 $('#admin-grade-add').on( 'click', function( event ){
     let discipline = 'disciplineID';
     let disciplineValue = disciplineID;
@@ -387,6 +396,9 @@ $('#admin-grade-add').on( 'click', function( event ){
         }
     });
 });
+
+/* Добавление новых ДЗ и темы */
+
 $('#sendNewHMandT').on( 'click', function( event ){
     let lessonID = document.getElementById("ThemesHomeWork").attributes[1].value;
     let newHomework = document.getElementById("homeworkNew").value;

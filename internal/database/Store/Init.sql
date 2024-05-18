@@ -1,9 +1,9 @@
 CREATE TABLE IF NOT EXISTS groups (
-                                    group_id SERIAL PRIMARY KEY,
-                                    group_name VARCHAR NOT NULL,
-                                    number INTEGER NOT NULL,
-                                    speciality VARCHAR NOT NULL,
-                                    course INTEGER NOT NULL
+                                      group_id SERIAL PRIMARY KEY,
+                                      group_name VARCHAR NOT NULL,
+                                      number INTEGER NOT NULL,
+                                      speciality VARCHAR NOT NULL,
+                                      course INTEGER NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS users  (
@@ -24,9 +24,9 @@ CREATE TABLE IF NOT EXISTS group_students ( --many to many
 CREATE TABLE IF NOT EXISTS disciplines (
                                            discipline_id SERIAL PRIMARY KEY,
                                            teacher_id INTEGER NOT NULL REFERENCES users(user_id),
-                                           discipline_name VARCHAR NOT NULL UNIQUE,
-                                           speciality VARCHAR NOT NULL,
-                                           course INTEGER NOT NULL
+                                           discipline_name VARCHAR UNIQUE,
+                                           speciality VARCHAR,
+                                           course INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS lessons ( --вариант для храниея рассписания всех групп в одной таблице
@@ -52,16 +52,25 @@ CREATE TABLE IF NOT EXISTS grades (
 );
 
 CREATE TABLE IF NOT EXISTS parent_students (
-                                      parent_id INTEGER REFERENCES users(user_id),
-                                      student_id INTEGER REFERENCES users(user_id)
+                                               parent_id INTEGER REFERENCES users(user_id),
+                                               student_id INTEGER REFERENCES users(user_id)
 );
 
 CREATE TABLE IF NOT EXISTS specialities (
-                                      speciality_id INTEGER PRIMARY KEY,
-                                      speciality_name VARCHAR NOT NULL,
-                                      group_id INTEGER REFERENCES groups(group_id),
-                                      discipline_id INTEGER REFERENCES disciplines(discipline_id)
+                                            speciality_id SERIAL PRIMARY KEY,
+                                            speciality_name VARCHAR NOT NULL
 );
+
+INSERT INTO specialities (speciality_name) VALUES ('Специальные машины и устройства');
+INSERT INTO specialities (speciality_name) VALUES ('Автоматические системы управления');
+INSERT INTO specialities (speciality_name) VALUES ('Компьютерные системы и комплексы');
+INSERT INTO specialities (speciality_name) VALUES ('Контроль работы измерительных приборов');
+INSERT INTO specialities (speciality_name) VALUES ('Экономика и бухгалтерский учет');
+INSERT INTO specialities (speciality_name) VALUES ('Технология металлообрабатывающего производства');
+INSERT INTO specialities (speciality_name) VALUES ('Технология машиностроения');
+INSERT INTO specialities (speciality_name) VALUES ('Информационные системы и программирование');
+INSERT INTO specialities (speciality_name) VALUES ('Техническая эксплуатация летательных аппаратов и двигателей');
+INSERT INTO specialities (speciality_name) VALUES ('Техническая эксплуатация электрифицированных и пилотажно-навигационных комплексов');
 
 INSERT INTO users (login, password, full_name, role) VALUES ('mylogin', 'mypassword', 'Андрей Горбунов', 'admin');
 INSERT INTO users (login, password, full_name, role) VALUES ('aliev', '1111111111', 'Алиев Алексей Алексеевич', 'student');
@@ -234,3 +243,23 @@ INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('7'
 INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '1', 'н', '2024-05-16', 'Контрольная работа');
 INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '1', '5', '2024-05-16', 'Контрольная работа');
 INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '1', '4', '2024-05-16', 'Контрольная работа');
+
+
+INSERT INTO parent_students(parent_id, student_id) VALUES ('30', '2');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('31', '3');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('32', '4');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('33', '5');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('34', '6');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('35', '7');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('36', '8');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('37', '9');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('38', '10');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('39', '11');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('40', '12');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('41', '13');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('42', '14');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('43', '15');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('44', '16');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('45', '17');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('46', '18');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('47', '19');

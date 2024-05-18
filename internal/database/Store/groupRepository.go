@@ -89,20 +89,32 @@ func (g *GroupRepository) GroupRegistration(group *models.Group) error {
 
 func configurationGroupName(speciality string, number, course int) string {
 	switch speciality {
-	case "ЭВМ":
-		return fmt.Sprintf("ЭВМ%d%d", course, number)
-	case "БИ":
-		return fmt.Sprintf("БИ%d%d", course, number)
-	case "ПМ":
-		return fmt.Sprintf("ПМ%d%d", course, number)
+	case "Специальные машины и устройства":
+		return fmt.Sprintf("СЦУ%d%d", course, number)
+	case "Автоматические системы управления":
+		return fmt.Sprintf("АСУ%d%d", course, number)
+	case "Компьютерные системы и комплексы":
+		return fmt.Sprintf("КСК%d%d", course, number)
+	case "Контроль работы измерительных приборов":
+		return fmt.Sprintf("КРИП%d%d", course, number)
+	case "Экономика и бухгалтерский учет":
+		return fmt.Sprintf("ЭБУ%d%d", course, number)
+	case "Технология металлообрабатывающего производства":
+		return fmt.Sprintf("ТМП%d%d", course, number)
+	case "Технология машиностроения":
+		return fmt.Sprintf("ТМ%d%d", course, number)
+	case "Информационные системы и программирование":
+		return fmt.Sprintf("ИСП%d%d", course, number)
+	case "Техническая эксплуатация летательных аппаратов и двигателей":
+		return fmt.Sprintf("ТЭЛАД%d%d", course, number)
 	default:
-		return fmt.Sprintf("БП%d%d", course, number)
+		return fmt.Sprintf("ТЭЭПНК%d%d", course, number)
 	}
 }
 
 func (g *GroupRepository) GetAllSpecialities() ([]string, error) {
 	const op = "fc.groupRep.GetAllSpecialities"
-	query := `SELECT speciality FROM disciplines`
+	query := `SELECT speciality_name FROM specialities`
 
 	rows, err := g.store.DB.Query(query)
 	if err != nil {

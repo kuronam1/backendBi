@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"log/slog"
 	"net/http"
+	"net/smtp"
 	"sbitnev_back/internal/database/Store"
 	"sbitnev_back/internal/router/handlers"
 	"sbitnev_back/internal/router/handlers/encryption"
@@ -17,6 +18,7 @@ const (
 	homePageUrl    = "/"
 	LoginPageUrl   = "/auth"
 	LogoutPageURl  = "/logout"
+	feedbackUrl    = "/feedback"
 	AdminMenuURL   = "/adminPanel/management"
 	StudentMenuURL = "/studentPanel/menu"
 	TeacherMenuURL = "/teacherPanel/menu"
@@ -25,6 +27,11 @@ const (
 	teacher        = "teacher"
 	student        = "student"
 	parent         = "parent"
+	host           = "smtp.mail.ru"
+	smtpPort       = "465"
+	from           = "testforpoject@xmail.ru"
+	password       = "rtyuehe1223"
+	mainMail       = "ex1cut123@gmail.com"
 )
 
 func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
@@ -43,16 +50,18 @@ func NewHandler(logger *slog.Logger, store *Store.Storage) handlers.Handler {
 			Logger:  logger,
 			Storage: store,
 		},
+		ParentHandler: &ParentHandler{
+			Logger:  logger,
+			Storage: store,
+		},
 	}
 }
-
-//Дописать проверки middleware !!!!
 
 func (h *handler) Register(router *gin.Engine) {
 	router.GET(homePageUrl, h.HomePage)
 	router.POST(LoginPageUrl, h.UserIdent())
 	router.POST(LogoutPageURl, h.Logout)
-	//router.POST(homePageUrl, h.FeedBack)
+	router.POST(feedbackUrl, h.Feedback())
 
 	AdminMenuPath := router.Group("/adminPanel")
 	AdminMenuPath.Use(middleware.CheckAdminAuth(h.storage))
@@ -84,30 +93,53 @@ func (h *handler) Register(router *gin.Engine) {
 
 	ParentMenuPath := router.Group("/parentPanel")
 	ParentMenuPath.Use(middleware.CheckParentAuth(h.storage))
-	ParentMenuPath.GET("/menu", h.StudentHandler.Menu)
-	ParentMenuPath.GET("/journal", h.StudentHandler.GetJournal)
-	ParentMenuPath.GET("/schedule", h.StudentHandler.GetSchedule)
+	ParentMenuPath.GET("/menu", h.ParentHandler.Menu)
+	ParentMenuPath.GET("/journal", h.ParentHandler.GetJournal)
+	ParentMenuPath.GET("/schedule", h.ParentHandler.GetSchedule)
 }
 
 func (h *handler) HomePage(c *gin.Context) {
 	if c.FullPath() != homePageUrl {
-		c.HTML(404, "", nil)
+		c.HTML(404, "error.html", gin.H{
+			"Description": "Мы не нашли ничего по вашему запросу",
+		})
 	}
 	c.HTML(200, "index.html", nil)
 }
 
-//??? Обговорить/обдумать идею автоотправления формы на какой-то рабочий email
-/*
-func (h *handler) FeedBack(c *gin.Context) {
-	FIO := c.PostForm("FIO")
-	email := c.PostForm("email")
-	msg := c.PostForm("msg")
+func (h *handler) Feedback() gin.HandlerFunc {
+	const op = "userHandler.feedback"
+	type request struct {
+		Fio     string `json:"fio"`
+		Email   string `json:"email"`
+		Message string `json:"message"`
+	}
+	return func(c *gin.Context) {
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			h.logger.Error(fmt.Sprintf("%s - %s", op, err.Error()))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
 
-	c.Status(http.StatusOK)
+		msg := []byte("От: " + req.Email + "\r\n" + "ФИО: " + req.Fio + "\r\n" + "Сообщение: " + req.Message)
+
+		auth := smtp.PlainAuth("", from, password, host)
+		if err := smtp.SendMail(host+":"+smtpPort, auth, from, []string{mainMail}, msg); err != nil {
+			h.logger.Error(fmt.Sprintf("%s - %s", op, err.Error()))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"status": "Message successfully sent",
+		})
+	}
 }
-*/
-
-//Не забыть про хедеры ...
 
 func (h *handler) UserIdent() gin.HandlerFunc {
 	return func(c *gin.Context) {

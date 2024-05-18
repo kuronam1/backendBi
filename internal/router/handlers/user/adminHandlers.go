@@ -67,22 +67,13 @@ func (h *AdminHandler) Management(c *gin.Context) {
 
 func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	const op = "AdminHandlers.ScheduleRegister"
-	log.Println("inUploadFile")
-	log.Println("Content-Type:", c.Request.Header["Content-Type"])
 	if body, err := io.ReadAll(c.Request.Body); err != nil {
 		panic(err)
 	} else {
-		log.Println("Body:", string(body))
-		// Нужно заново прикрепить тело к запросу, так как после `ReadAll` тело пустое.
 		c.Request.Body = io.NopCloser(bytes.NewReader(body))
 	}
-	// Для проверки распечатка полей формы как application/x-www-form-urlencoded
-	log.Println("PostFormArray", c.PostFormArray("file"))
-	log.Println("PostForm", c.PostForm("file"))
 
-	// Извлечение файлов из Multi-part
 	form, _ := c.MultipartForm()
-	log.Println("Form", form)
 	for i, fh := range form.File["file"] {
 		log.Println("File #", i)
 		log.Println("  file name", fh.Filename)

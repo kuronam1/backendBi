@@ -2,7 +2,6 @@ package Store
 
 import (
 	"errors"
-	"fmt"
 	"sbitnev_back/internal/database/models"
 	"time"
 )
@@ -142,7 +141,6 @@ ORDER BY u.full_name`)
 		if err != nil {
 			return nil, err
 		}
-		fmt.Println(grade)
 		journal.Grades[fullName] = append(journal.Grades[fullName], grade)
 	}
 	if err := rows.Err(); err != nil {

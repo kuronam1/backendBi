@@ -226,7 +226,7 @@ function restyleLinks(){
 
 function restyleLinksStudent(){
   let substringStudentSchedule = "schedule";
-  let suubstringStudentJournal = "journal";
+  let substringStudentJournal = "journal";
 
   // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
 
@@ -235,8 +235,27 @@ function restyleLinksStudent(){
     link.setAttribute("onclick", "return false");
     link.style.boxShadow = "0px 0px 5px var(--color1)";
     link.style.cursor = "default";
-  } else if (document.URL.includes(suubstringStudentJournal)){  // Для журнала
+  } else if (document.URL.includes(substringStudentJournal)){  // Для журнала
     let link = document.getElementById("student-journal");
+    link.setAttribute("onclick", "return false");
+    link.style.boxShadow = "0px 0px 5px var(--color1)";
+    link.style.cursor = "default";
+  }
+}
+
+function restyleLinksParent(){
+  let substringStudentSchedule = "schedule";
+  let substringStudentJournal = "journal";
+
+  // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
+
+  if (document.URL.includes(substringStudentSchedule)){ // Для расписания
+    let link = document.getElementById("parent-schedule");
+    link.setAttribute("onclick", "return false");
+    link.style.boxShadow = "0px 0px 5px var(--color1)";
+    link.style.cursor = "default";
+  } else if (document.URL.includes(substringStudentJournal)){  // Для журнала
+    let link = document.getElementById("parent-journal");
     link.setAttribute("onclick", "return false");
     link.style.boxShadow = "0px 0px 5px var(--color1)";
     link.style.cursor = "default";
