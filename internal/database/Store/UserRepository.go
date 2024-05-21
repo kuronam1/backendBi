@@ -96,7 +96,7 @@ func (u *UserRepository) GetUserByName(name string) (*models.User, error) {
 
 func (u *UserRepository) CreateUser(user *models.User) (int, error) {
 	const op = "fc.userRep.CreateUser"
-	stmt, err := u.store.DB.Prepare("INSERT INTO users (login, password, full_name, role) VALUES ($1, $2, $3, $4)")
+	stmt, err := u.store.DB.Prepare("INSERT INTO users (login, password, full_name, role) VALUES ($1, $2, $3, $4) RETURNING user_id")
 	if err != nil {
 		return 0, err
 	}
@@ -115,13 +115,20 @@ func (u *UserRepository) CreateUser(user *models.User) (int, error) {
 	return userData.UserID, nil
 }
 
-/*func (u *UserRepository) DeleteUser(user *models.User) error {
+func (u *UserRepository) UpdateUserPassword(login, password string) error {
+	stmt, err := u.store.DB.Prepare("UPDATE users SET password = $1 WHERE login = $2")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(password, login)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
-
-func (u *UserRepository) UpdateUser(user *models.User) error {
-	return nil
-}*/
 
 func (u *UserRepository) CreateGroupUserLink(userID int, groupName string) error {
 	const op = "fc.userRep.CreateUserLink"
@@ -295,4 +302,105 @@ func (u *UserRepository) GetUserByRole(role string) ([]models.User, error) {
 	}
 
 	return result, nil
+}
+
+func (u *UserRepository) DeleteStudentsByGroup(group models.Group) error {
+	AllSudentsStmt, err := u.store.DB.Prepare(`
+		SELECT student_id
+		FROM group_students
+		WHERE group_id = $1`)
+	if err != nil {
+		return err
+	}
+	defer AllSudentsStmt.Close()
+
+	rows, err := AllSudentsStmt.Query(group.Id)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var studentID int
+		err = rows.Scan(&studentID)
+		if err != nil {
+			return err
+		}
+
+		err = u.store.User().DeleteParentByStudentID(studentID)
+		if err != nil {
+			if errors.Is(err, sql.ErrNoRows) {
+				if err := u.store.User().DeleteUserByID(studentID); err != nil {
+					return err
+				}
+				continue
+			} else {
+				return err
+			}
+		}
+
+		if err := u.store.User().DeleteUserByID(studentID); err != nil {
+			return err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) DeleteUserByID(ID int) error {
+	userDeleteStmt, err := u.store.DB.Prepare(`DELETE FROM users WHERE user_id = $1`)
+	if err != nil {
+		return err
+	}
+	defer userDeleteStmt.Close()
+
+	_, err = userDeleteStmt.Exec(ID)
+	return err
+}
+
+func (u *UserRepository) DeleteParentLink(studentID int) error {
+	stmt, err := u.store.DB.Prepare("DELETE FROM parent_students WHERE student_id = $1 RETURNING parent_id")
+	if err != nil {
+		return err
+	}
+
+	result, err := stmt.Exec(studentID)
+	if err != nil {
+		return err
+	}
+
+	parentID, err := result.LastInsertId()
+
+	if err := u.store.User().DeleteUserByID(int(parentID)); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (u *UserRepository) DeleteParentByStudentID(studentID int) error {
+	stmt, err := u.store.DB.Prepare(`
+		SELECT parent_id FROM parent_students
+		WHERE student_id = $1`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	var parentID int
+	if err := stmt.QueryRow(&studentID).Scan(&parentID); err != nil {
+		return err
+	}
+
+	DeleteStmt, err := u.store.DB.Prepare("DELETE FROM users WHERE user_id = $1")
+	if err != nil {
+		return err
+	}
+	defer DeleteStmt.Close()
+
+	_, err = DeleteStmt.Exec(parentID)
+	return err
 }

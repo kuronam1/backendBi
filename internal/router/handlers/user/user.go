@@ -69,13 +69,13 @@ func (h *handler) Register(router *gin.Engine) {
 	AdminMenuPath.GET("/management", h.AdminHandler.Management)
 	AdminMenuPath.POST("/management/scheduleReg", h.AdminHandler.ScheduleRegister)
 	AdminMenuPath.POST("/management/userReg", h.AdminHandler.UserRegister())
-	//AdminMenuPath.POST("/management/userDel")
-	//AdminMenuPath.PATCH("/management/userRef")
+	AdminMenuPath.POST("/management/disciplineReg", h.AdminHandler.CreateDiscipline())
+	AdminMenuPath.POST("/management/updateCourse", h.AdminHandler.UpdateCourse)
+	AdminMenuPath.PATCH("/management/recoverPass", h.AdminHandler.RecoverUserPassword())
 	AdminMenuPath.POST("/management/groupReg", h.AdminHandler.GroupRegister())
-	AdminMenuPath.POST("/management/bdBackUp", h.AdminHandler.BackUp)
 	AdminMenuPath.GET("/journal", h.AdminHandler.GetJournal)
 	AdminMenuPath.PATCH("/journal/gradesRef", h.AdminHandler.GradesRefactor())
-	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule) // исправить + Исправить функцию по генерации имени группы (убрать пробелы) и специальности
+	AdminMenuPath.GET("/schedule", h.AdminHandler.GetSchedule)
 
 	TeacherMenuPath := router.Group("/teacherPanel")
 	TeacherMenuPath.Use(middleware.CheckTeacherAuth(h.storage))
@@ -100,7 +100,7 @@ func (h *handler) Register(router *gin.Engine) {
 
 func (h *handler) HomePage(c *gin.Context) {
 	if c.FullPath() != homePageUrl {
-		c.HTML(404, "error.html", gin.H{
+		c.HTML(http.StatusOK, "error.html", gin.H{
 			"Description": "Мы не нашли ничего по вашему запросу",
 		})
 	}

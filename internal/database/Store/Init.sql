@@ -1,8 +1,13 @@
+CREATE TABLE IF NOT EXISTS specialities (
+                                            speciality_id SERIAL PRIMARY KEY,
+                                            speciality_name VARCHAR NOT NULL UNIQUE
+);
+
 CREATE TABLE IF NOT EXISTS groups (
                                       group_id SERIAL PRIMARY KEY,
                                       group_name VARCHAR NOT NULL,
                                       number INTEGER NOT NULL,
-                                      speciality VARCHAR NOT NULL,
+                                      speciality VARCHAR NOT NULL REFERENCES specialities(speciality_name),
                                       course INTEGER NOT NULL
 );
 
@@ -16,16 +21,16 @@ CREATE TABLE IF NOT EXISTS users  (
 
 CREATE TABLE IF NOT EXISTS group_students ( --many to many
                                               group_id INTEGER REFERENCES groups(group_id),
-                                              student_id INTEGER REFERENCES users(user_id)
+                                              student_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
     -- PRIMARY KEY (group_id, student_id)
 );
 
 
 CREATE TABLE IF NOT EXISTS disciplines (
                                            discipline_id SERIAL PRIMARY KEY,
-                                           teacher_id INTEGER NOT NULL REFERENCES users(user_id),
-                                           discipline_name VARCHAR UNIQUE,
-                                           speciality VARCHAR,
+                                           teacher_id INTEGER NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
+                                           discipline_name VARCHAR,
+                                           speciality VARCHAR REFERENCES specialities(speciality_name),
                                            course INTEGER
 );
 
@@ -52,13 +57,8 @@ CREATE TABLE IF NOT EXISTS grades (
 );
 
 CREATE TABLE IF NOT EXISTS parent_students (
-                                               parent_id INTEGER REFERENCES users(user_id),
-                                               student_id INTEGER REFERENCES users(user_id)
-);
-
-CREATE TABLE IF NOT EXISTS specialities (
-                                            speciality_id SERIAL PRIMARY KEY,
-                                            speciality_name VARCHAR NOT NULL
+                                               parent_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE,
+                                               student_id INTEGER REFERENCES users(user_id) ON DELETE CASCADE
 );
 
 INSERT INTO specialities (speciality_name) VALUES ('Специальные машины и устройства');
@@ -123,6 +123,25 @@ INSERT INTO users (login, password, full_name, role) VALUES ('bianne', '17171717
 INSERT INTO users (login, password, full_name, role) VALUES ('stinah', '1818181818', 'Чернова Ульяна Георгиевна', 'parent');
 INSERT INTO users (login, password, full_name, role) VALUES ('madgett', '1919191919', 'Русаков Тимофей Викторович', 'parent');
 
+INSERT INTO parent_students(parent_id, student_id) VALUES ('30', '2');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('31', '3');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('32', '4');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('33', '5');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('34', '6');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('35', '7');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('36', '8');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('37', '9');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('38', '10');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('39', '11');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('40', '12');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('41', '13');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('42', '14');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('43', '15');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('44', '16');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('45', '17');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('46', '18');
+INSERT INTO parent_students(parent_id, student_id) VALUES ('47', '19');
+
 INSERT INTO groups (group_name, number, speciality, course) VALUES ('ИСП21','1', 'Информационные системы и программирование', '2');
 INSERT INTO groups (group_name, number, speciality, course) VALUES ('ИСП22','2', 'Информационные системы и программирование', '2');
 
@@ -158,108 +177,3 @@ INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES
 INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES ('29', 'Обеспечение качества функционирования компьютерных систем', 'Информационные системы и программирование', '2');
 INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES ('28', 'Учебная практика', 'Информационные системы и программирование', '2');
 INSERT INTO disciplines (teacher_id, discipline_name, speciality, course) VALUES ('30', 'Производственная практика', 'Информационные системы и программирование', '2');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-13 8:30:00', '1', '20', 'А-3', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-13 8:30:00', '1', '20', 'А-3', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-13 10:10:00', '2', '21', 'А-6', 'Семенар', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-13 10:10:00', '3', '22', 'Спортзал№1', 'Семенар', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-13 12:40:00', '3', '22', 'Спортзал№1', 'Семенар', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-13 12:40:00', '2', '21', 'А-6', 'Семенар', '2');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-14 8:30:00', '4', '23', 'Б-1', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-14 8:30:00', '4', '23', 'Б-1', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-14 10:10:00', '5', '24', 'А-4', 'Лекция', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-14 10:10:00', '5', '24', 'А-4', 'Лекция', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-14 12:40:00', '6', '25', 'А-3', 'Семенар', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-14 12:40:00', '7', '26', 'А-6', 'Семенар', '2');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 8:30:00', '8', '27', 'А-9', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 8:30:00', '8', '27', 'А-9', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 10:10:00', '9', '28', 'А-9', 'Лекция', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 10:10:00', '9', '28', 'А-9', 'Лекция', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-15 12:40:00', '7', '26', 'А-6', 'Семенар', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-15 12:40:00', '6', '25', 'А-3', 'Семенар', '2');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-16 8:30:00', '1', '20', 'А-3', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-16 8:30:00', '1', '20', 'А-3', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-16 10:10:00', '9', '28', 'А-9', 'Семенар', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-16 10:10:00', '10', '29', 'Б-3', 'Семенар', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-16 12:40:00', '10', '29', 'Б-3', 'Семенар', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-16 12:40:00', '9', '28', 'А-9', 'Семенар', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-16 14:20:00', '6', '25', 'А-3', 'Лекция', '3');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-16 14:20:00', '6', '25', 'А-3', 'Лекция', '3');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-17 8:30:00', '7', '26', 'А-6', 'Семенар', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-17 8:30:00', '12', '30', 'А-10', 'Семенар', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-17 10:10:00', '12', '30', 'А-10', 'Семенар', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-17 10:10:00', '7', '26', 'А-6', 'Семенар', '1');
-
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-18 8:30:00', '11', '28', 'А-12', 'Лекция', '0');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('1', '2024-05-18 10:10:00', '11', '28', 'А-12', 'Лекция', '1');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-18 12:40:00', '11', '28', 'А-12', 'Лекция', '2');
-INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order) VALUES ('2', '2024-05-18 14:20:00', '11', '28', 'А-12', 'Лекция', '3');
-
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('2', '1', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('3', '1', '3', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('4', '1', 'н', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('5', '1', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('6', '1', '4', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('7', '1', '2', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '1', '3', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '1', 'н', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '1', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('2', '2', '4', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('3', '2', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('4', '2', '3', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('5', '2', 'н', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('6', '2', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('7', '2', '4', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '2', 'н', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '2', '5', '2024-05-13', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '2', '4', '2024-05-13', 'Контрольная работа');
-
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '6', '3', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '6', '5', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '6', '4', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('11', '6', 'н', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('12', '6', '2', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '7', '3', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '7', '5', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '7', '4', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('11', '7', 'н', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('12', '7', '2', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '10', '3', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '10', '5', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '10', '4', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('11', '10', 'н', '2024-05-13', 'Летучка');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('12', '10', '2', '2024-05-13', 'Летучка');
-
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('2', '1', '5', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('3', '1', '5', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('4', '1', '3', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('5', '1', 'н', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('6', '1', '5', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('7', '1', '4', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('8', '1', 'н', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('9', '1', '5', '2024-05-16', 'Контрольная работа');
-INSERT INTO grades (student_id, discipline_id, grade, date, comment) VALUES ('10', '1', '4', '2024-05-16', 'Контрольная работа');
-
-
-INSERT INTO parent_students(parent_id, student_id) VALUES ('30', '2');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('31', '3');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('32', '4');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('33', '5');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('34', '6');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('35', '7');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('36', '8');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('37', '9');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('38', '10');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('39', '11');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('40', '12');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('41', '13');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('42', '14');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('43', '15');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('44', '16');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('45', '17');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('46', '18');
-INSERT INTO parent_students(parent_id, student_id) VALUES ('47', '19');

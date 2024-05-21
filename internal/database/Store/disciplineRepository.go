@@ -37,33 +37,31 @@ func (d *DisciplineRepository) GetDisciplineByName(name interface{}) (*models.Di
 	}
 }
 
-func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, speciality string, course int) (int64, error) {
+func (d *DisciplineRepository) RegisterDiscipline(teacherName, disciplineName, speciality string, course int) error {
 	const op = "fc.discRep.RegisterDiscipline"
 	stmt, err := d.store.DB.Prepare(`
-UPDATE disciplines
-SET discipline_name = $1, speciality = $2, course = $3
-WHERE teacher_id = $4
-RETURNING discipline_id`)
+		INSERT INTO disciplines (teacher_id, discipline_name, speciality, course)
+		VALUES ($1, $2, $3, $4) RETURNING discipline_id`)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
 	teacher, err := d.store.User().GetUserByName(teacherName)
 	if err != nil {
-		return 0, err
+		return err
 	}
 
-	result, err := stmt.Exec(disciplineName, speciality, course, teacher.UserID)
+	_, err = stmt.Exec(teacher.UserID, disciplineName, speciality, course)
+	if err != nil {
+		return err
+	}
+
+	/*id, err := result.LastInsertId()
 	if err != nil {
 		return 0, err
-	}
+	}*/
 
-	id, err := result.LastInsertId()
-	if err != nil {
-		return 0, err
-	}
-
-	return id, nil
+	return nil
 }
 
 func (d *DisciplineRepository) GetAllDisciplines() ([]*models.Discipline, error) {

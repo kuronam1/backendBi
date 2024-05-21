@@ -1,3 +1,37 @@
+var files;
+$('#admin-save-file').on('change', function(){
+    var fileInput= document.getElementById('admin-save-file'); // Начало быдлокода
+    var filePath = fileInput.value;
+    var allowedExtensions =
+        /(.xlsx|.xls)$/i;
+    if (!allowedExtensions.exec(filePath)) {
+        alert('Неверный формат файла');
+        fileInput.files = '';   // Конец быдлокода
+    } else files = fileInput.files[0];
+});
+$('#submit_button').on( 'click', function( event ){
+    event.stopPropagation();
+    event.preventDefault();
+    if( typeof files == 'undefined') return;
+    let data = new FormData();
+    let groupName = document.getElementById('admin-save-name').value;
+    //group
+    data.append('group', groupName);
+    data.append('file', files);
+    $.ajax({
+        url         : '/adminPanel/management/scheduleReg',
+        type        : 'POST',
+        data        : data,
+        cache       : false,
+        dataType    : 'multipart/form-data',
+        processData : false,
+        contentType : false,
+        success     : function() {
+            alert('Файл отправлен')
+        }
+    });
+
+});
 
 /* Обратная связь */
 
@@ -171,6 +205,79 @@ $('#schedule').on('click', function( event ){
     });
 });*/
 
+/* Перемещение курса на один вперед */
+
+$('#iamsure').on( 'click', function( event ){
+    $.ajax({
+        url: '/adminPanel/management/updateCourse',
+        type: 'POST',
+        data: JSON.stringify({
+        }),
+        dataType: 'json',
+        processData: false,
+        contentType: 'application/json',
+        success: function () {
+
+            alert("Группы перенесены на курс вперед")  // Сообщение об успешном добавлении пользователя
+        },
+        error: function (data) {
+            window.location.reload();
+            alert(JSON.parse(data))
+        }
+    });
+});
+
+/* Добавление новой дисциплины */
+
+$('#add-new-discipline').on( 'click', function( event ){
+    let teacherValue = document.getElementById("teacherName").value;
+    let specialityValue = document.getElementById("groupSpecialityDisc").value;
+    let disciplineValue = document.getElementById("disciplineName").value;
+    let groupNumberValue = document.getElementById("groupNumberDics").value;
+    $.ajax({
+        url: '/adminPanel/management/disciplineReg',
+        type: 'POST',
+        data: JSON.stringify({
+            teacherName : teacherValue,
+            disciplineName : disciplineValue,
+            specialityName : specialityValue,
+            course : groupNumberValue
+        }),
+        dataType: 'json',
+        processData: false,
+        contentType: 'application/json',
+        success: function () {
+            window.location.reload();
+            alert("Дисциплина успешно добавлена")  // Сообщение об успешном добавлении пользователя
+        },
+        error: function () {
+        }
+    });
+});
+
+/* Изменение пароля */
+
+$('#change-password').on( 'click', function( event ){
+    let loginValue = document.getElementById("login-repass").value;
+    let newPassValue = document.getElementById("newPassword").value;
+    $.ajax({
+        url: '/adminPanel/management/recoverPass',
+        type: 'PATCH',
+        data: JSON.stringify({
+            login : loginValue,
+            newPassword : newPassValue
+        }),
+        dataType: 'json',
+        processData: false,
+        contentType: 'application/json',
+        success: function () {
+            alert("Пароль пользователя успешно изменён")  // Сообщение об успешном добавлении пользователя
+        },
+        error: function () {
+        }
+    });
+});
+
 /* Добавление нового пользователя */
 
 $('#new-user-reg').on( 'click', function( event ){
@@ -196,6 +303,7 @@ $('#new-user-reg').on( 'click', function( event ){
             processData: false,
             contentType: 'application/json',
             success: function () {
+                window.location.reload();
                 alert("Пользователь успешно добавлен")  // Сообщение об успешном добавлении пользователя
             },
             error: function () {
@@ -221,6 +329,7 @@ $('#new-user-reg').on( 'click', function( event ){
             processData: false,
             contentType: 'application/json',
             success: function () {
+                window.location.reload();
                 alert("Пользователь успешно добавлен")
             },
             error: function () {
@@ -246,6 +355,7 @@ $('#new-user-reg').on( 'click', function( event ){
             processData: false,
             contentType: 'application/json',
             success: function () {
+                window.location.reload();
                 alert("Пользователь успешно добавлен")
             },
             error: function () {
@@ -275,6 +385,7 @@ $('#add-group').on( 'click', function( event ){
         processData : false,
         contentType : 'application/json',
         success     : function() {
+            window.location.reload();
             alert("Группа успешно добавлена")
         },
         error: function() {
@@ -284,7 +395,7 @@ $('#add-group').on( 'click', function( event ){
 
 /* Админское расписание */
 
-$('#admin-schedule-submit').on( 'click', function( event ){
+/*$('#admin-schedule-submit').on( 'click', function( event ){
     if(document.getElementById("group").value === 'false'){
         let teacher = 'teacher';
         let value = document.getElementById("teacher").value;
@@ -326,7 +437,7 @@ $('#admin-schedule-submit').on( 'click', function( event ){
             }
         });
     }
-});
+});*/
 
 /* Добавление новой оценки */
 

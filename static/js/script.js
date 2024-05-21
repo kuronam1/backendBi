@@ -318,6 +318,21 @@ function changeRole(){
   })
 }
 
+/* Перемещение на курс вперед popup */
+
+function areYouSure(){
+  const btnplusOne = document.getElementById("plusOne");
+  btnplusOne.addEventListener("click", function(){  // По клику на кнопку "Вход" открывается всплывающее окно, фон размывается
+    document.querySelector(".popup-sure").classList.add("active");
+    document.getElementById("overlay").style.display = "";
+  });
+  
+  document.querySelector(".popup-sure .close-btn").addEventListener("click", function(){ // По клику на кнопку "Крест" у окна удаляется класс "active", оно становится невидимым. Фон возвращается в стандартное состояние.
+    document.querySelector(".popup-sure").classList.remove("active");
+    document.getElementById("overlay").style.display = "none";
+  });
+}
+
 /* Выбор для журнала Администратора на один селектор */
 
 function oneSelector(){

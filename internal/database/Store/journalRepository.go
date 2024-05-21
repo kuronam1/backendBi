@@ -190,3 +190,19 @@ func (j *JournalRepository) CreateGrade(grade *models.Grade) error {
 
 	return err
 }
+
+func (j *JournalRepository) ClearJournal() error {
+	query := `
+		DROP TABLE grades;
+		CREATE TABLE IF NOT EXISTS grades (
+                      		grade_id SERIAL PRIMARY KEY,
+                            student_id INTEGER NOT NULL REFERENCES users(user_id),
+                            discipline_id INTEGER NOT NULL REFERENCES disciplines(discipline_id),
+                            grade CHAR(1) CHECK (grade IN ('2', '3', '4', '5', 'н')),
+                            date DATE NOT NULL,
+                            comment TEXT
+		)`
+
+	_, err := j.store.DB.Exec(query)
+	return err
+}

@@ -1,7 +1,6 @@
 package Store
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/xuri/excelize/v2"
@@ -19,7 +18,7 @@ type ScheduleRepository struct {
 	store *Storage
 }
 
-func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
+func (s *ScheduleRepository) ScheduleRegister(filePath, groupName string) error {
 	file, err := excelize.OpenFile(filePath)
 	if err != nil {
 		panic(err)
@@ -31,21 +30,26 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 		return err
 	}
 
-	var stmt *sql.Stmt
+	stmt, err := s.store.DB.Prepare(`
+				INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order)
+				VALUES ($1, $2, $3, $4, $5, $6, $7)`)
+	if err != nil {
+		return err
+	}
 	defer stmt.Close()
 
 	for _, row := range rows {
 		lesson := models.Lesson{}
-		lesson.GroupName = row[0]
-		lesson.Time, err = time.Parse(time.DateOnly, row[1])
+		lesson.GroupName = groupName
+		lesson.Time, err = time.Parse(time.DateOnly, row[0])
 		if err != nil {
 			return err
 		}
-		lesson.DisciplineName = row[2]
-		lesson.Audience = row[3]
-		lesson.Description = row[4]
-		teacherName := row[5]
-		lesson.LessonOrder, err = strconv.Atoi(row[6])
+		lesson.DisciplineName = row[1]
+		lesson.Audience = row[2]
+		lesson.Description = row[3]
+		teacherName := row[4]
+		lesson.LessonOrder, err = strconv.Atoi(row[5])
 		if err != nil {
 			return InternalServerErr
 		}
@@ -55,25 +59,7 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 			return fmt.Errorf("group not found")
 		}
 
-		var disciplineID int64
 		discipline, err := s.store.Disciplines().GetDisciplineByName(lesson.DisciplineName)
-		if err != nil {
-			if errors.Is(err, NotRegistered) {
-				disciplineID, err = s.store.Disciplines().RegisterDiscipline(teacherName,
-					lesson.DisciplineName, group.Speciality, group.Course)
-				if err != nil {
-					return fmt.Errorf("error while registering discipline")
-				}
-			} else {
-				return err
-			}
-		} else {
-			disciplineID = int64(discipline.DisciplineID)
-		}
-
-		stmt, err = s.store.DB.Prepare(`
-				INSERT INTO lessons (group_id, time, discipline_id, teacher_id, audience, description, lesson_order)
-				VALUES ($1, $2, $3, $4, $5, $6, $7)`)
 		if err != nil {
 			return err
 		}
@@ -84,12 +70,13 @@ func (s *ScheduleRepository) ScheduleRegister(filePath string) error {
 		}
 
 		_, err = stmt.Exec(group.Id, lesson.Time,
-			disciplineID, teacher.UserID, lesson.Audience,
+			discipline.DisciplineID, teacher.UserID, lesson.Audience,
 			lesson.Description, lesson.LessonOrder)
 		if err != nil {
 			return err
 		}
 	}
+
 	return nil
 }
 
@@ -432,5 +419,25 @@ func (s *ScheduleRepository) UpdateSubjectAndHomeWork(subject, homeWork string, 
 	defer stmt.Close()
 
 	_, err = stmt.Exec(subject, homeWork, id)
+	return err
+}
+
+func (s *ScheduleRepository) ClearSchedule() error {
+	query := `
+		DROP TABLE lessons;
+		CREATE TABLE IF NOT EXISTS lessons (
+		   					lesson_id SERIAL PRIMARY KEY,
+            				group_id INTEGER NOT NULL REFERENCES groups(group_id),
+                            time DATE NOT NULL,
+                            discipline_id INTEGER NOT NULL REFERENCES disciplines(discipline_id),
+                            teacher_id INTEGER NOT NULL REFERENCES users(user_id),
+                            audience VARCHAR(10) NOT NULL,
+                            description VARCHAR NOT NULL,
+                            subject VARCHAR DEFAULT NULL,
+                            homework VARCHAR DEFAULT NULL,
+                            lesson_order INTEGER NOT NULL
+		)`
+
+	_, err := s.store.DB.Exec(query)
 	return err
 }

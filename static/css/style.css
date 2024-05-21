@@ -210,8 +210,8 @@ footer{
 
 /*  Authentification  */
 
-.popup, .popupScore, .popupSchedule {
-	position: absolute;
+.popup, .popupScore, .popupSchedule, .popup-sure{
+	position: fixed;
 	font-size: 20px;
 	z-index: 10;
 	top: -150%;
@@ -233,6 +233,7 @@ footer{
 }
 
 .active{
+	position: fixed;
 	top: 50%;
 	opacity: 1;
 	transform: translate(-50%, -50%) scale(1);
@@ -241,7 +242,7 @@ footer{
 				transform 200ms ease-in-out 0ms;
 }
 
-.popup .close-btn, .popupScore .close-btn, .popupSchedule .close-btn
+.popup .close-btn, .popupScore .close-btn, .popupSchedule .close-btn, .popup-sure .close-btn
 {
 	position: absolute;
 	top: 10px;
@@ -256,7 +257,7 @@ footer{
 }
 
 
-.popup .form h2, .popupScore h2{
+.popup .form h2, .popupScore h2, .popup-sure h2{
 	text-align: center;
 	color: #222;
 	margin: 10px 0px 20px;
@@ -287,7 +288,7 @@ footer{
 }
 
 .popup .form .form-element button,
-.popupScore form button{
+.popupScore form button, .popup-sure form button{
 	width: 100%;
 	margin: 20px 0;
 	padding: 10px 0;

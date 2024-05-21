@@ -9,7 +9,7 @@
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Администратор</title> 
 </head>
-<body onload="logOutPopup(), changeRole(), restyleLinks()">
+<body onload="logOutPopup(), changeRole(), restyleLinks(), areYouSure()">
 
     <!-- Header -->
 
@@ -44,17 +44,23 @@
             <div class="col text-center forCenterBox"> <!-- Блок с загрузкой файла расписания -->
                 <div class="box">
                     <h4>Загрузить файл расписания:</h4>
-                    <form enctype="multipart/form-data" method="post" action="/adminPanel/management/scheduleReg">
-                        <input id="files" name="file" type="file" multiple accept=".xlsx , .xls"/>
+                    <form>
+                        <select id="admin-save-name" name="group" type="text" required>
+                            {{range .Groups}}
+                            <option value="{{.Name}}">{{.Name}}</option>
+                            {{end}}
+                        </select>
+                        <input id="admin-save-file" name="file" type="file" accept=".xlsx , .xls"/>
                         <br>
-                        <button type="submit">Загрузить</button>
+                        <button id="submit_button" type="button">Загрузить</button>
                     </form>
                 </div>
             </div>
             <div class="col text-center forCenterBox"> <!-- Блок с резервным сохранением БД -->
                 <div class="box">
-                    <h4>Сделать резервную копию БД:</h4>
-                    <button onclick="setTimeout('alert(`База данных успешно сохранена`)', 3000)">Сохранить</button>
+                    <h4>Кнопка смены курса</h4>
+                    <p>Передвигает все группы на один курс вперед</p>
+                    <button id="plusOne" type="button">Передвинуть</button>
                 </div>
             </div>
         </div>
@@ -107,6 +113,41 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col text-center forCenterBox"> <!-- Блок с добавлением новых пользователей -->
+                <div class="box">
+                    <h4>Добавление дисциплины</h4>
+                    <form>
+                        <select id="teacherName" required>
+                            <option selected disabled hidden>Выберите преподавателя</option>
+                            {{ range .Teachers }}   <!--.NameTeachers - Массив имен учителей -->
+                            <option name="teacherName" value="{{.FullName}}">{{.FullName}}</option>
+                            {{ end }}
+                        </select>
+                        <select id="groupSpecialityDisc" name="speciality" required>
+                            <option selected disabled hidden>Выберите специальность</option>
+                            {{ range .Specialities }}   <!--.Specialities - Массив доступных специальностей -->
+                            <option name="speciality" value="{{.}}">{{.}}</option>
+                            {{ end }}
+                        </select>
+                        <input type="text" id="disciplineName" placeholder="Название дисциплины" required>
+                        <input type="text" id="groupNumberDics" name="groupNumberDics" placeholder="Курс" required>
+                        <br>
+                        <button id="add-new-discipline" type="button">Добавить</button>
+                    </form>
+                </div>
+            </div>
+            <div class="col text-center forCenterBox"> <!-- Блок с добавлением новых пользователей -->
+                <div class="box">
+                    <h4>Смена пароля пользователя</h4>
+                    <form>
+                        <input type="text" id="login-repass" name="newlogin" placeholder="Логин" required>
+                        <input type="text" id="newPassword" name="password" placeholder="Новый пароль" required>
+                        <button id="change-password" type="button">Изменить</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </section>
 
     <!-- Всплывающее окно для выхода -->
@@ -123,6 +164,18 @@
         </div>
     </div>
     <div class="overlay" id="overlay" style="display: none"></div>
+
+    <div class="popup-sure">
+        <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
+        <div class="form">
+            <h2>Вы уверены? Это кардинальное изменение</h2>
+            <form method="post" action="#">
+                <div class="form-element">
+                    <button id="iamsure" type="button">Передвинуть</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
     <script src="../static/js/bootstrap.min.js"></script>
     <script src="../static/js/jquery.js"></script>

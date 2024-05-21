@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"io"
-	"log"
 	"log/slog"
 	"net/http"
 	"sbitnev_back/internal/database/Store"
@@ -47,6 +46,15 @@ func (h *AdminHandler) Management(c *gin.Context) {
 		return
 	}
 
+	teachers, err := h.Storage.User().GetAllTeachers()
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
 	specialities, err := h.Storage.Groups().GetAllSpecialities()
 	if err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -60,6 +68,7 @@ func (h *AdminHandler) Management(c *gin.Context) {
 		"Students":     students,
 		"Groups":       groups,
 		"Specialities": specialities,
+		"Teachers":     teachers,
 	})
 }
 
@@ -67,6 +76,16 @@ func (h *AdminHandler) Management(c *gin.Context) {
 
 func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	const op = "AdminHandlers.ScheduleRegister"
+	groupName := c.PostForm("group")
+	if groupName == "" {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+			"error": "no groupName",
+		})
+		return
+	}
+
+	h.Logger.Debug(groupName)
+
 	if body, err := io.ReadAll(c.Request.Body); err != nil {
 		panic(err)
 	} else {
@@ -74,14 +93,10 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 	}
 
 	form, _ := c.MultipartForm()
-	for i, fh := range form.File["file"] {
-		log.Println("File #", i)
-		log.Println("  file name", fh.Filename)
-		log.Println("  file size", fh.Size)
-		// Чтение содержимого файла
+	for _, fh := range form.File["file"] {
 		fileReader, _ := fh.Open()
-		contents, _ := io.ReadAll(fileReader)
-		log.Println("  file contents: ", string(contents))
+		_, _ = io.ReadAll(fileReader)
+		//log.Println("  file contents: ", string(contents))
 		fileReader.Close()
 	}
 
@@ -109,7 +124,7 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 		return
 	}
 
-	if err := h.Storage.Schedule().ScheduleRegister(filePath); err != nil {
+	if err := h.Storage.Schedule().ScheduleRegister(filePath, groupName); err != nil {
 		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 			"error": err,
@@ -117,7 +132,7 @@ func (h *AdminHandler) ScheduleRegister(c *gin.Context) {
 		return
 	}
 
-	c.JSON(202, gin.H{
+	c.JSON(http.StatusOK, gin.H{
 		"status": "schedule registered",
 	})
 }
@@ -160,15 +175,15 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 		}
 
 		switch user.Role {
-		case "teacher":
-			if err := rep.CreateTeacherDisciplineLink(id); err != nil {
-				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
-				c.HTML(http.StatusInternalServerError, "error.html", gin.H{
-					"StatusCode":  http.StatusInternalServerError,
-					"Description": "Ошибка создания связи",
-				})
-				return
-			}
+		/*case "teacher":
+		if err := rep.CreateTeacherDisciplineLink(id); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+			c.HTML(http.StatusInternalServerError, "error.html", gin.H{
+				"StatusCode":  http.StatusInternalServerError,
+				"Description": "Ошибка создания связи",
+			})
+			return
+		}*/
 		case "student":
 			if err := rep.CreateGroupUserLink(id, request.GroupName); err != nil {
 				h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
@@ -199,6 +214,77 @@ func (h *AdminHandler) UserRegister() gin.HandlerFunc {
 
 		c.JSON(http.StatusCreated, gin.H{
 			"status": "user registered",
+		})
+	}
+}
+
+func (h *AdminHandler) RecoverUserPassword() gin.HandlerFunc {
+	type request struct {
+		Login       string `json:"login"`
+		NewPassword string `json:"newPassword"`
+	}
+	const op = "AdminHandler.RecoverUserPassword"
+	return func(c *gin.Context) {
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": fmt.Sprintf("cannot bind request [%s]", err),
+			})
+			return
+		}
+
+		if err := h.Storage.User().UpdateUserPassword(req.Login, req.NewPassword); err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": err.Error(),
+			})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{
+			"Status": "password successfully recovered",
+		})
+	}
+}
+
+func (h *AdminHandler) CreateDiscipline() gin.HandlerFunc {
+	type request struct {
+		TeacherName    string `json:"teacherName"`
+		DisciplineName string `json:"disciplineName"`
+		SpecialityName string `json:"specialityName"`
+		Course         string `json:"course"`
+	}
+	const op = "AdminHandler.CreateDiscipline"
+	return func(c *gin.Context) {
+		var req request
+		if err := c.BindJSON(&req); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err.Error()))
+			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
+				"error": fmt.Sprintf("cannot bind request [%s]", err.Error()),
+			})
+			return
+		}
+
+		h.Logger.Debug(fmt.Sprintf("%v", req))
+
+		course, err := strconv.Atoi(req.Course)
+		if err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err.Error()))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": fmt.Sprintf("cannot bind request [%s]", err.Error()),
+			})
+			return
+		}
+
+		if err = h.Storage.Disciplines().RegisterDiscipline(req.TeacherName, req.DisciplineName, req.SpecialityName, course); err != nil {
+			h.Logger.Error(fmt.Sprintf("%s - %s", op, err.Error()))
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+				"error": fmt.Sprintf("cannot bind request [%s]", err.Error()),
+			})
+			return
+		}
+
+		c.JSON(http.StatusCreated, gin.H{
+			"status": "discipline successfully registered",
 		})
 	}
 }
@@ -250,17 +336,71 @@ func (h *AdminHandler) GroupRegister() gin.HandlerFunc {
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"error": err,
 			})
+			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusCreated, gin.H{
 			"status": "group created",
 		})
 	}
 }
 
-func (h *AdminHandler) BackUp(c *gin.Context) {
+func (h *AdminHandler) UpdateCourse(c *gin.Context) {
+	const op = "AdminHandler.SwitchCourse"
+	if err := h.Storage.Schedule().ClearSchedule(); err != nil {
+		h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	if err := h.Storage.Journal().ClearJournal(); err != nil {
+		h.Logger.Error(fmt.Sprintf("%s.ClearJournal - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	if err := h.Storage.Groups().UpdateGroupsCourse(); err != nil {
+		h.Logger.Error(fmt.Sprintf("%s.UpdateGroupsCourse - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	groups, err := h.Storage.Groups().GetAllGroups()
+	if err != nil {
+		h.Logger.Error(fmt.Sprintf("%s.GetAllGroups - %s", op, err))
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+			"error": err,
+		})
+		return
+	}
+
+	for _, group := range groups {
+		if group.Course >= 4 {
+			if err := h.Storage.User().DeleteStudentsByGroup(group); err != nil {
+				h.Logger.Error(fmt.Sprintf("%s.DeleteStudentsByGroup - %s", op, err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+			if err := h.Storage.Groups().DeleteGroup(group); err != nil {
+				h.Logger.Error(fmt.Sprintf("%s.DeleteGroup - %s", op, err))
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
+					"error": err,
+				})
+				return
+			}
+		}
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"status": "done",
+		"status": "course updated",
 	})
 }
 

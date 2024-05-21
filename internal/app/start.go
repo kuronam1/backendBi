@@ -22,10 +22,10 @@ func Run(cfg *config.Config) {
 		os.Exit(1)
 	}
 
-	/*	if err := database.PrepareTables(); err != nil {
-		logger.Error(fmt.Sprintf("[DB]: Error while initializing - %s", err))
+	if err := database.PrepareTables(); err != nil {
+		logger.Error(fmt.Sprintf("[DB]: Error while prepearing tables - %s", err))
 		os.Exit(1)
-	}*/
+	}
 
 	router := rt.InitRouter(logger, database) // расписать хендлеры + исправить ошибки из should be done
 

@@ -212,3 +212,57 @@ WHERE teacher_id = $1`)
 
 	return result, nil
 }
+
+func (g *GroupRepository) UpdateGroupsCourse() error {
+	stmt, err := g.store.DB.Prepare("UPDATE groups SET course = course + 1")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec()
+	if err != nil {
+		return err
+	}
+
+	query := `UPDATE groups SET group_name = $1 WHERE group_id = $2`
+
+	groups, err := g.store.Groups().GetAllGroups()
+	if err != nil {
+		return err
+	}
+
+	for _, group := range groups {
+		groupName := configurationGroupName(group.Speciality, group.Number, group.Course)
+		_, err = g.store.DB.Exec(query, groupName, group.Id)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (g *GroupRepository) DeleteGroup(group models.Group) error {
+	stmt, err := g.store.DB.Prepare(`
+	DELETE FROM groups 
+	WHERE group_name = $1`)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(group.Name)
+	return err
+}
+
+func (g *GroupRepository) DeleteGroupLink(groupID int) error {
+	stmt, err := g.store.DB.Prepare("DELETE FROM group_students WHERE group_id = $1")
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+
+	_, err = stmt.Exec(&groupID)
+	return err
+}

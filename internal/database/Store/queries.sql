@@ -201,5 +201,15 @@ FROM grades g
 WHERE gr.group_name = 'ИСП2-2' AND d.discipline_name = 'Основы философии'
 ORDER BY u.full_name;
 
-DELETE FROM lessons WHERE lesson_id = 42;
-DELETE FROM disciplines WHERE discipline_id = 19;
+DELETE FROM lessons WHERE group_id = 2;
+DELETE FROM disciplines WHERE discipline_id = 20;
+
+INSERT INTO disciplines (teacher_id, discipline_name, speciality, course)
+VALUES (48, 'Основы криптографии', 'Информационные системы и программирование', 1);
+
+DELETE Reservations, Rooms FROM
+    Reservations JOIN Rooms ON
+    Reservations.room_id = Rooms.id
+WHERE Rooms.has_kitchen = false;
+
+DELETE FROM group_students WHERE group_id = 2 RETURNING student_id;

@@ -5,10 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="7613d5f5-ff65-4f5d-b097-e22a5e1d5291" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/2e453c97-8479-4f20-9564-6f44573fe89f.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2e453c97-8479-4f20-9564-6f44573fe89f.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/dataSources/2e453c97-8479-4f20-9564-6f44573fe89f/storage_v2/_src_/database/MyDB.Ss8kAA/schema/public.abK9xQ.meta" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources/2e453c97-8479-4f20-9564-6f44573fe89f/storage_v2/_src_/database/MyDB.Ss8kAA/schema/public.abK9xQ.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/html/admin_management.html" beforeDir="false" afterPath="$PROJECT_DIR$/html/admin_management.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/internal/app/start.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/app/start.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/database/Store/Init.sql" beforeDir="false" afterPath="$PROJECT_DIR$/internal/database/Store/Init.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/database/Store/UserRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/database/Store/UserRepository.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/database/Store/disciplineRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/database/Store/disciplineRepository.go" afterDir="false" />
@@ -17,10 +18,8 @@
       <change beforePath="$PROJECT_DIR$/internal/database/Store/queries.sql" beforeDir="false" afterPath="$PROJECT_DIR$/internal/database/Store/queries.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/database/Store/scheduleRepository.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/database/Store/scheduleRepository.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/router/handlers/user/adminHandlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/handlers/user/adminHandlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/router/handlers/user/parentHandlers.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/handlers/user/parentHandlers.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/router/handlers/user/types.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/handlers/user/types.go" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/internal/router/handlers/user/user.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/handlers/user/user.go" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/internal/router/middleware/middleware.go" beforeDir="false" afterPath="$PROJECT_DIR$/internal/router/middleware/middleware.go" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/schedule/Test.xlsx" beforeDir="false" afterPath="$PROJECT_DIR$/schedule/Test.xlsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/css/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/static/css/style.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/savefile.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/savefile.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/static/js/script.js" beforeDir="false" afterPath="$PROJECT_DIR$/static/js/script.js" afterDir="false" />
@@ -42,34 +41,34 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Go Build.build.executor&quot;: &quot;Run&quot;,
-    &quot;Go Build.go build sbitnev_back/cmd/main/app.go.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.automatic.dependencies.download&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.go.modules.go.list.on.any.changes.was.set&quot;: &quot;true&quot;,
-    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
-    &quot;go.sdk.automatically.set&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/Users/kazekaoru/go/src/backendBi&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Go Build.build.executor": "Run",
+    "Go Build.go build sbitnev_back/cmd/main/app.go.executor": "Run",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.go.formatter.settings.were.checked": "true",
+    "RunOnceActivity.go.migrated.go.modules.settings": "true",
+    "RunOnceActivity.go.modules.automatic.dependencies.download": "true",
+    "RunOnceActivity.go.modules.go.list.on.any.changes.was.set": "true",
+    "go.import.settings.migrated": "true",
+    "go.sdk.automatically.set": "true",
+    "last_opened_file_path": "C:/Users/kazekaoru/go/src/backendBi",
+    "node.js.detected.package.eslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;postgresql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "postgresql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\kazekaoru\go\src\backendBi\html" />
-      <recent name="C:\Users\kazekaoru\go\src\backendBi\static\js" />
       <recent name="C:\Users\kazekaoru\go\src\backendBi\static\css" />
+      <recent name="C:\Users\kazekaoru\go\src\backendBi\static\js" />
       <recent name="C:\Users\kazekaoru\go\src\backendBi" />
     </key>
   </component>
