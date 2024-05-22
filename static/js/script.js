@@ -161,12 +161,10 @@ $(document).ready(function(){
     
   }(window.jQuery);
 
-
-
 /* Popup Login */
 
 function loginPopup(){
-  const enter = document.querySelector("#entry");
+  const enter = document.querySelector(".circle");
   enter.addEventListener("click", function(){   // По клику на кнопку "Войти" окну добавляется класс "active", оно становится видимым. Фон затемняется.
     document.querySelector(".popup").classList.add("active");
     document.getElementById("overlay").style.display = "";
@@ -178,11 +176,11 @@ function loginPopup(){
   });
 }
 
-// Popup Log out 
+// Popup Logout 
 
 function logOutPopup(){
-  const authorized = document.getElementById("authorized");
-  authorized.addEventListener("click", function(){  // По клику на кнопку "Вход" открывается всплывающее окно, фон размывается
+  const circle = document.querySelector(".circle");
+  circle.addEventListener("click", function(){  // По клику на кнопку "Вход" открывается всплывающее окно, фон размывается
     document.querySelector(".popup").classList.add("active");
     document.getElementById("overlay").style.display = "";
   });
@@ -191,94 +189,27 @@ function logOutPopup(){
     document.querySelector(".popup").classList.remove("active");
     document.getElementById("overlay").style.display = "none";
   });
-  
-  const circleExit = document.getElementById("circle");
 
-  circleExit.addEventListener('mouseover', function() {  // Если пользователь авторизован, то при наведении на иконку профиля появится крест
+  circle.addEventListener('mouseover', function() {  // Если пользователь авторизован, то при наведении на иконку профиля появится крест
     document.getElementById("icon").setAttribute("class", "icon-cancel-1");
   });
     
-  circleExit.addEventListener('mouseout', function() { 
+  circle.addEventListener('mouseout', function() { 
     document.getElementById("icon").setAttribute("class", "icon-ok");
   });
 }
 
-/* Изменяющиеся стили для кнопок в хедере  */
-
-function restyleLinks(){
-  let substringSchedule = "schedule";
-  let substringJournal = "journal";
-
-  // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
-
-  if (document.URL.includes(substringSchedule)){ // Для расписания
-    let link = document.getElementById("schedule");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  } else if (document.URL.includes(substringJournal)){  // Для журнала
-    let link = document.getElementById("journal");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  }
-}
-
-function restyleLinksStudent(){
-  let substringStudentSchedule = "schedule";
-  let substringStudentJournal = "journal";
-
-  // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
-
-  if (document.URL.includes(substringStudentSchedule)){ // Для расписания
-    let link = document.getElementById("student-schedule");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  } else if (document.URL.includes(substringStudentJournal)){  // Для журнала
-    let link = document.getElementById("student-journal");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  }
-}
-
-function restyleLinksParent(){
-  let substringStudentSchedule = "schedule";
-  let substringStudentJournal = "journal";
-
-  // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
-
-  if (document.URL.includes(substringStudentSchedule)){ // Для расписания
-    let link = document.getElementById("parent-schedule");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  } else if (document.URL.includes(substringStudentJournal)){  // Для журнала
-    let link = document.getElementById("parent-journal");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  }
-}
-
-function restyleLinksTeacher(){
-  let substringTeacherSchedule = "schedule";
-  let substringTeacherJournal = "journal";
-
-  // Все работает от входящих в URL слов. Если изменятся url'ы, то необходимо поменять условия ниже
-
-  if (document.URL.includes(substringTeacherSchedule)){ // Для расписания
-    let link = document.getElementById("teacher-schedule");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  } else if (document.URL.includes(substringTeacherJournal)){  // Для журнала
-    let link = document.getElementById("teacher-journal");
-    link.setAttribute("onclick", "return false");
-    link.style.boxShadow = "0px 0px 5px var(--color1)";
-    link.style.cursor = "default";
-  }
+function areYouSure(){
+  const btn = document.querySelector("#plusOne");
+  btn.addEventListener("click", function(){  // По клику на кнопку "Вход" открывается всплывающее окно, фон размывается
+    document.querySelector(".popup-sure").classList.add("active");
+    document.getElementById("overlay").style.display = "";
+  });
+  
+  document.querySelector(".popup-sure .close-btn").addEventListener("click", function(){ // По клику на кнопку "Крест" у окна удаляется класс "active", оно становится невидимым. Фон возвращается в стандартное состояние.
+    document.querySelector(".popup-sure").classList.remove("active");
+    document.getElementById("overlay").style.display = "none";
+  });
 }
 
 /* Цвет для оценок в журнале админа и учителя */
@@ -316,21 +247,6 @@ function changeRole(){
       document.getElementById("group").style.display = "none";
     }
   })
-}
-
-/* Перемещение на курс вперед popup */
-
-function areYouSure(){
-  const btnplusOne = document.getElementById("plusOne");
-  btnplusOne.addEventListener("click", function(){  // По клику на кнопку "Вход" открывается всплывающее окно, фон размывается
-    document.querySelector(".popup-sure").classList.add("active");
-    document.getElementById("overlay").style.display = "";
-  });
-  
-  document.querySelector(".popup-sure .close-btn").addEventListener("click", function(){ // По клику на кнопку "Крест" у окна удаляется класс "active", оно становится невидимым. Фон возвращается в стандартное состояние.
-    document.querySelector(".popup-sure").classList.remove("active");
-    document.getElementById("overlay").style.display = "none";
-  });
 }
 
 /* Выбор для журнала Администратора на один селектор */
@@ -407,7 +323,7 @@ function setScoreInPopup(role){
             if (tab.rows[this.i].cells[this.j].innerHTML === ''){ // Вариант, когда оценка не стоит, т.е. её можно только проставить (для учителя)
               nameStudent = '';
               date = "";
-              disciplineID = document.getElementById("dis").attributes[2].value
+              disciplineID = document.getElementById("dis").attributes.discipline.value
               scoreLevel = tab.rows[this.i].cells[this.j].innerHTML
               nameStudent = tab.rows[this.i].cells[0].innerHTML
               date = tab.rows[0].cells[this.j].innerHTML

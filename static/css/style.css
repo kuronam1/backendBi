@@ -4,107 +4,261 @@
 	--color3: #132e49;
 }
 
-
-@media (min-width: 1650px) {
-	body{
-		width: 80%;
-		margin: 0 auto !important;
-		box-shadow: 0 0 80px gray;
-	}
-}
-
 @font-face {
     font-family: 'Rubik';
     src: url('../font/Rubik-Regular.ttf'); /* Chrome 6+, Firefox 3.6+, IE 9+, Safari 5.1+ */
 }
 
-* {
-    font-family: 'Rubik, sans-serif';	
+*{
+    font-family: 'Rubik, sans-serif';
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;	
 }
-
-/* ~~~~~~~~~~~~DEFAULT PAGE~~~~~~~~~~~~~~~~ */
 
 /* Header */
 
-
 header{
+	margin: 0 auto;
+    width: 100%;
+    padding: 10px 100px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: transparent;
+    font-weight: bolder;
 	background-color: var(--color3);
 }
 
-#intro{
-	background-color: var(--color2);
+@media (max-width: 600px){
+	header{
+		padding: 10px 10px;
+	}
 }
 
-.button-nav a{
-	letter-spacing: 1px;
-}
-
-.hoverLinks:hover{
-	transition: 0.3s;
-	box-shadow: 0 0 4px black;
-	border: 2px solid var(--color2);
-	background-color: var(--color2);
-	color: var(--color3) !important;
-}
-
-#intro .button-nav a{
+.navigation a{
 	color: var(--color2);
-	border: 2px solid var(--color1);
-	background-color: #0095da;
-	transition: 0.3s;
+	text-decoration: none;
+	margin: 0 30px;
+	font-size: 25px;
+	position: relative;
 }
 
-#intro .button-nav a:hover{
-	transition: 0.3s;
-	box-shadow: 0 0 4px black;
-	border: 2px solid var(--color1);
+@media (max-width: 840px) {
+	.navigation a{
+		margin: 10px 30px;
+		text-align: center;
+	}
+	.navigation{
+		display: flex;
+		flex-direction: column;
+		margin: 20px 0;
+	}
+}
+
+.underline-static{
+	cursor: default;
+}
+
+.underline-static::after{
+	content: "";
+    position: absolute;
+	left: 0%;
+	top: 30px;
+    height: 3px;
+	width: 100%;
+    background-color: white;
+}
+
+.underline-effect::after{
+	content: "";
+    position: absolute;
+	left: 0%;
+	top: 30px;
+    height: 3px;
+	width: 100%;
+    background-color: white;
+    transform-origin: right;
+    transform: scaleX(0);
+    transition: transform .5s;
+}
+
+.underline-effect:hover::after{
+    transform-origin: left;
+    transform: scaleX(1);
+}
+
+.circle{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	flex-shrink: 0;
+	position: relative;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	border: 3px var(--color2) solid;
+	cursor: pointer;
+	overflow: hidden;
+	transition: 0.5s;
+}
+
+.circle::after{
+	content: "";
+    position: absolute;
+	left: 0;
+    height: 110%;
+	width: 110%;
+	border-radius: 50%;
+    background-color: var(--color1);
+	transform: scaleY(0);
+	transform-origin: top;
+	transition: transform 0.5s;
+}
+
+.circle:hover{
+	border-color: var(--color1);
+}
+
+.circle:hover::after{
+	transform: scaleY(1);
+	transition: transform 0.5s;
+	transform-origin: bottom;
+}
+
+.circle a{
+	color: var(--color2);
+	z-index: 5;
+}
+
+/* Footer */
+
+footer{
+	display: flex;
+	justify-content: space-evenly;
+	align-items: center;
+	text-align: center;
+	padding: 40px 10%;
+	background-color: #555a78; 
+    color: white;
+}
+
+@media (max-width: 700px) {
+	footer{
+		flex-direction: column;
+		padding: 0 10%;
+	}
+	.vk, footer form{
+		margin: 20px 0;
+		width: 100% !important;
+	}
+}
+
+
+.vk{
+	width: 40%;
+	flex-shrink: 0;
+} 
+
+footer form{
+	width: 60%;
+	flex-shrink: 0;
+}
+
+footer form input {
+	box-shadow: none;
+	border: 0;
+	color: black;
+	text-align: center;
+	font-size: 18px;
+	background: var(--color2);
+	height: 48px;
+	width: 70%;
+	padding: 14px;
+	border-radius: 5px;
+	margin: 5px;
+}
+
+footer form textarea {
+	height: auto; 
+	width: 70%; 
+	border: none; 
+	border-radius: 5px; 
+	background: var(--color2); 
+	padding: 0 20px;
+	resize: none; 
+	padding: 20px;
+	font-size: 15px;
+	margin: 5px;
+}
+
+footer form input:focus, footer form textarea:focus {
+	outline: none;
+	border-color: black;
+} 
+
+footer form button{
+	font-weight: bolder;
+	font-size: 18px;
+	color: var(--color2);
+	background: var(--color1);
+	display: inline-block;
+	float: none;
+	transition: all 0.25s;
+	border: 0;
+	border-radius: 5px;
+	padding: 12px 20px;
+	overflow: hidden;
+}
+
+footer form button:hover {
+	cursor: pointer;
 	background-color: var(--color2);
 	color: var(--color1);
-
+	box-shadow: 0px 0px 20px rgb(180, 180, 180);
 }
 
+/* Таблицы */ 
 
-#circle{
-    padding: 10px;
-    background-color: var(--color1);
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-	margin: 0 0 0 auto;
-	transition: 0.3s;
-	cursor: pointer;
+table{
+	display:block;
+	overflow-x: auto;	
+	width: 100%;
+	border: 3px solid var(--color3);
+	text-align: center;
+	font-size: 18px;
 }
 
-#circle:hover{
-	transform: scale(1.02);
-	transition: 0.5s;
-	box-shadow: 0 0 4px black;
+thead{
+	background-color: var(--color3);
+	color: var(--color2);
 }
 
-.icon-login, .icon-ok, .icon-cancel-1{
-    font-size: 25px;
-    color:  var(--color2);
+thead th{
+	border: 1px solid var(--color2);
+	border-bottom: 1px solid var(--color3);
+	border-top: 1px solid var(--color3);
 }
 
-#entry, #authorized{
-    margin-left: 2px;
-    margin-top: 2px;
-}
-
+td{
+	padding: 15px 5px;
+	border: 1px solid var(--color3);
+}	
 
 /* Banner */
 
 .banner{
+	display: block;
     width: 100%;
-    display: block;
     overflow: hidden;
     position: relative;
     z-index: 0;
 }
 
 .banner img{
+	display: block;
     width: 100%;
-    height: auto;
+	height: auto;
 }
 
 .welcome-text{
@@ -130,87 +284,130 @@ header{
     }
 }
 
-/* Footer */
+/* Main */
 
-footer{
-    background-color: #555a78;     /* #21325b; */
-    color: white;
+.main{
+	margin: 10px 5%;
 }
 
-.vk{
-	position: relative;
-	top: -50px;
+.main h1, #admin h1{
+	text-align: center;
+	margin: 15px 0;
 }
 
-@media (max-width: 767px){
-    .vk{
-        position: static;
-		margin-bottom: 25px;
-    }
+/* Таблица журнала */ 
+
+#disciplineNames, #fullname{
+	width: 15%;
 }
 
-#newsletter {
-	display: inline-block;
-	margin-top: 5px;
-	font-size: 20px;
+#levels{
+	width: 55%;
 }
 
-
-#newsletter button{
-	color: #ffffff;
-	background: #0095da;
-	display: inline-block;
-	float: none;
-	transition: all 0.25s;
-	border: 0;
-	border-radius: 5px;
-	padding: 12px 20px;
+#skips, #avgLevel, #totalLevel{
+	width: 10%;
 }
 
-#newsletter button:hover {
-	background: #ffffff;
-	color: #0095da;
-	box-shadow: 0px 0px 2px gray;
+/* Таблица расписания */
+
+#dateSchedule{
+	width: 7%;
 }
 
-#newsletter input {
-	background: none;
+#dayOfWeek{
+	width: 3%;
+}
+
+.timeLessons{
+	width: 18%;
+}
+
+.discipline{
+	font-weight: bold;
+}
+
+#teacherName, #groupName{
+	font-size: 15px;
+}
+
+#audience{
+	text-decoration: underline;
+}
+
+#description{
+	display: none;
+}
+
+.tableLessons{
+	cursor: pointer;
+}
+
+/* Блок селекторов */ 
+
+.selectors{
+	margin: 10px;
+}
+
+.selectors form{
+	display: flex;
+	align-items: center;
+    justify-content: center;
+}
+
+.selectors form select{
+	margin: 5px;
 	box-shadow: none;
-	border: 1px solid #ffffff;
+	border: 2px solid var(--color3);
 	color: black;
 	text-align: center;
 	background: #ffffff;
 	height: 48px;
-	width: 70%;
-	padding: 14px;
-	-webkit-transition: all 0.25s;	
-	transition: all 0.25s;
+	width: 250px;	
+	border-radius: 5px;		
+	font-size: 20px;
+}
+
+.selectors form select>option{
+	font-size: 20px;	
+}
+
+.selectors form button{
+	background: var(--color2);
+	height: 48px;
+	font-size: 20px;
+	transition: 0.3s;
+	border: 2px solid var(--color3);
 	border-radius: 5px;
-}
-#newsletter input:focus {
-	outline: none;
-	border-color: black;
-} 
-
-.input-box textarea {
-	height: auto; 
-	width: 70%; 
-	border: none; 
-	border-radius: 5px; 
-	background: #f0f1f8; 
-	padding: 0 20px;
-	resize: none; 
-	padding: 20px;
+	margin: 5px;
+	padding: 10px 20px;
+	cursor: pointer;
 }
 
-.input-box textarea:hover{
-	outline: none;
-	border-color: black;
+.selectors form button:hover{
+	background-color: var(--color3);
+	transition: 0.3s;
+	color: white;
 }
 
-/*  Authentification  */
 
-.popup, .popupScore, .popupSchedule, .popup-sure{
+@media (max-width: 767px){
+	.selectors form{
+		display: block;
+	}
+    .selectors form select{
+		display: block;
+		margin: 10px auto;
+	}
+	.selectors form button{
+		display: block;
+		margin: 0 auto;
+	}
+}
+
+/* Pop-ups */
+
+.popup, .popupScore, .popupSchedule, .popup-sure {
 	position: fixed;
 	font-size: 20px;
 	z-index: 10;
@@ -224,12 +421,18 @@ footer{
 	box-shadow: 2px 2px 5px 5px rgba(0,0, 0, 0.15);
 	border-radius: 20px;
 	transition: top 0ms ease-in-out 200ms,
-	opacity 50ms ease-in-out 0ms,
-	transform 50ms ease-in-out 0ms;
+	opacity 50ms ease-in-out 20ms,
+	transform 50ms ease-in-out 20ms;
 }
 
 .popupSchedule{
 	width: 600px;
+}
+
+@media (max-width: 600px){
+	.popup, .popupScore, .popupSchedule, .popup-sure{
+		width: 70%;
+	}
 }
 
 .active{
@@ -242,25 +445,29 @@ footer{
 				transform 200ms ease-in-out 0ms;
 }
 
-.popup .close-btn, .popupScore .close-btn, .popupSchedule .close-btn, .popup-sure .close-btn
-{
+.close-btn{
 	position: absolute;
 	top: 10px;
 	right: 4px;
 	text-align: center;
 	line-height: 15px;
 	cursor: pointer;
+	transition: 0.2s;
+}
+
+.close-btn i:hover{
+	color: var(--color1);
+	transition: 0.2s;
 }
 
 .icon-cancel-circled{
 	font-size: 35px;
 }
 
-
 .popup .form h2, .popupScore h2, .popup-sure h2{
 	text-align: center;
 	color: #222;
-	margin: 10px 0px 20px;
+	margin: 20px 0px 10px;
 	font-size: 30px;
 	font-weight: bold;
 }
@@ -288,7 +495,8 @@ footer{
 }
 
 .popup .form .form-element button,
-.popupScore form button, .popup-sure form button{
+.popupScore form button,
+.popup-sure button{
 	width: 100%;
 	margin: 20px 0;
 	padding: 10px 0;
@@ -319,20 +527,7 @@ footer{
 	z-index: 3;
   }
 
-  /* ~~~~~~~~~~~~STUDENT JOURNAL~~~~~~~~~~~~~~~~ */
-
-#schedule, #journal, #teacher-schedule,#teacher-journal, #student-journal,#student-schedule, #parent-schedule, #parent-journal{
-	text-decoration: none;
-	font-weight: bolder;
-	color: var(--color2);
-	font-size: 23px;
-	font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-	padding: 10px 20px;
-	transition: 0.3s;
-	border-radius: 10px;
-	border: 2px solid var(--color2);
-	cursor: pointer;
-}
+/* Стили для popup */
 
 #dataForPopup{
 	padding: 20px 0;
@@ -346,71 +541,6 @@ footer{
 	font-weight: normal;
 }
 
-  /* ~~~~~~~~~~~~TEACHER JOURNAL~~~~~~~~~~~~~~~~ */
-
-.button-select form{
-	display: flex;
-	align-items: center;
-    justify-content: center;
-	font-size: 20px;
-}
-
-.button-select form select{
-	margin: 5px;
-	background: none;
-	box-shadow: none;
-	border: 2px solid var(--color3);
-	color: black;
-	text-align: center;
-	background: #ffffff;
-	height: 48px;
-	width: 250px;
-	-webkit-transition: all 0.25s;	
-	transition: all 0.25s;
-	border-radius: 5px;		
-}
-
-.button-select form select>option{
-	font-size: 20px;	
-}
-
-.button-select form button, #saveTable{
-	background: var(--color2);
-	display: inline-block;
-	float: none;
-	transition: all 0.25s;
-	border: 0;
-	border-radius: 5px;
-	margin: 20px;
-	padding: 7.7px 20px;
-	border: 2px solid var(--color3);
-}
-
-
-
-.button-select form button:hover, #saveTable:hover{
-	background-color: var(--color3);
-	transition: 0.3s;
-	color: white;
-}
-
-
-@media (max-width: 500px){
-	.button-select form{
-		display: block;
-	}
-    .button-select form select{
-		display: block;
-		margin: 10px auto;
-	}
-	.button-select form button{
-		display: block;
-		margin: 0 auto;
-	}
-	
-}
-
-
 .selectScore{
 	background: 0;
 	border: 0;
@@ -420,17 +550,6 @@ footer{
 	text-align: center;
 }
 
-#saveTable{
-	margin: 0;
-	font-size: 20px;
-}
-
-/*
-.selectScore>option[value="1"]{
-	color: red;
-	text-decoration: underline;
-}
-*/
 .selectScore option[value="2"]{
 	color: red;
 }
@@ -490,48 +609,55 @@ footer{
 #ThemesHomeWork button:hover{
 	color: var(--color3);
 	background-color: var(--color2);
-
 }
 
-/* Admin page */
-
-#brend, #student-brend, #teacher-brend, #parent-brend{
-	cursor: pointer;
-}
+/* Menagement */
 
 #admin{
-	background-color: var(--color2);
-	padding-top: 20px;
+	margin: 10px 10%;
 	font-size: 20px;
 }
 
-#admin h2{
-	margin-top: 10px;
-	font-weight: bold;
+.gridManagement{
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-auto-rows: minmax(100px, auto);
+	gap: 100px;
+	text-align: center;
+	margin-top: 30px;
 }
 
-#admin .row{
-	margin: 0 50px;
+@media (max-width: 800px){
+	.gridManagement{
+		grid-template-columns: 1fr;
+	}
 }
 
-#admin .col{
-	color: #000;
-	border: 2px solid #48485c;
+.box{
+	border: 2px solid var(--color3);
 	border-radius: 15px;
-	margin: 50px;
 	padding: 40px 0;
+	color: #000;
 	background-color: var(--color2);
-	box-shadow: 0 0 2px black;
-}
-
-.forCenterBox{
+	align-content: center;
 	display: flex;
+	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-
+	transition: 0.3s;
 }
 
-.col button{
+.box:hover{
+	box-shadow: 0 0 5px var(--color1);
+	transition: 0.3s;
+}
+
+#admin h4{
+	margin: 5px;
+	font-size: 22px;
+}
+
+#admin button{
 	color: #ffffff;
 	background: var(--color3);
 	display: inline-block;
@@ -539,45 +665,48 @@ footer{
 	transition: all 0.25s;
 	border: 0;
 	border-radius: 5px;
-	margin: 20px;
+	margin: 5px;
 	padding: 8px 20px;
 	font-weight: bolder;
 	border: 2px solid var(--color2);
+	cursor: pointer;
+	font-size: 20px;
 }
 
-
-
-.col button:hover {
+#admin button:hover {
 	background: #ffffff;
 	color: var(--color3);
 	border: 2px solid var(--color3);
 	box-shadow: 0px 0px 2px gray;
 }
 
-.col input[type="text"], .col select {
+#admin input[type="text"], #admin select {
 	margin: 5px;
 	background: none;
 	box-shadow: none;
 	border: 2px solid var(--color3);
-	font-size: 17px/21px;
+	font-size: 18px;
 	color: black;
 	text-align: center;
 	background: #ffffff;
 	height: 48px;
 	width: 70%;
-	-webkit-transition: all 0.25s;	
-	transition: all 0.25s;
 	border-radius: 5px;
 }
 
-.col input:focus, select {
+#admin input[type="file"]{
+	margin: 5px;
+	font-size: 16px;
+	color: black;
+	text-align: center;
+}
+
+#admin input:focus, select {
 	outline: none;
 	border-color: black;
 } 
 
-
-
-/* ADMIN JOURNAL */
+/* Попап с оценкой */
 
 .popupScore form input[type="text"]{
 	margin-top: 0;
@@ -658,20 +787,21 @@ footer{
 }
 
 .sorry button{
-	font-size: 35px;
+	font-size: 25px;
 	border-radius: 10px;
 	background-color: var(--color3);
 	border: 2px solid var(--color3);
 	color: white;
-	padding: 3px 10px;
+	padding: 10px 10px;
 	transition: 0.3s;
+	cursor: pointer;
 }
 
 .sorry button:hover{
 	background-color: var(--color2);
 	color: var(--color3);
 	transition: 0.5s;
-	box-shadow: 0 0 px gainsboro;
+	box-shadow: 0 0 4px black;
 }
 
 #ups{

@@ -14,6 +14,8 @@ var (
 	InternalServerErr = errors.New("internal server error")
 )
 
+const timePayload = "02-01-2006"
+
 type ScheduleRepository struct {
 	store *Storage
 }
@@ -372,7 +374,7 @@ func (s *ScheduleRepository) GetAllGroupsLessonsOneDis(groupName, disciplineName
 	for rows.Next() {
 		var t time.Time
 		err = rows.Scan(&t)
-		tm := t.Format(time.DateOnly)
+		tm := t.Format(timePayload)
 		if err != nil {
 			return nil, err
 		}

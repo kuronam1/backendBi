@@ -462,7 +462,7 @@ func (h *AdminHandler) GetJournal(c *gin.Context) {
 		"Journal":        journal,
 		"GroupName":      groupName,
 		"DisciplineName": disciplineName,
-		"Lessons":        lessons,
+		"LessonsTime":    lessons,
 		"Groups":         groups,
 		"Disciplines":    disciplines,
 		"Pre":            0,
@@ -541,7 +541,7 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			return
 		}
 
-		newGradeDate, err := time.Parse(time.DateOnly, req.NewDate)
+		newGradeDate, err := time.Parse(timePayload, req.NewDate)
 		if err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -550,7 +550,7 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 			return
 		}
 
-		Gradeid, err := strconv.Atoi(req.GradeID)
+		GradeID, err := strconv.Atoi(req.GradeID)
 		if err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s in parse", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
@@ -560,7 +560,7 @@ func (h *AdminHandler) GradesRefactor() gin.HandlerFunc {
 		}
 
 		oldGrade := &models.Grade{
-			GradeID:      Gradeid,
+			GradeID:      GradeID,
 			StudentID:    user.UserID,
 			DisciplineID: id,
 			Date:         newGradeDate,

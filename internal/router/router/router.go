@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const timePayload = "02-01-2006"
+
 func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
 	log.Info("[router]: registration front files and routes")
 	router := gin.New()
@@ -32,7 +34,7 @@ func InitRouter(log *slog.Logger, db *Store.Storage) http.Handler {
 }
 
 func TFormat(t time.Time) string {
-	return t.Format(time.DateOnly)
+	return t.Format(timePayload)
 }
 
 func CountN(grades []models.Grade) int {

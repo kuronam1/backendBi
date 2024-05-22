@@ -3,7 +3,6 @@ package Store
 import (
 	"errors"
 	"sbitnev_back/internal/database/models"
-	"time"
 )
 
 var (
@@ -165,7 +164,7 @@ ORDER BY u.full_name`)
 			grades, inMap := journal.Grades[journal.Headers[i]]
 			if inMap {
 				for _, value := range grades {
-					if value.Date.Format(time.DateOnly) == lessons[j] {
+					if value.Date.Format(timePayload) == lessons[j] {
 						studentGrades[j] = value
 					}
 				}

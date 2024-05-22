@@ -11,6 +11,8 @@ import (
 	"time"
 )
 
+const timePayload = "02-01-2006"
+
 type TeacherHandler struct {
 	Logger  *slog.Logger
 	Storage *Store.Storage
@@ -85,6 +87,9 @@ func (h *TeacherHandler) GetJournal(c *gin.Context) {
 		})
 		return
 	}
+
+	h.Logger.Debug(fmt.Sprintf("%v", journal))
+
 	c.HTML(http.StatusOK, "journal_teacher.html", gin.H{
 		"Journal":        journal,
 		"LessonsTime":    lessonsTime,
@@ -160,7 +165,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 			return
 		}
 
-		h.Logger.Info("%v", req)
+		h.Logger.Debug("%v", req)
 
 		user, err := h.Storage.User().GetUserByName(req.StudentName)
 		if err != nil {
@@ -171,7 +176,7 @@ func (h *TeacherHandler) AddGrade() gin.HandlerFunc {
 			return
 		}
 
-		date, err := time.Parse(time.DateOnly, req.Date)
+		date, err := time.Parse(timePayload, req.Date)
 		if err != nil {
 			h.Logger.Error(fmt.Sprintf("%s - %s", op, err))
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{

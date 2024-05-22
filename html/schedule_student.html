@@ -3,83 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
     <link rel="stylesheet" href="../static/css/style.css">
     <link rel="stylesheet" href="../static/css/fontello.css">
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Расписание Группа {{.GroupName}}</title>
 </head>
-<body onload="logOutPopup(), restyleLinksStudent(), checkScheduleStudent(), colorForSchedule()">
+<body onload="logOutPopup(), checkScheduleStudent(), colorForSchedule()">
 
     <!-- Header -->
 
     <header>
-        <nav class="container navbar navbar-expand-lg">
-            <div class="col-md-3 justify-content-start">
-                <a href="/studentPanel/menu" id="student-brend" class="navbar-brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
-            </div>
-            <div class="col-md-3 justify-content-center text-center">
-                <div class="button-nav">
-                    <a href="/studentPanel/schedule" id="student-schedule">Расписание</a>
-                </div>
-            </div>
-            <div class="col-md-3 justify-content-center text-center">
-                <div class="button-nav">
-                    <a href="/studentPanel/journal"  class="hoverLinks"  id="student-journal">Журнал</a>
-                </div>
-            </div>
-            <div class="col-md-3 justify-content-end">
-                <div id="circle">
-                    <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
-                </div>
-            </div>
+        <a class="logo"><img src="../static/media/logo.png"></a>
+        <nav class="navigation">
+            <a id="homepage" class="underline-effect" href="/studentPanel/menu">Главная</a>
+            <a id="schedule" class="underline-static" href="/studentPanel/schedule">Расписание</a>
+            <a id="journal" class="underline-effect" href="/studentPanel/journal">Журнал</a>
         </nav>
+        <div class="circle">
+            <a href="#" id="authorized"><i id="icon" class="icon-ok"></i></a>
+        </div>
     </header>
 
-    <!-- Таблица с расписанием, фулл с бэка  -->
-    <section class="pb-3 pt-3">
-        <div class="container mb-4"> <!-- Расписание начинается от сюда. Весь этот блок должен быть выдан с бэка -->
-            <h1 class="text-center">Расписание {{.GroupName}}</h1>
-            <table style="text-align: center;" id="table" class="table table-bordered table-striped">
-                <thead>
-                    <tr>
-                        <th style="width: 10%;" scope="col" id="dateSchedule">Дата</th>
-                        <th scope="col">День недели</th>
-                        <th style="width: 16%;" class="timeLessons" scope="col">8:30 - 10:00</th>
-                        <th style="width: 16%;" class="timeLessons" scope="col">10:10 - 11:40</th>
-                        <th style="width: 16%;" class="timeLessons" scope="col">12:40 - 14:10</th>
-                        <th style="width: 16%;" class="timeLessons" scope="col">14:20 - 15:50</th>
-                        <th style="width: 16%;" class="timeLessons" scope="col">16:00 - 17:30</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{ range .Schedule }}
-                    {{range $DoW, $lessons := .}}
-                    <tr>
-                        <td scope="row">{{range $lessons}}
-                            {{if ne .DisciplineName ""}}
-                            {{TFormat .Time}}{{break}}
-                            {{end}}
-                            {{end}}</td>
-                        <td scope="row">{{$DoW}}</td>
+    <section class="selectors">
+
+    </section>
+
+    <section class="main">
+        <h1 class="greeting">Расписание {{.GroupName}}</h1>
+        <table id="table" rules="groups">
+            <thead>
+                <tr>
+                    <th id="dateSchedule">Дата</th>
+                    <th id="dayOfWeek">ДН</th>
+                    <th class="timeLessons">8:30 - 10:00</th>
+                    <th class="timeLessons">10:10 -11:40</th>
+                    <th class="timeLessons">12:40 - 14:10</th>
+                    <th class="timeLessons">14:20 - 15:50</th>
+                    <th class="timeLessons">16:00 - 17:30</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{ range .Schedule }}
+                {{range $DoW, $lessons := .}}
+                <tr>
+                    <td>
                         {{range $lessons}}
                         {{if ne .DisciplineName ""}}
-                        <td class="tableLessons" typeLessons="{{.Description}}" themes="{{.Subject}}" homeworks="{{.HomeWork}}" scope="row">
-                            <p style="margin: 0; font-weight: bold;">{{.DisciplineName}}</p>
-                            <p style="margin: 0; font-size: 15px;">{{.TeacherName}}</p>
-                            <p style="margin: 0; text-decoration: underline;">{{.Audience}}</p>
-                            <p style="display: none;">{{.Description}}</p>
-                        </td>
-                        {{else}}
-                        <td scope="row"></td>
+                        {{TFormat .Time}}{{break}}
                         {{end}}
                         {{end}}
-                    </tr>
+                    </td>
+                    <td>{{$DoW}}</td>
+                    {{range $lessons}}
+                    {{if ne .DisciplineName ""}}
+                    <td class="tableLessons" typeLessons="{{.Description}}" themes="{{.Subject}}" homeworks="{{.HomeWork}}">
+                        <p class="discipline">{{.DisciplineName}}</p>
+                        <p id="teacherName">{{.TeacherName}}</p>
+                        <p id="audience">{{.Audience}}</p>
+                        <p id="description">{{.Description}}</p>
+                    </td>
+                    {{else}}
+                    <td></td>
                     {{end}}
                     {{end}}
-                </tbody>
-            </table>
-        </div>
+                </tr>
+                {{end}}
+                {{end}}
+            </tbody>
+        </table>
     </section>
 
     <!-- Всплывающее окно для выхода -->
@@ -96,6 +87,9 @@
         </div>
     </div>
     <div class="overlay" id="overlay" style="display: none"></div>
+
+    <!-- Всплывающее окно для расписания -->
+
     <div class="popupSchedule">
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
         <div id="windowSchedule">
@@ -105,7 +99,6 @@
             <p>Текущее ДЗ: <span id="homework"></span></p>
         </div>
     </div>
-    <script src="../static/js/bootstrap.min.js"></script>
     <script src="../static/js/jquery.js"></script>
     <script src="../static/js/script.js"></script>
     <script src="../static/js/savefile.js"></script>

@@ -4,97 +4,77 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/css/style.css">
-    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
-    
     <link rel="stylesheet" href="../static/css/fontello.css">
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Администратор, Журнал</title> 
 </head>
-<body onload="restyleLinks(), logOutPopup(), setScoreInPopup('adm'), avgSkips()"> 
+<body onload="logOutPopup(), setScoreInPopup('adm'), avgSkips()"> 
 
-<header>
-    <nav class="container navbar navbar-expand-lg">
-        <div class="col-md-3 justify-content-start">
-            <a href="/adminPanel/management" id="brend"><img src="../static/media/logo.png" alt="МАИ РКТ"></a>
+    <header>
+        <a class="logo"><img src="../static/media/logo.png"></a>
+        <nav class="navigation">
+            <a id="homepage" class="underline-effect" href="/adminPanel/management">Главная</a>
+            <a id="schedule" class="underline-effect" href="/adminPanel/schedule">Расписание</a>
+            <a id="journal" class="underline-static" href="/adminPanel/journal">Журнал</a>
+        </nav>
+        <div class="circle">
+            <a href="#" id="authorized"><i id="icon" class="icon-ok"></i></a>
         </div>
-        <div class="col-md-3 justify-content-center text-center">
-            <div class="button-nav">
-                <a href="/adminPanel/schedule" class="hoverLinks"  id="schedule">Расписание</a>
-            </div>
-        </div>
-        <div class="col-md-3 justify-content-center text-center">
-            <div class="button-nav">
-                <a href="/adminPanel/journal" id="journal">Журнал</a>
-            </div>
-        </div>
-        <div class="col-md-3 justify-content-end">
-            <div id="circle">
-                <a href="#" class="nav-link p-0" id="authorized"><i id="icon" class="icon-ok"></i></a>
-            </div>
-        </div>
-    </nav>
-</header>
+    </header>
 
-    <!-- Table -->
-    
-    <section class="pb-3">
-            <div class="button-select">
-                <form method="get" action="/adminPanel/journal">
-                    <select id="admin-group" name="group" required>
-                        <option selected disabled hidden value="" name="group">Выберите группу</option>
-                        {{ range .Groups }}   <!--.Groups - Массив доступных групп -->
-                        <option name="group" value="{{.Name}}">{{.Name}}</option>
-                        {{ end }}
-                    </select>
-                    <select id="discipline" name="discipline" required>
-                        <option selected disabled hidden value="" name="discipline">Выберите дисциплину</option>
-                        {{ range .Disciplines }}   <!--.Disciplines - Массив доступных дис -->
-                        <option name="discipline" value="{{.DisciplineName}}">{{.DisciplineName}}</option>
-                        {{ end }}
-                    </select>
-                    <button type="submit">
-                        Вывести
-                    </button>
-                </form>
-            </div>
-
-            {{if eq .Pre 0}}
-
-            <form>  <!-- Журнал начинается от сюда. Весь этот блок должен быть выдан с бэка -->
-                <h1 class="text-center">Журнал группы {{.GroupName}} по предмету {{.DisciplineName}}</h1>
-                <div class="container mb-4 table-responsive">
-                    <table id="table" class="table table-bordered text-center table-responsive justify-content-center">
-                        <thead>
-                          <tr>
-                            <th style="width: 15%;" scope="col">ФИО студента</th>
-                              {{range .Lessons}}
-                              <th class="dates" scope="col">{{.}}</th>
-                              {{end}}
-                            <th style="width: 15%;" scope="col">Пропуски</th>
-                            <th style="width: 15%;" scope="col">Средний балл</th>
-                            <th style="width: 15%;" scope="col">Итоговая оценка</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                        {{ range .Journal }}
-                        {{ range $FIO, $grades := . }}
-                        <tr>
-                            <td class="FIO">{{$FIO}}</td><!-- ФИО -->
-                            {{ range $grades }}
-                            <td level="{{.GradeID}}" discipline="{{.DisciplineID}}" >{{.Level}}</td>
-                            {{ end }}
-                            <td></td><!-- пропуски -->
-                            <td></td><!-- средний балл -->
-                            <td></td><!-- итоговая оценка -->
-                        </tr>
-                        {{end}}
-                        {{end}}
-                        </tbody>
-                    </table>
-                </div>
-            </form>
-            {{end}}
+    <section class="selectors">
+        <form method="get" action="/adminPanel/journal">
+            <select id="admin-group" name="group" required>
+                <option selected disabled hidden value="" name="group">Выберите группу</option>
+                {{ range .Groups }}   <!--.Groups - Массив доступных групп -->
+                <option name="group" value="{{.Name}}">{{.Name}}</option>
+                {{ end }}
+            </select>
+            <select id="discipline" name="discipline" required>
+                <option selected disabled hidden value="" name="discipline">Выберите дисциплину</option>
+                {{ range .Disciplines }}   <!--.Disciplines - Массив доступных дис -->
+                <option name="discipline" value="{{.DisciplineName}}">{{.DisciplineName}}</option>
+                {{ end }}
+            </select>
+            <button type="submit">
+                Вывести
+            </button>
+        </form>
     </section>
+    
+    {{if eq .Pre 0}}
+    <section class="main">
+        <h1 class="text-center">Журнал группы {{.GroupName}} по предмету {{.DisciplineName}}</h1>
+        <table id="table" rules="groups">
+            <thead>
+                <tr>
+                    <th id="fullname">ФИО студента</th>
+                    {{range .LessonsTime}}
+                    <th class="dates">{{.}}</th>
+                    {{end}}
+                    <th id="skips">Пропуски</th>
+                    <th id="avgLevel">Средний балл</th>
+                    <th id="totalLevel">Итоговая оценка</th>
+                </tr>
+            </thead>
+            <tbody>
+            {{ range .Journal }}
+            {{ range $FIO, $grades := . }}
+            <tr>
+                <td class="FIO">{{$FIO}}</td><!-- ФИО -->
+                {{ range $grades }}
+                <td level="{{.GradeID}}" discipline="{{.DisciplineID}}" >{{.Level}}</td>
+                {{ end }}
+                <td></td><!-- пропуски -->
+                <td></td><!-- средний балл -->
+                <td></td><!-- итоговая оценка -->
+            </tr>
+            {{end}}
+            {{end}}
+            </tbody>
+        </table>
+    </section>
+    {{end}}
 
     <div class="popup">
         <div class="close-btn" id="cancel"><i class="icon-cancel-circled"></i></div>
@@ -128,7 +108,6 @@
         </div>
     </div>
 
-    <script src="../static/js/bootstrap.min.js"></script>
     <script src="../static/js/jquery.js"></script>
     <script src="../static/js/script.js"></script>
     <script src="../static/js/savefile.js"></script>
