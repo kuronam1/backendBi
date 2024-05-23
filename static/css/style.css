@@ -221,7 +221,6 @@ footer form button:hover {
 /* Таблицы */ 
 
 table{
-	display:block;
 	overflow-x: auto;	
 	width: 100%;
 	border: 3px solid var(--color3);
