@@ -47,37 +47,35 @@
     <!-- Таблица успеваемости -->
     {{if .Table}}
     <section class="main">
-        <form>
-            <h1 id="dis" discipline="{{.UsedDiscipline}}">Журнал группы {{.GroupName}} по предмету {{.UsedDiscipline}}</h1>
-            <table id="table" rules="groups">
-                <thead>
-                <tr>
-                    <th id="fullname">ФИО студента</th>
-                    {{range .LessonsTime}}
-                    <th class="dates">{{.}}</th>
-                    {{end}}
-                    <th id="skips">Пропуски</th>
-                    <th id="avgLevel">Средний балл</th>
-                    <th id="totalLevel">Итоговая оценка</th>
-                </tr>
-                </thead>
-                <tbody>
-                {{ range .Journal }}
-                {{ range $FIO, $grades := . }}
-                <tr>
-                    <td class="FIO">{{$FIO}}</td><!-- ФИО -->
-                    {{ range $grades }}
-                    <td>{{.Level}}</td>
-                    {{ end }}
-                    <td></td><!-- пропуски -->
-                    <td></td><!-- средний балл -->
-                    <td></td><!-- итоговая оценка -->
-                </tr>
+        <h1 id="dis" discipline="{{.UsedDiscipline}}">Журнал группы {{.GroupName}} по предмету {{.UsedDiscipline}}</h1>
+        <table id="table" rules="groups">
+            <thead>
+            <tr>
+                <th id="fullname">ФИО студента</th>
+                {{range .LessonsTime}}
+                <th class="dates">{{.}}</th>
                 {{end}}
-                {{end}}
-                </tbody>
-            </table>
-        </form>
+                <th id="skips">Пропуски</th>
+                <th id="avgLevel">Средний балл</th>
+                <th id="totalLevel">Итоговая оценка</th>
+            </tr>
+            </thead>
+            <tbody>
+            {{ range .Journal }}
+            {{ range $FIO, $grades := . }}
+            <tr>
+                <td class="FIO">{{$FIO}}</td><!-- ФИО -->
+                {{ range $grades }}
+                <td>{{.Level}}</td>
+                {{ end }}
+                <td></td><!-- пропуски -->
+                <td></td><!-- средний балл -->
+                <td></td><!-- итоговая оценка -->
+            </tr>
+            {{end}}
+            {{end}}
+            </tbody>
+        </table>
     </section>
     {{end}}
 
