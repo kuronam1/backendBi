@@ -172,7 +172,11 @@ footer{
 .vk{
 	width: 40%;
 	flex-shrink: 0;
-} 
+}
+
+.vk img{
+	margin: 5px;
+}
 
 footer form{
 	width: 60%;
@@ -194,15 +198,14 @@ footer form input {
 }
 
 footer form textarea {
-	height: auto; 
+	height: 96px; 
 	width: 70%; 
 	border: none; 
 	border-radius: 5px; 
 	background: var(--color2); 
-	padding: 0 20px;
+	padding: 14px;
 	resize: none; 
-	padding: 20px;
-	font-size: 15px;
+	font-size: 18px;
 	margin: 5px;
 }
 
