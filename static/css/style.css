@@ -277,6 +277,10 @@ td{
     font-weight: 700;
 }
 
+#second-message, #third-message{
+	display: none;
+}
+
 @media (max-width: 767px){
     .welcome-message{
         font-size: 28px;
