@@ -4,12 +4,14 @@ function opacityMessage(){
   const firstMessage = document.getElementById("first-message")
   const secondMessage = document.getElementById("second-message")
   const thirdMessage = document.getElementById("third-message")
+  firstMessage.style.display = "none";
   secondMessage.style.display = "none";
   thirdMessage.style.display = "none";
 
   const messageOpacity = [
     {
       opacity: 0,
+      display: "block",
       easing: "ease-in",
     },
     {
@@ -18,35 +20,35 @@ function opacityMessage(){
     },
     {
       opacity: 0,
+      display: "none",
       easing: "ease-in",
     },
   ];
 
   const timing = {
-    duration: 3000,
+    duration: 2950,
   };
 
+  let count = 1;
+
   function relapseScript(){
-    thirdMessage.style.display = "none";
-    firstMessage.style.display = "block";
-    firstMessage.animate(messageOpacity, timing);
-    setTimeout(() => {
-      firstMessage.style.display = "none";
-      secondMessage.style.display = "block";
-      secondMessage.animate(messageOpacity, timing);
-    }, 3000)
-    setTimeout(() => {
-      secondMessage.style.display = "none";
-      thirdMessage.style.display = "block";
-      thirdMessage.animate(messageOpacity, timing);
-    }, 6000)
+    if (count == 1){
+      firstMessage.animate(messageOpacity, timing)
+      count += 1
+    } else if (count == 2){
+      secondMessage.animate(messageOpacity, timing)
+      count += 1
+    } else{
+      thirdMessage.animate(messageOpacity, timing)
+      count = 1
+    }
   }
 
   relapseScript()
 
   setInterval(() => {
     relapseScript()
-  }, 9000)
+  }, 3000)
 
 }
 

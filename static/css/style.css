@@ -16,6 +16,20 @@
 	box-sizing: border-box;	
 }
 
+@media (min-width: 2100px){
+	body{
+		margin: 0 5%;
+		box-shadow: 0 0 100px gray;
+	}
+}
+
+@media (min-width: 2200px){
+	body{
+		margin: 0 10%;
+		box-shadow: 0 0 100px gray;
+	}
+}
+
 /* Header */
 
 header{
