@@ -3,4 +3,4 @@ serverHTTP:
   addr: "localhost:8080"
   timeout: 4s
   idleTimeout: 10s
-pgUrl: "postgres://postgres:Rtyuehe1223@localhost:5432/MyDB?sslmode=disable"
+pgUrl: "postgres://postgres:7321968@localhost:5432/root?sslmode=disable"
