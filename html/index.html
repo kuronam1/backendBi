@@ -8,7 +8,7 @@
     <link rel="shortcut icon" href="../static/media/icon.png" type="image/x-icon">
     <title>Филиал МАИ РКТ | Расписание, Журнал</title> 
 </head>
-<body onload="loginPopup()">
+<body onload="loginPopup(), opacityMessage()">
 
     <header>
         <a class="logo"><img src="../static/media/logo.png"></a>
@@ -22,7 +22,9 @@
     <section class="banner">
         <img src="../static/media/souz.jpg">
         <div class="welcome-text">
-            <h1 class="welcome-message"><span class="rotate"> ФИЛИАЛ МАИ РКТ, РАСПИСАНИЕ, ЭЛЕКТРОННЫЙ ЖУРНАЛ </span></h1>
+            <h1 class="welcome-message" id="first-message">ФИЛИАЛ МАИ РКТ</h1>
+            <h1 class="welcome-message" id="second-message">РАСПИСАНИЕ</h1>
+            <h1 class="welcome-message" id="third-message">ЭЛЕКТРОННЫЙ ЖУРНАЛ</h1>
         </div>
     </section>
 
